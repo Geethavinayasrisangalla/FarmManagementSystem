@@ -1,5 +1,35 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model IEnumerable<FarmManagement.Web.Models.Entities.PlantingSchedule>
+
+<h2>Field Supervisor Dashboard</h2>
+<p>Monitoring active crops and preparing for harvest.</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Field Name</th>
+            <th>Crop Name</th>
+            <th>Planting Date</th>
+            <th>Days Since Planting</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var daysActive = (DateTime.Now - item.PlantingDate).Days;
+            <tr>
+                <td>@item.Field.FieldName</td>
+                <td>@item.Crop.CropName</td>
+                <td>@item.PlantingDate.ToShortDateString()</td>
+                <td>
+                    <span class="badge bg-info">@daysActive Days</span>
+                </td>
+                <td>@item.Status</td>
+                <td>
+                    <a asp-action="RecordHarvest" asp-route-id="@item.FieldId" class="btn btn-success">Record Harvest</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
