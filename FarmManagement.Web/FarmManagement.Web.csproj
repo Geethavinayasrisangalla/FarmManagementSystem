@@ -6,4 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="entityframework" Version="6.5.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.9" />
+    <PackageReference Include="microsoft.entityframeworkcore.sqlserver" Version="10.0.5" />
+  </ItemGroup>
+
 </Project>
