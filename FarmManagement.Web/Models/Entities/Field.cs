@@ -1,14 +1,15 @@
-﻿namespace FarmManagement.Web.Models.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FarmManagement.Web.Models.Entities
 {
     public class Field
     {
-<<<<<<< HEAD
-=======
+        [Key]
         public int FieldId { get; set; }
-        public string Name { get; set; }
-        public float AreaSize { get; set; }
-        public string SoilType { get; set; }
-        public string LocationGPS { get; set; }
->>>>>>> d23d1d03193aa41ce49a950df556b479c53056c5
+        [Required]
+        public string FieldName { get; set; } = string.Empty;
+        public double AreaSize { get; set; }
+        public string? SoilType { get; set; }
+        public string? LocationGps { get; set; }
     }
 }

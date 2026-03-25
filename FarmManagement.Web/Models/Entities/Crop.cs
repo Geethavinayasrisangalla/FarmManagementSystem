@@ -1,14 +1,15 @@
-﻿namespace FarmManagement.Web.Models.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FarmManagement.Web.Models.Entities
 {
     public class Crop
     {
-<<<<<<< HEAD
-=======
+        [Key]
         public int CropId { get; set; }
-        public string CommonName { get; set; }
-        public string ScientificName { get; set; }
-        public string CategoName { get; set; }
-        public string RecommendedSeason {  get; set; }
->>>>>>> d23d1d03193aa41ce49a950df556b479c53056c5
+        [Required]
+        public string CommonName { get; set; } = string.Empty;
+        public string? ScientificName { get; set; }
+        public string? Category { get; set; }
+        public string? RecommendedSeason { get; set; }
     }
 }

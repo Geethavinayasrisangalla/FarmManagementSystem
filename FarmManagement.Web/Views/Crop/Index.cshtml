@@ -1,5 +1,24 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model IEnumerable<FarmManagement.Web.Models.Entities.Crop>
+
+<h2>Crop Inventory</h2>
+<a asp-action="Create" class="btn btn-primary">Add New Crop</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Season</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.CommonName</td>
+                <td>@item.Category</td>
+                <td>@item.RecommendedSeason</td>
+            </tr>
+        }
+    </tbody>
+</table>
