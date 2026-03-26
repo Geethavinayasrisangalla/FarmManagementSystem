@@ -20,7 +20,7 @@
             var daysActive = (DateTime.Now - item.PlantingDate).Days;
             <tr>
                 <td>@item.Field.FieldName</td>
-                <td>@item.Crop.CropName</td>
+                <td>@item.Crop.CommonName</td>
                 <td>@item.PlantingDate.ToShortDateString()</td>
                 <td>
                     <span class="badge bg-info">@daysActive Days</span>

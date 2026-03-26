@@ -1,7 +1,10 @@
-﻿using FarmManagement.Web.Models.Entities;
-using FarmManagement.Web.Models.Interfaces;
-using FarmManagement.Web.Models.ViewModels;
-using FarmManagement.Web.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using FarmManagement.Web.Data;             // Connects to your Database folder
+using FarmManagement.Web.Services;         // Connects to your Services folder
+using FarmManagement.Web.Models.Entities;  // Connects to Crop/Field entities
+using FarmManagement.Web.Models.ViewModels;// Connects to your CropViewModel
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace FarmManagement.Web.Controllers

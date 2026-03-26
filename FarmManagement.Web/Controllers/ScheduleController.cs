@@ -2,6 +2,7 @@
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Data;
 using Microsoft.EntityFrameworkCore;
+using FarmManagement.Web.Models.Entities;
 
 public class ScheduleController : Controller
 {
