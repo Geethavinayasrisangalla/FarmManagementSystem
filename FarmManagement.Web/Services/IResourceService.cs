@@ -1,4 +1,4 @@
-﻿using FarmManagement.Web.Models;
+﻿using FarmManagement.Web.Models.Entities;
 
 namespace FarmManagement.Web.Services
 {

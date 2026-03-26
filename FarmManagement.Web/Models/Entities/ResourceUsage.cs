@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace FarmManagement.Web.Models
+namespace FarmManagement.Web.Models.Entities
 {
     public class ResourceUsage
     {

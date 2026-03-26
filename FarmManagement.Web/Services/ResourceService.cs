@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using FarmManagement.Web.Data;
-using FarmManagement.Web.Models;
+using FarmManagement.Web.Models.Entities;
 
 namespace FarmManagement.Web.Services
 {
     public class ResourceService : IResourceService
     {
-        private readonly ApplicationDbContext _db;
-        public ResourceService(ApplicationDbContext db) => _db = db;
+        private readonly FarmDbContext _db;
+        public ResourceService(FarmDbContext db) => _db = db;
 
         public async Task<List<Resource>> GetAllAsync()
             => await _db.Resources.AsNoTracking().ToListAsync();
@@ -61,7 +61,7 @@ namespace FarmManagement.Web.Services
             {
                 // deduct
                 resource.QuantityAvailable -= (int)Math.Ceiling(usage.QuantityUsed); // coerce to int if you're storing ints
-                _db.ResourceUsages.Add(usage);
+                _db.ResourceUsage.Add(usage);
                 await _db.SaveChangesAsync();
                 await tx.CommitAsync();
                 return (true, null);
