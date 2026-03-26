@@ -8,7 +8,7 @@ namespace FarmManagement.Web.Services
     {
         private readonly FarmDbContext _context;
 
-        // Dependency Injection: Bringing in the Database Context
+        // DEPENDENCY INJECTION
         public CropService(FarmDbContext context)
         {
             _context = context;
