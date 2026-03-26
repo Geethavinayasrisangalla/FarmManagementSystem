@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using FarmManagement.Web.Data;
 using FarmManagement.Web.Services; // IMPORTANT: This allows ICropService to be found
-using FarmManagement.Web.Models.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +14,7 @@ builder.Services.AddDbContext<FarmDbContext>(options =>
 // 3. Dependency Injection (Connects Interface to Implementation)
 // This fixes the "ICropService could not be found" error
 builder.Services.AddScoped<ICropService, CropService>();
+builder.Services.AddScoped<IResourceService, ResourceService>();
 
 var app = builder.Build();
 
