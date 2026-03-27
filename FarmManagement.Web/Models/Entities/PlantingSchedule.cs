@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FarmManagement.Web.Models.Entities
@@ -9,18 +10,22 @@ namespace FarmManagement.Web.Models.Entities
         public int ScheduleId { get; set; }
 
         [Required]
+        [ForeignKey("Crop")]
         public int CropId { get; set; }
 
-        [ForeignKey("CropId")]
-        public virtual Crop? Crop { get; set; } // <--- ADD THIS (Fixes Controller error)
-
         [Required]
+        [ForeignKey("Field")]
         public int FieldId { get; set; }
 
-        [ForeignKey("FieldId")]
-        public virtual Field? Field { get; set; } // <--- ADD THIS (Fixes Controller error)
-
+        [Required]
         public DateTime PlantingDate { get; set; }
-        public string Status { get; set; } = "Active";
+
+        public DateTime EstimatedHarvestDate { get; set; }
+        [Required]
+        public string Status { get; set; } = "Planned";
+
+        public Crop Crop { get; set; }
+        public Field Field { get; set; }
     }
 }
+
