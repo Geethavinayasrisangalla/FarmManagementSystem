@@ -1,6 +1,11 @@
 ﻿namespace FarmManagement.Web.Models.Enums
 {
-    public class ResourceType
+    public enum ResourceType
     {
+        Seed,
+        Fertilizer,
+        Pesticide,
+        Water,
+        Other
     }
 }

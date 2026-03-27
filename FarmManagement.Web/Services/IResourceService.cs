@@ -10,7 +10,8 @@ namespace FarmManagement.Web.Services
         Task<Resource?> UpdateAsync(Resource resource);
         Task<bool> DeleteAsync(int id);
 
-        // Usage operation: creates usage and deducts inventory atomically
+        // Usage operations
+        Task<List<ResourceUsage>> GetUsagesByResourceAsync(int resourceId);
         Task<(bool Success, string? ErrorMessage)> CreateUsageAsync(ResourceUsage usage);
     }
 }

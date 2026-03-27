@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FarmManagement.Web.Models.Entities
 {
@@ -8,22 +7,26 @@ namespace FarmManagement.Web.Models.Entities
         [Key]
         public int ResourceId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Name is required")]
         [StringLength(200)]
+        [Display(Name = "Resource Name")]
         public string Name { get; set; } = null!;
 
-        [Required]
+        [Required(ErrorMessage = "Type is required")]
         [StringLength(50)]
-        public string Type { get; set; } = null!; // Seed/Fertilizer/Pesticide
+        [Display(Name = "Type")]
+        public string Type { get; set; } = null!; // Seed / Fertilizer / Pesticide / Water
 
-        [Required]
+        [Required(ErrorMessage = "Unit is required")]
         [StringLength(20)]
-        public string Unit { get; set; } = null!; // kg/Liters
+        [Display(Name = "Unit")]
+        public string Unit { get; set; } = null!; // kg / Liters / bags
 
-        [Range(0, int.MaxValue)]
-        public int QuantityAvailable { get; set; }
+        [Range(0, int.MaxValue, ErrorMessage = "Quantity cannot be negative")]
+        [Display(Name = "Quantity Available")]
+        public double QuantityAvailable { get; set; }
 
-        // navigation
+        // Navigation
         public ICollection<ResourceUsage>? Usages { get; set; }
     }
 }

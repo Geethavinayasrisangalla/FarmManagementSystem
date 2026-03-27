@@ -28,7 +28,8 @@ builder.Services.AddScoped<CropService>();
 builder.Services.AddScoped<FieldService>();
 
 // Member 2 — Resource & Inventory
-builder.Services.AddScoped<ResourceService>();
+// NOTE: Register as interface so controller uses IResourceService (DI)
+builder.Services.AddScoped<IResourceService, ResourceService>();
 
 // Member 3 — Planting & Harvest Scheduling
 builder.Services.AddScoped<ScheduleService>();
