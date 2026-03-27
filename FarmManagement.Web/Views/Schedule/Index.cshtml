@@ -1,35 +1,92 @@
 ﻿@model IEnumerable<FarmManagement.Web.Models.Entities.PlantingSchedule>
+@{
+    ViewData["Title"] = "Planting Schedules";
+}
 
-<h2>Field Supervisor Dashboard</h2>
-<p>Monitoring active crops and preparing for harvest.</p>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>🌱 Planting Schedules</h2>
+        <div>
+            <a asp-action="Create" class="btn btn-success">+ New Schedule</a>
+            <a asp-action="HarvestList" class="btn btn-warning ms-2">🌾 Harvest Records</a>
+        </div>
+    </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Field Name</th>
-            <th>Crop Name</th>
-            <th>Planting Date</th>
-            <th>Days Since Planting</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            var daysActive = (DateTime.Now - item.PlantingDate).Days;
-            <tr>
-                <td>@item.Field.FieldName</td>
-                <td>@item.Crop.CommonName</td>
-                <td>@item.PlantingDate.ToShortDateString()</td>
-                <td>
-                    <span class="badge bg-info">@daysActive Days</span>
-                </td>
-                <td>@item.Status</td>
-                <td>
-                    <a asp-action="RecordHarvest" asp-route-id="@item.FieldId" class="btn btn-success">Record Harvest</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No planting schedules found. Create one!</div>
+    }
+    else
+    {
+        <table class="table table-bordered table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>#ID</th>
+                    <th>Crop ID</th>
+                    <th>Field ID</th>
+                    <th>Planting Date</th>
+                    <th>Est. Harvest Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.ScheduleId</td>
+                        <td>@item.CropId</td>
+                        <td>@item.FieldId</td>
+                        <td>@item.PlantingDate.ToString("dd MMM yyyy")</td>
+                        <td>@item.EstimatedHarvestDate.ToString("dd MMM yyyy")</td>
+                        <td>
+                            @if (item.Status == "Planned")
+                            {
+                                <span class="badge bg-secondary">📋 Planned</span>
+                            }
+                            else if (item.Status == "Active")
+                            {
+                                <span class="badge bg-primary">🌿 Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">✅ Completed</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.ScheduleId"
+                               class="btn btn-info btn-sm">Details</a>
+
+                            @if (item.Status == "Planned")
+                            {
+                                <form asp-action="ActivateSchedule"
+                                      asp-route-id="@item.ScheduleId"
+                                      method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-primary btn-sm"
+                                            onclick="return confirm('Activate this schedule?')">
+                                        ▶ Activate
+                                    </button>
+                                </form>
+                            }
+
+                            @if (item.Status == "Active")
+                            {
+                                <a asp-action="RecordHarvest" asp-route-id="@item.ScheduleId"
+                                   class="btn btn-warning btn-sm">🌾 Harvest</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

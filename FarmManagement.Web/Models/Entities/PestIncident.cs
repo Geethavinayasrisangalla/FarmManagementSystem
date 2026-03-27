@@ -25,6 +25,5 @@ namespace FarmManagement.Web.Models.Entities
 
         // Navigation property
         public List<Treatment> Treatments { get; set; } = new List<Treatment>();
-
     }
 }

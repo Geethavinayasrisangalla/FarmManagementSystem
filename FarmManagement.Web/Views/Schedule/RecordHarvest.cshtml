@@ -1,0 +1,85 @@
+﻿@model FarmManagement.Web.Models.Entities.Harvest
+@{
+    ViewData["Title"] = "Record Harvest";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shadow">
+                <div class="card-header bg-warning">
+                    <h4 class="mb-0">🌾 Record Harvest</h4>
+                </div>
+                <div class="card-body">
+
+                    <form asp-action="RecordHarvest" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="All"
+                             class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="ScheduleId" class="form-label fw-bold"></label>
+                            <input asp-for="ScheduleId" class="form-control" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CropId" class="form-label fw-bold"></label>
+                            <input asp-for="CropId" class="form-control" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="FieldId" class="form-label fw-bold"></label>
+                            <input asp-for="FieldId" class="form-control" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="HarvestDate" class="form-label fw-bold"></label>
+                            <input asp-for="HarvestDate" type="date" class="form-control" />
+                            <span asp-validation-for="HarvestDate"
+                                  class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="HarvestedQuantity"
+                                   class="form-label fw-bold"></label>
+                            <input asp-for="HarvestedQuantity" class="form-control"
+                                   placeholder="e.g. 500.00" />
+                            <span asp-validation-for="HarvestedQuantity"
+                                  class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="QualityGrade" class="form-label fw-bold"></label>
+                            <select asp-for="QualityGrade" class="form-select">
+                                <option value="">-- Select Grade --</option>
+                                <option value="A">A — Excellent</option>
+                                <option value="B">B — Good</option>
+                                <option value="C">C — Average</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning w-100">
+                                💾 Save Harvest
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary w-100">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
