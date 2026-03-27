@@ -1,15 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FarmManagement.Web.Models.Enums;
 
-namespace FarmManagement.Web.Models.Entities
+namespace FarmManagement.Web.Models.Entities;
+
+public class Crop
 {
-    public class Crop
-    {
-        [Key]
-        public int CropId { get; set; }
-        [Required]
-        public string CommonName { get; set; } = string.Empty;
-        public string? ScientificName { get; set; }
-        public string? Category { get; set; }
-        public string? RecommendedSeason { get; set; }
-    }
+    public int CropId { get; set; }
+    public string CropName { get; set; } = string.Empty;
+    public string CropType { get; set; } = string.Empty;
+    public SeasonType Season { get; set; }
+    public DateTime PlantingDate { get; set; }
+    public DateTime ExpectedHarvestDate { get; set; }
+    public string Status { get; set; } = "Growing";
+    public int FieldId { get; set; }
+
+    public Field Field { get; set; } = null!;
+    public ICollection<PestIncident> PestIncidents { get; set; } = new List<PestIncident>();
+    public ICollection<PlantingSchedule> PlantingSchedules { get; set; } = new List<PlantingSchedule>();
+    public ICollection<YieldReport> YieldReports { get; set; } = new List<YieldReport>();
 }

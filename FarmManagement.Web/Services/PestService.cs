@@ -1,37 +1,58 @@
-﻿using FarmManagement.Web.Models.Entities;
-using Microsoft.EntityFrameworkCore;
-using FarmManagement.Web.Data;
+﻿using FarmManagement.Web.Data;
+using FarmManagement.Web.Models.Entities;
+using FarmManagement.Web.Models.Enums;
 
 namespace FarmManagement.Web.Services
 {
     public class PestService : IPestService
     {
-        private readonly PestDbContext _context;
+    private readonly FarmDbContext _db;
+    public PestService(FarmDbContext db) => _db = db;
 
-        public PestService(PestDbContext context)
+    public async Task<IEnumerable<PestIncident>> GetAllAsync() =>
+        await _db.PestIncidents.Include(p => p.Crop)
+                               .OrderByDescending(p => p.ReportedDate)
+                               .ToListAsync();
+
+    public async Task<PestIncident?> GetByIdAsync(int id) =>
+        await _db.PestIncidents.Include(p => p.Crop)
+                               .Include(p => p.Treatments)
+                               .FirstOrDefaultAsync(p => p.PestIncidentId == id);
+
+    public async Task<IEnumerable<PestIncident>> GetActivesAsync() =>
+        await _db.PestIncidents.Include(p => p.Crop)
+                               .Where(p => p.Status == IncidentStatus.Active)
+                               .ToListAsync();
+
+    public async Task CreateAsync(PestIncident incident)
+    {
+        _db.PestIncidents.Add(incident);
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task UpdateStatusAsync(int id, string status, string? treatmentNotes)
+    {
+        var pest = await _db.PestIncidents.FindAsync(id)
+                   ?? throw new KeyNotFoundException("Incident not found.");
+        pest.Status = Enum.Parse<IncidentStatus>(status);
+
+        if (!string.IsNullOrWhiteSpace(treatmentNotes))
         {
-            _context = context;
+            _db.Treatments.Add(new Treatment
+            {
+                PestIncidentId = id,
+                TreatmentType = "Manual Update",
+                Description = treatmentNotes,
+                AppliedDate = DateTime.Now
+            });
         }
-        public async Task<int> RecordPestIncidentAsync(PestIncident incident)
-        {
-            _context.PestIncidents.Add(incident);
-            return await _context.SaveChangesAsync();
-        }
+        await _db.SaveChangesAsync();
+    }
 
-        public async Task<int> LogTreatmentAsync(Treatment treatment)
-        {
-            _context.Treatments.Add(treatment);
-
-            // IMP: call treatment.QuantityUsed to update the inventory of the pesticide
-            return await _context.SaveChangesAsync();
-        }
-
-        public async Task<IEnumerable<PestIncident>> GetPestHistoryAsync()
-        {
-            return await _context.PestIncidents
-                .Include(pi => pi.Treatments)
-                .ToListAsync();
-
-        }
+    public async Task DeleteAsync(int id)
+    {
+        var p = await _db.PestIncidents.FindAsync(id);
+        if (p != null) { _db.PestIncidents.Remove(p); await _db.SaveChangesAsync(); }
+    }
     }
 }

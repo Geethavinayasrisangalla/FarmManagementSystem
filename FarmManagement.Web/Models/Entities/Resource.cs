@@ -1,32 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FarmManagement.Web.Models.Enums;
 
-namespace FarmManagement.Web.Models.Entities
+namespace FarmManagement.Web.Models.Entities;
+
+public class Resource
 {
-    public class Resource
-    {
-        [Key]
-        public int ResourceId { get; set; }
+    public int ResourceId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public ResourceType Type { get; set; }
+    public decimal Quantity { get; set; }
+    public string Unit { get; set; } = string.Empty;
+    public DateTime LastUpdated { get; set; } = DateTime.Now;
 
-        [Required(ErrorMessage = "Name is required")]
-        [StringLength(200)]
-        [Display(Name = "Resource Name")]
-        public string Name { get; set; } = null!;
-
-        [Required(ErrorMessage = "Type is required")]
-        [StringLength(50)]
-        [Display(Name = "Type")]
-        public string Type { get; set; } = null!; // Seed / Fertilizer / Pesticide / Water
-
-        [Required(ErrorMessage = "Unit is required")]
-        [StringLength(20)]
-        [Display(Name = "Unit")]
-        public string Unit { get; set; } = null!; // kg / Liters / bags
-
-        [Range(0, int.MaxValue, ErrorMessage = "Quantity cannot be negative")]
-        [Display(Name = "Quantity Available")]
-        public double QuantityAvailable { get; set; }
-
-        // Navigation
-        public ICollection<ResourceUsage>? Usages { get; set; }
-    }
+    public ICollection<ResourceUsage> ResourceUsages { get; set; } = new List<ResourceUsage>();
 }

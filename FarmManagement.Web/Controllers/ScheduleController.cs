@@ -1,99 +1,103 @@
-﻿using System;
+﻿using FarmManagement.Models.ViewModels;
+using FarmManagement.Services.Interfaces;
+using FarmManagement.Web.Models.ViewModels;
+using FarmManagement.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using FarmManagement.Web.Models.Entities;
-using FarmManagement.Web.Services;
 
-namespace FarmManagement.Web.Controllers
+namespace FarmManagement.Controllers;
+
+public class ScheduleController : Controller
 {
-    public class ScheduleController : Controller
+    private readonly IScheduleService _scheduleService;
+
+    public ScheduleController(IScheduleService scheduleService)
     {
-        private readonly ScheduleService _scheduleService;
+        _scheduleService = scheduleService;
+    }
 
-        public ScheduleController(ScheduleService scheduleService)
+    // GET: /Schedule
+    public async Task<IActionResult> Index()
+    {
+        var schedules = await _scheduleService.GetAllAsync();
+        return View(schedules);
+    }
+
+    // GET: /Schedule/HarvestList
+    public async Task<IActionResult> HarvestList()
+    {
+        var upcoming = await _scheduleService.GetUpcomingAsync();
+        return View(upcoming);
+    }
+
+    // GET: /Schedule/Details/5
+    public async Task<IActionResult> Details(int id)
+    {
+        var schedule = await _scheduleService.GetByIdAsync(id);
+        if (schedule == null) return NotFound();
+        return View(schedule);
+    }
+
+    // GET: /Schedule/Create
+    public async Task<IActionResult> Create()
+    {
+        var vm = await _scheduleService.PrepareViewModelAsync();
+        return View(vm);
+    }
+
+    // POST: /Schedule/Create
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(ScheduleViewModel vm)
+    {
+        if (!ModelState.IsValid)
         {
-            _scheduleService = scheduleService;
+            var prepared = await _scheduleService.PrepareViewModelAsync(vm);
+            return View(prepared);
         }
 
-        // GET: /Schedule/Index
-        // Shows all planting schedules
-        public IActionResult Index()
+        await _scheduleService.CreateAsync(vm);
+        TempData["Success"] = "Harvest scheduled successfully.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    // GET: /Schedule/RecordHarvest/5
+    public async Task<IActionResult> RecordHarvest(int id)
+    {
+        var schedule = await _scheduleService.GetByIdAsync(id);
+        if (schedule == null) return NotFound();
+
+        if (schedule.Status == "Completed")
         {
-            var schedules = _scheduleService.GetAllSchedules();
-            return View(schedules);
+            TempData["Error"] = "This harvest has already been recorded.";
+            return RedirectToAction(nameof(HarvestList));
         }
 
-        // GET: /Schedule/CreatePlantingSchedule
-        public IActionResult CreatePlantingSchedule()
+        return View(schedule);
+    }
+
+    // POST: /Schedule/RecordHarvest
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RecordHarvest(int id, decimal actualYield, string? notes)
+    {
+        if (actualYield <= 0)
         {
-            return View();
+            TempData["Error"] = "Actual yield must be greater than 0.";
+            return RedirectToAction(nameof(RecordHarvest), new { id });
         }
 
-        // POST: /Schedule/CreatePlantingSchedule
-        [HttpPost]
-        public IActionResult CreatePlantingSchedule(PlantingSchedule schedule)
-        {
-            if (!ModelState.IsValid)
-                return View(schedule);
+        await _scheduleService.RecordHarvestAsync(id, actualYield, notes);
+        TempData["Success"] = "Harvest recorded successfully.";
+        return RedirectToAction(nameof(HarvestList));
+    }
 
-            bool success = _scheduleService.CreatePlantingSchedule(schedule);
-
-            if (!success)
-            {
-                ModelState.AddModelError("",
-                    "This field is currently Active. " +
-                    "Please record a Harvest before planting again.");
-                return View(schedule);
-            }
-
-            return RedirectToAction("Index");
-        }
-
-        // POST: /Schedule/ActivateSchedule/5
-        [HttpPost]
-        public IActionResult ActivateSchedule(int id)
-        {
-            bool success = _scheduleService.ActivateSchedule(id);
-
-            if (!success)
-                return BadRequest("Schedule not found or is not in Planned status.");
-
-            return RedirectToAction("Index");
-        }
-
-        // GET: /Schedule/RecordHarvest
-        public IActionResult RecordHarvest()
-        {
-            return View();
-        }
-
-        // POST: /Schedule/RecordHarvest
-        [HttpPost]
-        public IActionResult RecordHarvest(Harvest harvest)
-        {
-            if (!ModelState.IsValid)
-                return View(harvest);
-
-            bool success = _scheduleService.RecordHarvest(harvest);
-
-            if (!success)
-            {
-                ModelState.AddModelError("",
-                    "Cannot record harvest. Field must be in Active status.");
-                return View(harvest);
-            }
-
-            return RedirectToAction("Index");
-        }
-
-        // GET: /Schedule/GetScheduleDetails/5
-        public IActionResult GetScheduleDetails(int id)
-        {
-            var schedule = _scheduleService.GetScheduleById(id);
-
-            if (schedule == null)
-                return NotFound();
-
-            return View(schedule);
-        }
+    // POST: /Schedule/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        await _scheduleService.DeleteAsync(id);
+        TempData["Success"] = "Schedule deleted.";
+        return RedirectToAction(nameof(Index));
     }
 }

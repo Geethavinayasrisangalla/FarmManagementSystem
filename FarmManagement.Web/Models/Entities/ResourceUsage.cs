@@ -1,37 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace FarmManagement.Web.Models.Entities;
 
-namespace FarmManagement.Web.Models.Entities
+public class ResourceUsage
 {
-    public class ResourceUsage
-    {
-        [Key]
-        public int UsageId { get; set; }
+    public int ResourceUsageId { get; set; }
+    public int ResourceId { get; set; }
+    public int FieldId { get; set; }
+    public decimal QuantityUsed { get; set; }
+    public DateTime UsedDate { get; set; } = DateTime.Now;
+    public string? Notes { get; set; }
 
-        [Required]
-        [ForeignKey(nameof(Resource))]
-        public int ResourceId { get; set; }
-
-        // Optional: link to Field where resource was applied
-        [ForeignKey(nameof(Field))]
-        public int? FieldId { get; set; }
-
-        [Required(ErrorMessage = "Quantity used is required")]
-        [Range(0.0001, double.MaxValue, ErrorMessage = "Quantity used must be greater than 0")]
-        [Display(Name = "Quantity Used")]
-        public double QuantityUsed { get; set; }
-
-        [Required]
-        [DataType(DataType.Date)]
-        [Display(Name = "Date Applied")]
-        public DateTime DateApplied { get; set; } = DateTime.Today;
-
-        [StringLength(500)]
-        [Display(Name = "Remarks")]
-        public string? Remarks { get; set; }
-
-        // Navigation properties
-        public Resource? Resource { get; set; }
-        public Field? Field { get; set; }
-    }
+    public Resource Resource { get; set; } = null!;
+    public Field Field { get; set; } = null!;
 }

@@ -1,33 +1,13 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace FarmManagement.Web.Models.Entities;
 
-namespace FarmManagement.Web.Models.Entities
+public class Treatment
 {
-    public class Treatment
-    {
-        [Key]
-        public int TreatmentId { get; set; }
+    public int TreatmentId { get; set; }
+    public int PestIncidentId { get; set; }
+    public string TreatmentType { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public DateTime AppliedDate { get; set; } = DateTime.Now;
+    public string? Outcome { get; set; }
 
-        public int IncidentId { get; set; }
-
-        [ForeignKey("IncidentId")]
-        public PestIncident PestIncident { get; set;}
-
-        // [Required(ErrorMessage = "Please select a resource or chemical.")]
-        public string ResourceId { get; set; }
-
-        // [Required]
-        // [Display(Name="Treatment Date"]
-        public DateTime TreatmentDate { get; set; }
-
-        // [Required]
-        public string TreatmentType { get; set; }
-
-        // For deduction
-        // public decimal QuantityUsed {get; set; }
-
-        [StringLength(100)]
-        public string Remarks { get; set; }
-    }
-}   
+    public PestIncident PestIncident { get; set; } = null!;
+}

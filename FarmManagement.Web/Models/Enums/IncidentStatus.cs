@@ -1,6 +1,8 @@
-﻿namespace FarmManagement.Web.Models.Enums
+﻿namespace FarmManagement.Web.Models.Enums;
+
+public enum IncidentStatus
 {
-    public class IncidentStatus
-    {
-    }
+    Active = 0,
+    UnderTreatment = 1,
+    Resolved = 2
 }

@@ -1,24 +1,34 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+using FarmManagement.Models.ViewModels;
+using FarmManagement.Services.Interfaces;
 using FarmManagement.Web.Models;
+using FarmManagement.Web.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
-namespace FarmManagement.Web.Controllers;
+namespace FarmManagement.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index()
+    private readonly IReportService _reportService;
+
+    public HomeController(IReportService reportService)
     {
-        return View();
+        _reportService = reportService;
     }
 
-    public IActionResult Privacy()
+    // GET: / (Dashboard)
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var vm = await _reportService.GetDashboardDataAsync();
+        return View(vm);
     }
 
+    // GET: /Home/Error
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        return View(new ErrorViewModel
+        {
+            RequestId = HttpContext.TraceIdentifier
+        });
     }
 }

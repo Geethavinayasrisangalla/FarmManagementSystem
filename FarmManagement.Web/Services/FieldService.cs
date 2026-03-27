@@ -1,0 +1,55 @@
+﻿using FarmManagement.Web.Data;
+using FarmManagement.Web.Models.Entities;
+using FarmManagement.Web.Models.Enums;
+using FarmManagement.Web.Models.ViewModels;
+using FarmManagement.Web.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+
+namespace FarmManagement.Web.Services;
+
+public class FieldService : IFieldService
+{
+    private readonly FarmDbContext _db;
+    public FieldService(FarmDbContext db) => _db = db;
+
+    public async Task<IEnumerable<Field>> GetAllAsync() =>
+        await _db.Fields.Include(f => f.Crops)
+                        .OrderByDescending(f => f.FieldId)
+                        .ToListAsync();
+
+    public async Task<Field?> GetByIdAsync(int id) =>
+        await _db.Fields.Include(f => f.Crops)
+                        .Include(f => f.ResourceUsages).ThenInclude(ru => ru.Resource)
+                        .FirstOrDefaultAsync(f => f.FieldId == id);
+
+    public async Task CreateAsync(FieldViewModel vm)
+    {
+        _db.Fields.Add(new Field
+        {
+            FieldName = vm.FieldName,
+            AreaHectares = vm.AreaHectares,
+            SoilType = vm.SoilType,
+            Location = vm.Location,
+            CreatedAt = DateTime.Now
+        });
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(FieldViewModel vm)
+    {
+        var field = await _db.Fields.FindAsync(vm.FieldId)
+                    ?? throw new KeyNotFoundException("Field not found.");
+        field.FieldName = vm.FieldName;
+        field.AreaHectares = vm.AreaHectares;
+        field.SoilType = vm.SoilType;
+        field.Location = vm.Location;
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var field = await _db.Fields.FindAsync(id);
+        if (field != null) { _db.Fields.Remove(field); await _db.SaveChangesAsync(); }
+    }
+}

@@ -1,69 +1,76 @@
-﻿@model FarmManagement.Web.Models.Entities.PlantingSchedule
+﻿@model FarmManagement.Models.HarvestSchedule
 @{
     ViewData["Title"] = "Schedule Details";
 }
 
 <div class="container mt-4">
-    <div class="row justify-content-center">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-semibold">Harvest Schedule Details</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">← Back</a>
+    </div>
+
+    <div class="row g-4">
         <div class="col-md-6">
-
-            <div class="card shadow">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">📋 Schedule #@Model.ScheduleId Details</h4>
-                </div>
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white fw-semibold">Schedule Info</div>
                 <div class="card-body">
-                    <table class="table table-borderless">
-                        <tr>
-                            <th width="45%">Schedule ID</th>
-                            <td>@Model.ScheduleId</td>
-                        </tr>
-                        <tr>
-                            <th>Crop ID</th>
-                            <td>@Model.CropId</td>
-                        </tr>
-                        <tr>
-                            <th>Field ID</th>
-                            <td>@Model.FieldId</td>
-                        </tr>
-                        <tr>
-                            <th>Planting Date</th>
-                            <td>@Model.PlantingDate.ToString("dd MMM yyyy")</td>
-                        </tr>
-                        <tr>
-                            <th>Est. Harvest Date</th>
-                            <td>@Model.EstimatedHarvestDate.ToString("dd MMM yyyy")</td>
-                        </tr>
-                        <tr>
-                            <th>Status</th>
-                            <td>
-                                @if (Model.Status == "Planned")
-                                {
-                                    <span class="badge bg-secondary fs-6">📋 Planned</span>
-                                }
-                                else if (Model.Status == "Active")
-                                {
-                                    <span class="badge bg-primary fs-6">🌿 Active</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-success fs-6">✅ Completed</span>
-                                }
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="card-footer">
-                    <a asp-action="Index" class="btn btn-secondary">← Back to List</a>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Crop</dt>
+                        <dd class="col-sm-7">@Model.Crop?.CropName</dd>
 
-                    @if (Model.Status == "Active")
+                        <dt class="col-sm-5">Scheduled Date</dt>
+                        <dd class="col-sm-7">@Model.ScheduledDate.ToString("dd MMM yyyy")</dd>
+
+                        <dt class="col-sm-5">Expected Yield</dt>
+                        <dd class="col-sm-7">@Model.ExpectedYieldKg kg</dd>
+
+                        <dt class="col-sm-5">Status</dt>
+                        <dd class="col-sm-7">
+                            @if (Model.Status == "Completed")
+                            {
+                                <span class="badge bg-success">Completed</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">@Model.Status</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-5">Notes</dt>
+                        <dd class="col-sm-7">@(Model.Notes ?? "—")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header fw-semibold">Harvest Record</div>
+                <div class="card-body">
+                    @if (Model.HarvestRecord != null)
                     {
-                        <a asp-action="RecordHarvest" asp-route-id="@Model.ScheduleId"
-                           class="btn btn-warning ms-2">🌾 Record Harvest</a>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Harvested On</dt>
+                            <dd class="col-sm-7">@Model.HarvestRecord.HarvestedDate.ToString("dd MMM yyyy")</dd>
+
+                            <dt class="col-sm-5">Actual Yield</dt>
+                            <dd class="col-sm-7">@Model.HarvestRecord.ActualYieldKg kg</dd>
+
+                            <dt class="col-sm-5">Quality Notes</dt>
+                            <dd class="col-sm-7">@(Model.HarvestRecord.QualityNotes ?? "—")</dd>
+                        </dl>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Harvest not recorded yet.</p>
+                        @if (Model.Status != "Completed")
+                        {
+                            <a asp-action="RecordHarvest" asp-route-id="@Model.HarvestScheduleId"
+                               class="btn btn-success btn-sm">Record Harvest</a>
+                        }
                     }
                 </div>
             </div>
-
         </div>
     </div>
 </div>
-

@@ -1,15 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace FarmManagement.Web.Models.Entities;
 
-namespace FarmManagement.Web.Models.Entities
+public class Field
 {
-    public class Field
-    {
-        [Key]
-        public int FieldId { get; set; }
-        [Required]
-        public string FieldName { get; set; } = string.Empty;
-        public double AreaSize { get; set; }
-        public string? SoilType { get; set; }
-        public string? LocationGps { get; set; }
-    }
+    public int FieldId { get; set; }
+    public string FieldName { get; set; } = string.Empty;
+    public double AreaHectares { get; set; }
+    public string SoilType { get; set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    public ICollection<Crop> Crops { get; set; } = new List<Crop>();
+    public ICollection<ResourceUsage> ResourceUsages { get; set; } = new List<ResourceUsage>();
 }

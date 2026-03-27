@@ -1,12 +1,12 @@
-﻿@model IEnumerable<FarmManagement.Web.Models.Entities.Harvest>
+﻿@model IEnumerable<FarmManagement.Models.HarvestSchedule>
 @{
-    ViewData["Title"] = "Harvest Records";
+    ViewData["Title"] = "Upcoming Harvests";
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>🌾 Harvest Records</h2>
-        <a asp-action="Index" class="btn btn-secondary">← Back to Schedules</a>
+        <h2 class="fw-semibold">Upcoming Harvests</h2>
+        <a asp-action="Create" class="btn btn-success">+ Schedule Harvest</a>
     </div>
 
     @if (TempData["Success"] != null)
@@ -17,58 +17,56 @@
         </div>
     }
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">No harvest records found yet.</div>
-    }
-    else
-    {
-        <table class="table table-bordered table-hover table-striped">
-            <thead class="table-success">
-                <tr>
-                    <th>#ID</th>
-                    <th>Schedule ID</th>
-                    <th>Crop ID</th>
-                    <th>Field ID</th>
-                    <th>Harvest Date</th>
-                    <th>Quantity (kg)</th>
-                    <th>Grade</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td>@item.HarvestId</td>
-                        <td>@item.ScheduleId</td>
-                        <td>@item.CropId</td>
-                        <td>@item.FieldId</td>
-                        <td>@item.HarvestDate.ToString("dd MMM yyyy")</td>
-                        <td><strong>@item.HarvestedQuantity kg</strong></td>
-                        <td>
-                            @if (item.QualityGrade == "A")
-                            {
-                                <span class="badge bg-success fs-6">A — Excellent</span>
-                            }
-                            else if (item.QualityGrade == "B")
-                            {
-                                <span class="badge bg-warning text-dark fs-6">B — Good</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary fs-6">C — Average</span>
-                            }
-                        </td>
+                        <th>Crop</th>
+                        <th>Scheduled Date</th>
+                        <th>Expected Yield</th>
+                        <th>Days Remaining</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-
-        <div class="card mt-3 col-md-4">
-            <div class="card-body text-center">
-                <h6 class="text-muted">Total Harvested</h6>
-                <h3 class="text-success">@Model.Sum(h => h.HarvestedQuantity) kg</h3>
-            </div>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var daysLeft = (item.ScheduledDate - DateTime.Today).Days;
+                        <tr>
+                            <td class="fw-semibold">@item.Crop?.CropName</td>
+                            <td>@item.ScheduledDate.ToString("dd MMM yyyy")</td>
+                            <td>@item.ExpectedYieldKg kg</td>
+                            <td>
+                                @if (daysLeft < 0)
+                                {
+                                    <span class="text-danger">Overdue</span>
+                                }
+                                else if (daysLeft <= 7)
+                                {
+                                    <span class="text-warning fw-semibold">@daysLeft days</span>
+                                }
+                                else
+                                {
+                                    <span>@daysLeft days</span>
+                                }
+                            </td>
+                            <td><span class="badge bg-warning text-dark">@item.Status</span></td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.HarvestScheduleId"
+                                   class="btn btn-sm btn-outline-info">Details</a>
+                                <a asp-action="RecordHarvest" asp-route-id="@item.HarvestScheduleId"
+                                   class="btn btn-sm btn-success">Record</a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="6" class="text-center text-muted py-4">No upcoming harvests in the next 30 days.</td></tr>
+                    }
+                </tbody>
+            </table>
         </div>
-    }
+    </div>
 </div>

@@ -1,15 +1,12 @@
-namespace FarmManagement.Web.Models.ViewModels
+using FarmManagement.Web.Models.Entities;
+
+namespace FarmManagement.Web.Models.ViewModels;
+
+public class YieldAnalyticsViewModel
 {
-    public class YieldAnalyticsViewModel
-    {
-        public string FieldName { get; set; }
-
-        public double AreaSize { get; set; }
-
-        public double TotalHarvested { get; set; }
-
-        public double AverageYield { get; set; }
-
-        public double CalculatedEfficiency { get; set; }
-    }
+    public IEnumerable<string> CropNames { get; set; } = new List<string>();
+    public IEnumerable<decimal> YieldValues { get; set; } = new List<decimal>();
+    public IEnumerable<Harvest> Records { get; set; } = new List<Harvest>();
+    public decimal AverageYield { get; set; }
+    public decimal TotalYield { get; set; }
 }

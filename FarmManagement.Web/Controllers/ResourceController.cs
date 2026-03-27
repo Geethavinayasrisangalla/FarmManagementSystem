@@ -1,175 +1,125 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using FarmManagement.Web.Models.Entities;
+﻿using FarmManagement.Models.ViewModels;
+using FarmManagement.Services.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
-using FarmManagement.Web.Services;
-using FarmManagement.Web.Data;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
-namespace FarmManagement.Web.Controllers
+namespace FarmManagement.Controllers;
+
+public class ResourceController : Controller
 {
-    public class ResourceController : Controller
+    private readonly IResourceService _resourceService;
+    private readonly IFieldService _fieldService;
+
+    public ResourceController(IResourceService resourceService, IFieldService fieldService)
     {
-        private readonly IResourceService _resourceService;
-        private readonly FarmDbContext _db; // used for Field dropdown in usage form
+        _resourceService = resourceService;
+        _fieldService = fieldService;
+    }
 
-        public ResourceController(IResourceService resourceService, FarmDbContext db)
+    // GET: /Resource
+    public async Task<IActionResult> Index()
+    {
+        var resources = await _resourceService.GetAllAsync();
+        return View(resources);
+    }
+
+    // GET: /Resource/Details/5
+    public async Task<IActionResult> Details(int id)
+    {
+        var resource = await _resourceService.GetByIdAsync(id);
+        if (resource == null) return NotFound();
+        return View(resource);
+    }
+
+    // GET: /Resource/Create
+    public IActionResult Create()
+    {
+        return View(new InventoryViewModel());
+    }
+
+    // POST: /Resource/Create
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(InventoryViewModel vm)
+    {
+        if (!ModelState.IsValid) return View(vm);
+
+        await _resourceService.CreateAsync(vm);
+        TempData["Success"] = $"Resource '{vm.Name}' added successfully.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    // GET: /Resource/Edit/5
+    public async Task<IActionResult> Edit(int id)
+    {
+        var resource = await _resourceService.GetByIdAsync(id);
+        if (resource == null) return NotFound();
+
+        var vm = new InventoryViewModel
         {
-            _resourceService = resourceService;
-            _db = db;
+            ResourceId = resource.ResourceId,
+            Name = resource.Name,
+            Type = resource.Type,
+            Quantity = resource.Quantity,
+            Unit = resource.Unit
+        };
+
+        return View(vm);
+    }
+
+    // POST: /Resource/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, InventoryViewModel vm)
+    {
+        if (id != vm.ResourceId) return BadRequest();
+        if (!ModelState.IsValid) return View(vm);
+
+        await _resourceService.UpdateAsync(vm);
+        TempData["Success"] = $"Resource '{vm.Name}' updated successfully.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    // GET: /Resource/Allocate/5
+    public async Task<IActionResult> Allocate(int id)
+    {
+        var resource = await _resourceService.GetByIdAsync(id);
+        if (resource == null) return NotFound();
+
+        ViewBag.Resource = resource;
+        ViewBag.Fields = await _fieldService.GetAllAsync();
+        return View();
+    }
+
+    // POST: /Resource/Allocate
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Allocate(int resourceId, int fieldId,
+                                               decimal qty, string? notes)
+    {
+        try
+        {
+            await _resourceService.AllocateAsync(resourceId, fieldId, qty, notes);
+            TempData["Success"] = "Resource allocated successfully.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
         }
 
-        // ─── INDEX: List all resources ──────────────────────────────────────
-        public async Task<IActionResult> Index()
-        {
-            var resources = await _resourceService.GetAllAsync();
-            var vm = new InventoryViewModel { Resources = resources };
-            return View(vm);
-        }
+        return RedirectToAction(nameof(Index));
+    }
 
-        // ─── DETAILS: View one resource + usage history ─────────────────────
-        public async Task<IActionResult> Details(int id)
-        {
-            var resource = await _resourceService.GetByIdAsync(id);
-            if (resource == null) return NotFound();
-            return View(resource);
-        }
+    // POST: /Resource/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var resource = await _resourceService.GetByIdAsync(id);
+        if (resource == null) return NotFound();
 
-        // ─── CREATE GET ──────────────────────────────────────────────────────
-        public IActionResult Create()
-        {
-            PopulateTypeDropdown();
-            return View(new Resource());
-        }
-
-        // ─── CREATE POST ─────────────────────────────────────────────────────
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Resource resource)
-        {
-            if (!ModelState.IsValid)
-            {
-                PopulateTypeDropdown(resource.Type);
-                return View(resource);
-            }
-
-            await _resourceService.CreateAsync(resource);
-            TempData["Success"] = $"Resource '{resource.Name}' added to inventory.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        // ─── EDIT GET ────────────────────────────────────────────────────────
-        public async Task<IActionResult> Edit(int id)
-        {
-            var resource = await _resourceService.GetByIdAsync(id);
-            if (resource == null) return NotFound();
-            PopulateTypeDropdown(resource.Type);
-            return View(resource);
-        }
-
-        // ─── EDIT POST ───────────────────────────────────────────────────────
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Resource resource)
-        {
-            if (id != resource.ResourceId) return BadRequest();
-
-            if (!ModelState.IsValid)
-            {
-                PopulateTypeDropdown(resource.Type);
-                return View(resource);
-            }
-
-            var updated = await _resourceService.UpdateAsync(resource);
-            if (updated == null) return NotFound();
-
-            TempData["Success"] = $"Resource '{resource.Name}' updated successfully.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        // ─── DELETE POST ─────────────────────────────────────────────────────
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var deleted = await _resourceService.DeleteAsync(id);
-            if (!deleted) return NotFound();
-
-            TempData["Success"] = "Resource deleted.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        // ─── USAGE LOG: View all usages for a resource ───────────────────────
-        public async Task<IActionResult> UsageLog(int id)
-        {
-            var resource = await _resourceService.GetByIdAsync(id);
-            if (resource == null) return NotFound();
-            ViewBag.Resource = resource;
-
-            var usages = await _resourceService.GetUsagesByResourceAsync(id);
-            return View(usages);
-        }
-
-        // ─── LOG USAGE GET (form to record a usage) ─────────────────────────
-        public async Task<IActionResult> LogUsage(int? resourceId)
-        {
-            var vm = await BuildUsageViewModel(resourceId);
-            return View(vm);
-        }
-
-        // ─── LOG USAGE POST ──────────────────────────────────────────────────
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LogUsage(ResourceUsageViewModel vm)
-        {
-            if (!ModelState.IsValid)
-            {
-                var refreshed = await BuildUsageViewModel(vm.ResourceId);
-                refreshed.QuantityUsed = vm.QuantityUsed;
-                refreshed.Remarks = vm.Remarks;
-                refreshed.DateApplied = vm.DateApplied;
-                return View(refreshed);
-            }
-
-            var usage = new ResourceUsage
-            {
-                ResourceId = vm.ResourceId,
-                FieldId = vm.FieldId,
-                QuantityUsed = vm.QuantityUsed,
-                DateApplied = vm.DateApplied,
-                Remarks = vm.Remarks
-            };
-
-            var (success, error) = await _resourceService.CreateUsageAsync(usage);
-            if (!success)
-            {
-                ModelState.AddModelError(string.Empty, error ?? "Could not log usage.");
-                var refreshed = await BuildUsageViewModel(vm.ResourceId);
-                return View(refreshed);
-            }
-
-            TempData["Success"] = "Usage logged and inventory updated.";
-            return RedirectToAction(nameof(UsageLog), new { id = vm.ResourceId });
-        }
-
-        // ─── Helpers ─────────────────────────────────────────────────────────
-        private void PopulateTypeDropdown(string? selected = null)
-        {
-            var types = new List<string> { "Seed", "Fertilizer", "Pesticide", "Water", "Other" };
-            ViewBag.Types = new SelectList(types, selected);
-            ViewBag.Units = new SelectList(new[] { "kg", "Liters", "bags", "units", "tonnes" }, selected);
-        }
-
-        private async Task<ResourceUsageViewModel> BuildUsageViewModel(int? resourceId)
-        {
-            var vm = new ResourceUsageViewModel
-            {
-                ResourceId = resourceId ?? 0,
-                DateApplied = DateTime.Today,
-                AvailableResources = await _db.Resources.AsNoTracking().ToListAsync(),
-                AvailableFields = await _db.Fields.AsNoTracking().ToListAsync()
-            };
-            return vm;
-        }
+        await _resourceService.DeleteAsync(id);
+        TempData["Success"] = $"Resource '{resource.Name}' deleted.";
+        return RedirectToAction(nameof(Index));
     }
 }

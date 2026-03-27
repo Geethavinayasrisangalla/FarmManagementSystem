@@ -1,79 +1,88 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using FarmManagement.Web.Data;
-using FarmManagement.Web.Models;
-using FarmManagement.Web.Models.Entities;
-using FarmManagement.Web.Services;
+﻿using FarmManagement.Web.Models.Entities;
+using FarmManagement.Web.Models.Enums;
+using FarmManagement.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FarmManagement.Web.Controllers
 {
     public class PestController : Controller
+{
+    private readonly IPestService _pestService;
+    private readonly ICropService _cropService;
+
+    public PestController(IPestService pestService, ICropService cropService)
     {
-        private readonly IPestService _pestService;
-        private readonly PestDbContext _context;
+        _pestService = pestService;
+        _cropService = cropService;
+    }
 
-        public PestController(IPestService pestService, PestDbContext context)
+    // GET: /Pest
+    public async Task<IActionResult> Index()
+    {
+        var incidents = await _pestService.GetAllAsync();
+        return View(incidents);
+    }
+
+    // GET: /Pest/Details/5
+    public async Task<IActionResult> Details(int id)
+    {
+        var incident = await _pestService.GetByIdAsync(id);
+        if (incident == null) return NotFound();
+        return View(incident);
+    }
+
+    // GET: /Pest/Create
+    public async Task<IActionResult> Create()
+    {
+        ViewBag.Crops = await _cropService.GetAllAsync();
+        return View(new PestIncident());
+    }
+
+    // POST: /Pest/Create
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(PestIncident pest)
+    {
+        // Remove navigation property from validation
+        ModelState.Remove("Crop");
+
+        if (!ModelState.IsValid)
         {
-            _pestService = pestService;
-            _context = context; 
+            ViewBag.Crops = await _cropService.GetAllAsync();
+            return View(pest);
         }
 
-        // GET: /Pest/Index (View History)
-        public async Task<IActionResult> Index()
-        {
-            var history = await _pestService.GetPestHistoryAsync();
-            return View(history);
-        }
+        pest.ReportedDate = DateTime.Now;
+        pest.Status = IncidentStatus.Active;
 
-        // GET: /Pest/RecordIncident
-        public IActionResult RecordIncident()
-        {
-            // Taking data from Member 1 to populate dropdowns
-            ViewBag.Fields = new SelectList(_context.Fields, "FieldId", "FieldName");
-            ViewBag.Crops = new SelectList(_context.Crops, "CropId", "CropName");
-            return View();
-        }
+        await _pestService.CreateAsync(pest);
+        TempData["Success"] = $"Pest incident '{pest.PestName}' reported successfully.";
+        return RedirectToAction(nameof(Index));
+    }
 
-        // POST: /Pest/RecordIncident
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RecordIncident(PestIncident incident)
-        {
-            if (ModelState.IsValid)
-            {
-                await _pestService.RecordPestIncidentAsync(incident);
-                return RedirectToAction(nameof(Index));
-            }
+    // POST: /Pest/UpdateStatus
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateStatus(int id, string status, string? treatmentNotes)
+    {
+        var incident = await _pestService.GetByIdAsync(id);
+        if (incident == null) return NotFound();
 
-            ViewBag.Fields = new SelectList(_context.Fields, "FieldId", "FieldName");
-            ViewBag.Crops = new SelectList(_context.Crops, "CropId", "CropName");
-            return View(incident);
-        }
+        await _pestService.UpdateStatusAsync(id, status, treatmentNotes);
+        TempData["Success"] = $"Status updated to '{status}' for '{incident.PestName}'.";
+        return RedirectToAction(nameof(Index));
+    }
 
-        // GET: /Pest/LogTreatment/{incidentId}
-        public IActionResult LogTreatment(int incidentId)
-        {
-            ViewBag.IncidentId = incidentId;
-            ViewBag.Resources = new SelectList(_context.Resources.Where(r => r.ResourceType == "PESTICIDE"), "ResourceId", "Name");
-            return View();
-        }
+    // POST: /Pest/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var incident = await _pestService.GetByIdAsync(id);
+        if (incident == null) return NotFound();
 
-        // POST: /Pest/LogTreatment
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LogTreatment(Treatment treatment)
-        {
-            if (ModelState.IsValid)
-            {
-                await _pestService.LogTreatmentAsync(treatment);
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewBag.IncidentId = treatment.IncidentId;
-            ViewBag.Resources = new SelectList(_context.Resources.Where(r => r.ResourceType == "PESTICIDE"), "ResourceId", "Name");
-            return View(treatment);
-        }
+        await _pestService.DeleteAsync(id);
+        TempData["Success"] = $"Incident '{incident.PestName}' deleted.";
+        return RedirectToAction(nameof(Index));
     }
 }

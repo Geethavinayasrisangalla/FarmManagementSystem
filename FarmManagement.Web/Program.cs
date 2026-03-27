@@ -1,53 +1,46 @@
-// ============================================================
-// Program.cs — FarmManagement.Web
-// ============================================================
 using FarmManagement.Web.Data;
+using FarmManagement.Web.Services.Interfaces;
+using FarmManagement.Web.Data;
+using FarmManagement.Web.Models.Validations;
 using FarmManagement.Web.Services;
+using FarmManagement.Web.Services.Interfaces;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ─────────────────────────────────────────
-// Step 1: Add MVC
-// ─────────────────────────────────────────
+// ── Database ─────────────────────────────────────────────────
+builder.Services.AddDbContext<FarmDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// ── MVC ──────────────────────────────────────────────────────
 builder.Services.AddControllersWithViews();
 
-// ─────────────────────────────────────────
-// Step 2: Connect Database (FarmDbContext)
-// ─────────────────────────────────────────
-builder.Services.AddDbContext<FarmDbContext>(options =>
-    options.UseSqlServer(builder.Configuration
-        .GetConnectionString("DefaultConnection")));
+// ── FluentValidation (correct way for v11) ───────────────────
+// FluentValidation packages are optional. If you have FluentValidation installed, register validators here.
+// builder.Services.AddFluentValidationAutoValidation();
+// builder.Services.AddFluentValidationClientsideAdapters();
+// builder.Services.AddValidatorsFromAssemblyContaining<CropValidator>();
 
-// ─────────────────────────────────────────
-// Step 3: Register All 5 Member Services
-// ─────────────────────────────────────────
-
-// Member 1 — Crop & Field Management
-builder.Services.AddScoped<CropService>();
-builder.Services.AddScoped<FieldService>();
-
-// Member 2 — Resource & Inventory
-// NOTE: Register as interface so controller uses IResourceService (DI)
+// ── Services (DI) ────────────────────────────────────────────
+builder.Services.AddScoped<ICropService, CropService>();
+builder.Services.AddScoped<IFieldService, FieldService>();
+builder.Services.AddScoped<IPestService, PestService>();
 builder.Services.AddScoped<IResourceService, ResourceService>();
+builder.Services.AddScoped<IScheduleService, ScheduleService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
-// Member 3 — Planting & Harvest Scheduling
-builder.Services.AddScoped<ScheduleService>();
+// ── Session ──────────────────────────────────────────────────
+builder.Services.AddSession(opt =>
+{
+    opt.IdleTimeout = TimeSpan.FromMinutes(30);
+    opt.Cookie.HttpOnly = true;
+    opt.Cookie.IsEssential = true;
+});
 
-// Member 4 — Pest & Treatment
-builder.Services.AddScoped<PestService>();
-
-// Member 5 — Yield Analytics & Reporting
-builder.Services.AddScoped<ReportService>();
-
-// ─────────────────────────────────────────
-// Step 4: Build the App
-// ─────────────────────────────────────────
 var app = builder.Build();
 
-// ─────────────────────────────────────────
-// Step 5: Middleware Pipeline
-// ─────────────────────────────────────────
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -57,11 +50,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
 app.UseAuthorization();
 
-// ─────────────────────────────────────────
-// Step 6: Default Route
-// ─────────────────────────────────────────
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

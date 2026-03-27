@@ -1,105 +1,90 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using FarmManagement.Web.Data;
+﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
+using FarmManagement.Web.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FarmManagement.Web.Services
 {
-    public class ScheduleService
+    public class ScheduleService : IScheduleService
     {
-        private readonly FarmDbContext _context;
+    private readonly FarmDbContext _db;
+    public ScheduleService(FarmDbContext db) => _db = db;
 
-        public ScheduleService(FarmDbContext context)
+    public async Task<IEnumerable<PlantingSchedule>> GetAllAsync() =>
+        await _db.PlantingSchedules.Include(ps => ps.Crop)
+                                   .OrderBy(ps => ps.ScheduledDate)
+                                   .ToListAsync();
+
+    public async Task<PlantingSchedule?> GetByIdAsync(int id) =>
+        await _db.PlantingSchedules.Include(ps => ps.Crop)
+                                   .Include(ps => ps.Harvest)
+                                   .FirstOrDefaultAsync(ps => ps.PlantingScheduleId == id);
+
+    public async Task CreateAsync(ScheduleViewModel vm)
+    {
+        _db.PlantingSchedules.Add(new PlantingSchedule
         {
-            _context = context;
-        }
+            CropId = vm.CropId,
+            ScheduledDate = vm.ScheduledDate,
+            ExpectedYieldKg = vm.ExpectedYieldKg,
+            Notes = vm.Notes,
+            Status = "Scheduled"
+        });
+        await _db.SaveChangesAsync();
+    }
 
-        // --- PLANTING SCHEDULE METHODS ---
+    public async Task UpdateAsync(ScheduleViewModel vm)
+    {
+        var ps = await _db.PlantingSchedules.FindAsync(vm.PlantingScheduleId)
+                 ?? throw new KeyNotFoundException("Schedule not found.");
+        ps.CropId = vm.CropId;
+        ps.ScheduledDate = vm.ScheduledDate;
+        ps.ExpectedYieldKg = vm.ExpectedYieldKg;
+        ps.Notes = vm.Notes;
+        await _db.SaveChangesAsync();
+    }
 
-        // Create a new planting schedule (Status = "Planned")
-        public bool CreatePlantingSchedule(PlantingSchedule schedule)
+    public async Task DeleteAsync(int id)
+    {
+        var ps = await _db.PlantingSchedules.FindAsync(id);
+        if (ps != null) { _db.PlantingSchedules.Remove(ps); await _db.SaveChangesAsync(); }
+    }
+
+    public async Task RecordHarvestAsync(int scheduleId, decimal actualYield, string? notes)
+    {
+        var ps = await _db.PlantingSchedules.FindAsync(scheduleId)
+                 ?? throw new KeyNotFoundException("Schedule not found.");
+        ps.Status = "Completed";
+        _db.Harvests.Add(new Harvest
         {
-            // Check if the field is already Active (planted but not harvested)
-            bool fieldAlreadyActive = _context.PlantingSchedules
-                .Any(s => s.FieldId == schedule.FieldId && s.Status == "Active");
+            PlantingScheduleId = scheduleId,
+            ActualYieldKg = actualYield,
+            QualityNotes = notes,
+            HarvestedDate = DateTime.Now
+        });
+        await _db.SaveChangesAsync();
+    }
 
-            if (fieldAlreadyActive)
-            {
-                // Cannot plant again until current harvest is recorded
-                return false;
-            }
+    public async Task<IEnumerable<PlantingSchedule>> GetUpcomingAsync(int days = 30) =>
+        await _db.PlantingSchedules.Include(ps => ps.Crop)
+                                   .Where(ps => ps.ScheduledDate <= DateTime.Today.AddDays(days)
+                                             && ps.Status == "Scheduled")
+                                   .OrderBy(ps => ps.ScheduledDate)
+                                   .ToListAsync();
 
-            schedule.Status = "Planned";
-            _context.PlantingSchedules.Add(schedule);
-            _context.SaveChanges();
-            return true;
-        }
-
-        // Get all planting schedules
-        public List<PlantingSchedule> GetAllSchedules()
+    public async Task<ScheduleViewModel> PrepareViewModelAsync(ScheduleViewModel? vm = null)
+    {
+        vm ??= new ScheduleViewModel();
+        var crops = await _db.Crops.Where(c => c.Status == "Growing")
+                                   .OrderBy(c => c.CropName)
+                                   .ToListAsync();
+        vm.Crops = crops.Select(c => new SelectListItem
         {
-            return _context.PlantingSchedules.ToList();
-        }
-
-        // Get a single schedule by ID
-        public PlantingSchedule GetScheduleById(int scheduleId)
-        {
-            return _context.PlantingSchedules
-                .FirstOrDefault(s => s.ScheduleId == scheduleId);
-        }
-
-        // Activate a schedule (Planned → Active)
-        public bool ActivateSchedule(int scheduleId)
-        {
-            var schedule = _context.PlantingSchedules
-                .FirstOrDefault(s => s.ScheduleId == scheduleId);
-
-            if (schedule == null || schedule.Status != "Planned")
-                return false;
-
-            schedule.Status = "Active";
-            _context.SaveChanges();
-            return true;
-        }
-
-        // --- HARVEST METHODS ---
-
-        // Record a harvest and mark schedule as Completed (Active → Completed)
-        public bool RecordHarvest(Harvest harvest)
-        {
-            // Find the related schedule
-            var schedule = _context.PlantingSchedules
-                .FirstOrDefault(s => s.ScheduleId == harvest.ScheduleId);
-
-            if (schedule == null || schedule.Status != "Active")
-            {
-                // Can only harvest an Active field
-                return false;
-            }
-
-            // Save the harvest record
-            _context.Harvests.Add(harvest);
-
-            // Mark the schedule as Completed
-            schedule.Status = "Completed";
-
-            _context.SaveChanges();
-            return true;
-        }
-
-        // Get all harvests
-        public List<Harvest> GetAllHarvests()
-        {
-            return _context.Harvests.ToList();
-        }
-
-        // Get harvest by field (used by Member 5 for yield calculation)
-        public List<Harvest> GetHarvestsByField(int fieldId)
-        {
-            return _context.Harvests
-                .Where(h => h.FieldId == fieldId)
-                .ToList();
-        }
+            Value = c.CropId.ToString(),
+            Text = c.CropName,
+            Selected = c.CropId == vm.CropId
+        }).ToList();
+        return vm;
+    }
     }
 }

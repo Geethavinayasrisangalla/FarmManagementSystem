@@ -1,85 +1,63 @@
-﻿@model FarmManagement.Web.Models.Entities.Harvest
+﻿@model FarmManagement.Models.HarvestSchedule
 @{
     ViewData["Title"] = "Record Harvest";
 }
 
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-semibold">Record Harvest</h2>
+        <a asp-action="HarvestList" class="btn btn-outline-secondary">← Back</a>
+    </div>
 
-            <div class="card shadow">
-                <div class="card-header bg-warning">
-                    <h4 class="mb-0">🌾 Record Harvest</h4>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light fw-semibold">Schedule Summary</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <small class="text-muted">Crop</small>
+                    <p class="fw-semibold mb-0">@Model.Crop?.CropName</p>
                 </div>
-                <div class="card-body">
-
-                    <form asp-action="RecordHarvest" method="post">
-                        @Html.AntiForgeryToken()
-
-                        <div asp-validation-summary="All"
-                             class="alert alert-danger"></div>
-
-                        <div class="mb-3">
-                            <label asp-for="ScheduleId" class="form-label fw-bold"></label>
-                            <input asp-for="ScheduleId" class="form-control" readonly />
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="CropId" class="form-label fw-bold"></label>
-                            <input asp-for="CropId" class="form-control" readonly />
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="FieldId" class="form-label fw-bold"></label>
-                            <input asp-for="FieldId" class="form-control" readonly />
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="HarvestDate" class="form-label fw-bold"></label>
-                            <input asp-for="HarvestDate" type="date" class="form-control" />
-                            <span asp-validation-for="HarvestDate"
-                                  class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="HarvestedQuantity"
-                                   class="form-label fw-bold"></label>
-                            <input asp-for="HarvestedQuantity" class="form-control"
-                                   placeholder="e.g. 500.00" />
-                            <span asp-validation-for="HarvestedQuantity"
-                                  class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="QualityGrade" class="form-label fw-bold"></label>
-                            <select asp-for="QualityGrade" class="form-select">
-                                <option value="">-- Select Grade --</option>
-                                <option value="A">A — Excellent</option>
-                                <option value="B">B — Good</option>
-                                <option value="C">C — Average</option>
-                            </select>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-warning w-100">
-                                💾 Save Harvest
-                            </button>
-                            <a asp-action="Index" class="btn btn-secondary w-100">
-                                Cancel
-                            </a>
-                        </div>
-                    </form>
-
+                <div class="col-md-4">
+                    <small class="text-muted">Scheduled Date</small>
+                    <p class="fw-semibold mb-0">@Model.ScheduledDate.ToString("dd MMM yyyy")</p>
+                </div>
+                <div class="col-md-4">
+                    <small class="text-muted">Expected Yield</small>
+                    <p class="fw-semibold mb-0">@Model.ExpectedYieldKg kg</p>
                 </div>
             </div>
+        </div>
+    </div>
 
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white fw-semibold">Enter Actual Harvest Data</div>
+        <div class="card-body">
+            <form asp-action="RecordHarvest" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.HarvestScheduleId" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Actual Yield (kg)</label>
+                    <div class="input-group">
+                        <input type="number" name="actualYield" class="form-control"
+                               step="0.01" min="0.01" required
+                               placeholder="Enter actual yield in kg" />
+                        <span class="input-group-text">kg</span>
+                    </div>
+                    <div class="form-text">Expected was @Model.ExpectedYieldKg kg</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Quality Notes (optional)</label>
+                    <textarea name="notes" class="form-control" rows="3"
+                              placeholder="e.g. Good quality, minor pest damage on 10%..."></textarea>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">Save Harvest Record</button>
+                    <a asp-action="HarvestList" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
-
