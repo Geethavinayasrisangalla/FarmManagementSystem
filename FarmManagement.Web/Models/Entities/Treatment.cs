@@ -17,11 +17,11 @@ namespace FarmManagement.Web.Models.Entities
         // [Required(ErrorMessage = "Please select a resource or chemical.")]
         public string ResourceId { get; set; }
 
-        // [Required]
+        [Required]
         // [Display(Name="Treatment Date"]
         public DateTime TreatmentDate { get; set; }
 
-        // [Required]
+        [Required]
         public string TreatmentType { get; set; }
 
         // For deduction

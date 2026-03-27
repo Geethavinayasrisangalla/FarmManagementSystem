@@ -56,7 +56,7 @@ namespace FarmManagement.Web.Controllers
         public IActionResult LogTreatment(int incidentId)
         {
             ViewBag.IncidentId = incidentId;
-            ViewBag.Resources = new SelectList(_context.Resources.Where(r => r.ResourceType == "PESTICIDE"), "ResourceId", "Name");
+            ViewBag.Resources = new SelectList(_context.Resources.Where(r => r.Type == "PESTICIDE"), "ResourceId", "Name");
             return View();
         }
 
@@ -72,7 +72,7 @@ namespace FarmManagement.Web.Controllers
             }
 
             ViewBag.IncidentId = treatment.IncidentId;
-            ViewBag.Resources = new SelectList(_context.Resources.Where(r => r.ResourceType == "PESTICIDE"), "ResourceId", "Name");
+            ViewBag.Resources = new SelectList(_context.Resources.Where(r => r.Type == "PESTICIDE"), "ResourceId", "Name");
             return View(treatment);
         }
     }

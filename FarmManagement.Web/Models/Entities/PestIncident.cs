@@ -10,9 +10,14 @@ namespace FarmManagement.Web.Models.Entities
         [Key]
         public int IncidentId { get; set; }
 
+        [Required]
         public int FieldId { get; set; }
         public int CropId { get; set; }
+
+        [Required]
         public DateTime IncidentDate { get; set; } = DateTime.Now;
+
+        [Required]
         public string Description { get; set; }
 
         // Not present in the pdf, but is added for better tracking
