@@ -2,7 +2,45 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero-section d-flex align-items-center justify-content-center">
+    <div class="overlay"></div>
+    <div class="content-box text-center text-white p-5 shadow-lg">
+        <h1 class="display-1 fw-bold mb-3">🌱 FarmAdmin</h1>
+        <p class="lead mb-4 fs-3">Precision Agriculture & Field Management System</p>
+        <hr class="bg-white border-2 border-top border-white opacity-50 mb-4">
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a asp-controller="Crop" asp-action="Index" class="btn btn-success btn-lg px-4 gap-3 fw-bold">Open Crop Registry</a>
+            <a asp-controller="Field" asp-action="Index" class="btn btn-outline-light btn-lg px-4 fw-bold">View Field Mapping</a>
+        </div>
+    </div>
 </div>
+
+<style>
+    /* This creates the full-screen farming background */
+    .hero-section {
+        background: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') no-content center center;
+        background-size: cover;
+        height: 85vh; /* Covers most of the screen height */
+        position: relative;
+        border-radius: 15px;
+        margin-top: 20px;
+        overflow: hidden;
+    }
+
+    /* Darkens the image so the white text is easy to read */
+    .overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1;
+    }
+
+    .content-box {
+        position: relative;
+        z-index: 2;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px); /* Modern "Glass" effect */
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+    }
+</style>
