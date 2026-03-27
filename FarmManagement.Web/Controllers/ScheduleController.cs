@@ -1,67 +1,99 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using FarmManagement.Web.Models.Entities;
-using FarmManagement.Web.Data;
-using Microsoft.EntityFrameworkCore;
-using FarmManagement.Web.Models.Entities;
+using FarmManagement.Web.Services;
 
-public class ScheduleController : Controller
+namespace FarmManagement.Web.Controllers
 {
-    private readonly FarmDbContext _context;
-
-    public ScheduleController(FarmDbContext context)
+    public class ScheduleController : Controller
     {
-        _context = context;
-    }
+        private readonly ScheduleService _scheduleService;
 
-    // GET: List all active plantings for the Supervisor
-    public async Task<IActionResult> Index()
-    {
-        var schedules = await _context.PlantingSchedules
-            .Include(s => s.Crop)
-            .Include(s => s.Field)
-            .Where(s => s.Status == "Active")
-            .ToListAsync();
-        return View(schedules);
-    }
-
-    // POST: CreatePlanting
-    [HttpPost]
-    public async Task<IActionResult> CreatePlanting(PlantingSchedule schedule)
-    {
-        // WHY: Check if the field is already occupied (Prevents double-planting)
-        var isOccupied = await _context.PlantingSchedules
-            .AnyAsync(s => s.FieldId == schedule.FieldId && s.Status == "Active");
-
-        if (isOccupied)
+        public ScheduleController(ScheduleService scheduleService)
         {
-            ModelState.AddModelError("", "Error: This field already has an active crop!");
+            _scheduleService = scheduleService;
+        }
+
+        // GET: /Schedule/Index
+        // Shows all planting schedules
+        public IActionResult Index()
+        {
+            var schedules = _scheduleService.GetAllSchedules();
+            return View(schedules);
+        }
+
+        // GET: /Schedule/CreatePlantingSchedule
+        public IActionResult CreatePlantingSchedule()
+        {
+            return View();
+        }
+
+        // POST: /Schedule/CreatePlantingSchedule
+        [HttpPost]
+        public IActionResult CreatePlantingSchedule(PlantingSchedule schedule)
+        {
+            if (!ModelState.IsValid)
+                return View(schedule);
+
+            bool success = _scheduleService.CreatePlantingSchedule(schedule);
+
+            if (!success)
+            {
+                ModelState.AddModelError("",
+                    "This field is currently Active. " +
+                    "Please record a Harvest before planting again.");
+                return View(schedule);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        // POST: /Schedule/ActivateSchedule/5
+        [HttpPost]
+        public IActionResult ActivateSchedule(int id)
+        {
+            bool success = _scheduleService.ActivateSchedule(id);
+
+            if (!success)
+                return BadRequest("Schedule not found or is not in Planned status.");
+
+            return RedirectToAction("Index");
+        }
+
+        // GET: /Schedule/RecordHarvest
+        public IActionResult RecordHarvest()
+        {
+            return View();
+        }
+
+        // POST: /Schedule/RecordHarvest
+        [HttpPost]
+        public IActionResult RecordHarvest(Harvest harvest)
+        {
+            if (!ModelState.IsValid)
+                return View(harvest);
+
+            bool success = _scheduleService.RecordHarvest(harvest);
+
+            if (!success)
+            {
+                ModelState.AddModelError("",
+                    "Cannot record harvest. Field must be in Active status.");
+                return View(harvest);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        // GET: /Schedule/GetScheduleDetails/5
+        public IActionResult GetScheduleDetails(int id)
+        {
+            var schedule = _scheduleService.GetScheduleById(id);
+
+            if (schedule == null)
+                return NotFound();
+
             return View(schedule);
         }
-
-        schedule.Status = "Active";
-        _context.Add(schedule);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
-    }
-
-    // POST: RecordHarvest
-    [HttpPost]
-    public async Task<IActionResult> RecordHarvest(Harvest harvest)
-    {
-        // WHY: Save the production data for Member 5's Analytics
-        _context.Harvests.Add(harvest);
-
-        // WHY: Update the Schedule status to "Completed" to free up the field
-        var schedule = await _context.PlantingSchedules
-            .FirstOrDefaultAsync(s => s.FieldId == harvest.FieldId && s.Status == "Active");
-
-        if (schedule != null)
-        {
-            schedule.Status = "Completed";
-            _context.Update(schedule);
-        }
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction("Index", "Report"); // Send to Member 5's view
     }
 }
