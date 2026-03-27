@@ -1,24 +1,52 @@
-using Microsoft.EntityFrameworkCore;
+// ============================================================
+// Program.cs — FarmManagement.Web
+// ============================================================
 using FarmManagement.Web.Data;
-using FarmManagement.Web.Services; // IMPORTANT: This allows ICropService to be found
+using FarmManagement.Web.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Add services to the container (Standard MVC setup)
+// ─────────────────────────────────────────
+// Step 1: Add MVC
+// ─────────────────────────────────────────
 builder.Services.AddControllersWithViews();
 
-// 2. Database Connection (Found in appsettings.json)
+// ─────────────────────────────────────────
+// Step 2: Connect Database (FarmDbContext)
+// ─────────────────────────────────────────
 builder.Services.AddDbContext<FarmDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration
+        .GetConnectionString("DefaultConnection")));
 
-// 3. Dependency Injection (Connects Interface to Implementation)
-// This fixes the "ICropService could not be found" error
-builder.Services.AddScoped<ICropService, CropService>();
-builder.Services.AddScoped<IResourceService, ResourceService>();
+// ─────────────────────────────────────────
+// Step 3: Register All 5 Member Services
+// ─────────────────────────────────────────
 
+// Member 1 — Crop & Field Management
+builder.Services.AddScoped<CropService>();
+builder.Services.AddScoped<FieldService>();
+
+// Member 2 — Resource & Inventory
+builder.Services.AddScoped<ResourceService>();
+
+// Member 3 — Planting & Harvest Scheduling
+builder.Services.AddScoped<ScheduleService>();
+
+// Member 4 — Pest & Treatment
+builder.Services.AddScoped<PestService>();
+
+// Member 5 — Yield Analytics & Reporting
+builder.Services.AddScoped<ReportService>();
+
+// ─────────────────────────────────────────
+// Step 4: Build the App
+// ─────────────────────────────────────────
 var app = builder.Build();
 
-// 4. Configure the HTTP request pipeline
+// ─────────────────────────────────────────
+// Step 5: Middleware Pipeline
+// ─────────────────────────────────────────
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -27,12 +55,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
-// 5. Default Route (Points to Home/Index on startup)
+// ─────────────────────────────────────────
+// Step 6: Default Route
+// ─────────────────────────────────────────
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
