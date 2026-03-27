@@ -1,0 +1,74 @@
+﻿@model IEnumerable<FarmManagement.Web.Models.Entities.Harvest>
+@{
+    ViewData["Title"] = "Harvest Records";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>🌾 Harvest Records</h2>
+        <a asp-action="Index" class="btn btn-secondary">← Back to Schedules</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No harvest records found yet.</div>
+    }
+    else
+    {
+        <table class="table table-bordered table-hover table-striped">
+            <thead class="table-success">
+                <tr>
+                    <th>#ID</th>
+                    <th>Schedule ID</th>
+                    <th>Crop ID</th>
+                    <th>Field ID</th>
+                    <th>Harvest Date</th>
+                    <th>Quantity (kg)</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.HarvestId</td>
+                        <td>@item.ScheduleId</td>
+                        <td>@item.CropId</td>
+                        <td>@item.FieldId</td>
+                        <td>@item.HarvestDate.ToString("dd MMM yyyy")</td>
+                        <td><strong>@item.HarvestedQuantity kg</strong></td>
+                        <td>
+                            @if (item.QualityGrade == "A")
+                            {
+                                <span class="badge bg-success fs-6">A — Excellent</span>
+                            }
+                            else if (item.QualityGrade == "B")
+                            {
+                                <span class="badge bg-warning text-dark fs-6">B — Good</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary fs-6">C — Average</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="card mt-3 col-md-4">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Total Harvested</h6>
+                <h3 class="text-success">@Model.Sum(h => h.HarvestedQuantity) kg</h3>
+            </div>
+        </div>
+    }
+</div>
