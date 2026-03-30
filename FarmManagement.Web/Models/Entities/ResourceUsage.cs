@@ -4,11 +4,12 @@ public class ResourceUsage
 {
     public int ResourceUsageId { get; set; }
     public int ResourceId { get; set; }
-    public int FieldId { get; set; }
+    public int ScheduleId { get; set; }            // fixed: was FieldId
     public decimal QuantityUsed { get; set; }
     public DateTime UsedDate { get; set; } = DateTime.Now;
     public string? Notes { get; set; }
 
+    // ── Navigation Properties ─────────────────────────────────────
     public Resource Resource { get; set; } = null!;
-    public Field Field { get; set; } = null!;
+    public PlantingSchedule PlantingSchedule { get; set; } = null!; // fixed: was Field
 }

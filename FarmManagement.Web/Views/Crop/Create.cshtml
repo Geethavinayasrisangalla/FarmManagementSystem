@@ -1,5 +1,78 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model FarmManagement.Web.Models.ViewModels.CropViewModel
+
 @{
+    ViewData["Title"] = "Add New Crop";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Add New Crop</h2>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="CropName" class="form-label"></label>
+                    <input asp-for="CropName" class="form-control" placeholder="e.g. Wheat" />
+                    <span asp-validation-for="CropName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="CropType" class="form-label"></label>
+                    <input asp-for="CropType" class="form-control" placeholder="e.g. Grain" />
+                    <span asp-validation-for="CropType" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Season" class="form-label"></label>
+                    <select asp-for="Season" class="form-select"
+                            asp-items="Html.GetEnumSelectList<FarmManagement.Web.Models.Enums.SeasonType>()">
+                        <option value="">-- Select Season --</option>
+                    </select>
+                    <span asp-validation-for="Season" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="FieldId" class="form-label"></label>
+                    <select asp-for="FieldId" class="form-select"
+                            asp-items="Model.Fields">
+                        <option value="">-- Select Field --</option>
+                    </select>
+                    <span asp-validation-for="FieldId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="PlantingDate" class="form-label"></label>
+                    <input asp-for="PlantingDate" class="form-control" type="date" />
+                    <span asp-validation-for="PlantingDate" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ExpectedHarvestDate" class="form-label"></label>
+                    <input asp-for="ExpectedHarvestDate" class="form-control" type="date" />
+                    <span asp-validation-for="ExpectedHarvestDate" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Save Crop
+                </button>
+                <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

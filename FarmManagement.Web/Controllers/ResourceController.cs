@@ -1,19 +1,16 @@
-﻿using FarmManagement.Models.ViewModels;
-using FarmManagement.Services.Interfaces;
-using FarmManagement.Web.Models.ViewModels;
+﻿using FarmManagement.Web.Models.ViewModels;
+using FarmManagement.Web.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FarmManagement.Controllers;
+namespace FarmManagement.Web.Controllers;
 
 public class ResourceController : Controller
 {
     private readonly IResourceService _resourceService;
-    private readonly IFieldService _fieldService;
 
-    public ResourceController(IResourceService resourceService, IFieldService fieldService)
+    public ResourceController(IResourceService resourceService)
     {
         _resourceService = resourceService;
-        _fieldService = fieldService;
     }
 
     // GET: /Resource
@@ -87,7 +84,6 @@ public class ResourceController : Controller
         if (resource == null) return NotFound();
 
         ViewBag.Resource = resource;
-        ViewBag.Fields = await _fieldService.GetAllAsync();
         return View();
     }
 

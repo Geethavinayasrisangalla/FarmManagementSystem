@@ -1,20 +1,16 @@
-﻿using FarmManagement.Models;
-using FarmManagement.Models.ViewModels;
-using FarmManagement.Services.Interfaces;
-using FarmManagement.Web.Services.Interfaces;
+﻿using FarmManagement.Web.Models.ViewModels;
+using FarmManagement.Web.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FarmManagement.Controllers;
+namespace FarmManagement.Web.Controllers;
 
 public class CropController : Controller
 {
     private readonly ICropService _cropService;
-    private readonly IFieldService _fieldService;
 
-    public CropController(ICropService cropService, IFieldService fieldService)
+    public CropController(ICropService cropService)
     {
         _cropService = cropService;
-        _fieldService = fieldService;
     }
 
     // GET: /Crop

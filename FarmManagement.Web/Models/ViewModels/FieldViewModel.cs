@@ -14,7 +14,7 @@ public class FieldViewModel
     [Required]
     [Range(0.1, 10000)]
     [Display(Name = "Area (Hectares)")]
-    public double AreaHectares { get; set; }
+    public decimal AreaHectares { get; set; }   // fixed: was double, must match Field entity
 
     [Required(ErrorMessage = "Soil type is required.")]
     [Display(Name = "Soil Type")]

@@ -13,6 +13,7 @@ public class Crop
     public string Status { get; set; } = "Growing";
     public int FieldId { get; set; }
 
+    // ── Navigation Properties ─────────────────────────────────────
     public Field Field { get; set; } = null!;
     public ICollection<PestIncident> PestIncidents { get; set; } = new List<PestIncident>();
     public ICollection<PlantingSchedule> PlantingSchedules { get; set; } = new List<PlantingSchedule>();

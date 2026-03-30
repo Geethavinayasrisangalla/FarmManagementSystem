@@ -1,11 +1,13 @@
 ﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Enums;
+using FarmManagement.Web.Models.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-namespace FarmManagement.Web.Services
+namespace FarmManagement.Web.Services;
+
+public class PestService : IPestService
 {
-    public class PestService : IPestService
-    {
     private readonly FarmDbContext _db;
     public PestService(FarmDbContext db) => _db = db;
 
@@ -16,8 +18,8 @@ namespace FarmManagement.Web.Services
 
     public async Task<PestIncident?> GetByIdAsync(int id) =>
         await _db.PestIncidents.Include(p => p.Crop)
-                               .Include(p => p.Treatments)
                                .FirstOrDefaultAsync(p => p.PestIncidentId == id);
+    // removed: .Include(p => p.Treatments) — Treatment entity removed
 
     public async Task<IEnumerable<PestIncident>> GetActivesAsync() =>
         await _db.PestIncidents.Include(p => p.Crop)
@@ -34,25 +36,19 @@ namespace FarmManagement.Web.Services
     {
         var pest = await _db.PestIncidents.FindAsync(id)
                    ?? throw new KeyNotFoundException("Incident not found.");
+
         pest.Status = Enum.Parse<IncidentStatus>(status);
 
+        // fixed: store notes directly on entity instead of creating Treatment object
         if (!string.IsNullOrWhiteSpace(treatmentNotes))
-        {
-            _db.Treatments.Add(new Treatment
-            {
-                PestIncidentId = id,
-                TreatmentType = "Manual Update",
-                Description = treatmentNotes,
-                AppliedDate = DateTime.Now
-            });
-        }
+            pest.TreatmentNotes = treatmentNotes;
+
         await _db.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id)
     {
-        var p = await _db.PestIncidents.FindAsync(id);
-        if (p != null) { _db.PestIncidents.Remove(p); await _db.SaveChangesAsync(); }
-    }
+        var pest = await _db.PestIncidents.FindAsync(id);
+        if (pest != null) { _db.PestIncidents.Remove(pest); await _db.SaveChangesAsync(); }
     }
 }

@@ -1,5 +1,7 @@
-﻿// ── IResourceService.cs ──────────────────────────────────────
-using FarmManagement.Models.ViewModels;
+﻿using FarmManagement.Web.Models.Entities;
+using FarmManagement.Web.Models.ViewModels;
+
+namespace FarmManagement.Web.Models.Interfaces;
 
 public interface IResourceService
 {
@@ -8,7 +10,6 @@ public interface IResourceService
     Task CreateAsync(InventoryViewModel vm);
     Task UpdateAsync(InventoryViewModel vm);
     Task DeleteAsync(int id);
-    Task AllocateAsync(int resourceId, int fieldId, decimal qty, string? notes);
+    Task AllocateAsync(int resourceId, int scheduleId, decimal qty, string? notes); // fixed: fieldId → scheduleId
     Task<IEnumerable<Resource>> GetLowStockAsync(decimal threshold = 10);
 }
-

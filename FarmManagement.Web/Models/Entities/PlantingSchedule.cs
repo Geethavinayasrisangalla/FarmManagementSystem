@@ -2,13 +2,17 @@
 
 public class PlantingSchedule
 {
-    public int PlantingScheduleId { get; set; }
+    public int ScheduleId { get; set; }            // fixed: was PlantingScheduleId
     public int CropId { get; set; }
+    public int FieldId { get; set; }               // added: FK to Field
     public DateTime ScheduledDate { get; set; }
     public decimal ExpectedYieldKg { get; set; }
     public string Status { get; set; } = "Scheduled";
     public string? Notes { get; set; }
 
+    // ── Navigation Properties ─────────────────────────────────────
     public Crop Crop { get; set; } = null!;
-    public Harvest? Harvest { get; set; }
+    public Field Field { get; set; } = null!;                              // added
+    public ICollection<Harvest> Harvests { get; set; } = new List<Harvest>();          // fixed: was singular Harvest?
+    public ICollection<ResourceUsage> ResourceUsages { get; set; } = new List<ResourceUsage>(); // added
 }

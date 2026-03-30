@@ -1,5 +1,73 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model FarmManagement.Web.Models.ViewModels.FieldViewModel
+
 @{
+    ViewData["Title"] = "Edit Field";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Edit Field</h2>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Edit" asp-route-id="@Model.FieldId" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="FieldId" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="FieldName" class="form-label"></label>
+                    <input asp-for="FieldName" class="form-control" />
+                    <span asp-validation-for="FieldName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="AreaHectares" class="form-label"></label>
+                    <div class="input-group">
+                        <input asp-for="AreaHectares" class="form-control" />
+                        <span class="input-group-text">ha</span>
+                    </div>
+                    <span asp-validation-for="AreaHectares" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="SoilType" class="form-label"></label>
+                    <select asp-for="SoilType" class="form-select">
+                        <option value="">-- Select Soil Type --</option>
+                        <option value="Loamy">Loamy</option>
+                        <option value="Clay">Clay</option>
+                        <option value="Sandy">Sandy</option>
+                        <option value="Sandy Loam">Sandy Loam</option>
+                        <option value="Silt">Silt</option>
+                        <option value="Peaty">Peaty</option>
+                        <option value="Chalky">Chalky</option>
+                    </select>
+                    <span asp-validation-for="SoilType" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Location" class="form-label"></label>
+                    <input asp-for="Location" class="form-control" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Update Field
+                </button>
+                <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

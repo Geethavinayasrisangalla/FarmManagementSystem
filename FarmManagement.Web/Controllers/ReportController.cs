@@ -1,8 +1,7 @@
-﻿using FarmManagement.Services.Interfaces;
-using FarmManagement.Web.Services.Interfaces;
+﻿using FarmManagement.Web.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FarmManagement.Controllers;
+namespace FarmManagement.Web.Controllers;
 
 public class ReportController : Controller
 {

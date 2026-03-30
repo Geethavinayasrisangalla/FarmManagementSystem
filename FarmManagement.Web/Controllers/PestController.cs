@@ -1,11 +1,11 @@
 ﻿using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Enums;
-using FarmManagement.Web.Services.Interfaces;
+using FarmManagement.Web.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FarmManagement.Web.Controllers
-{
-    public class PestController : Controller
+namespace FarmManagement.Web.Controllers;
+
+public class PestController : Controller
 {
     private readonly IPestService _pestService;
     private readonly ICropService _cropService;
@@ -43,7 +43,6 @@ namespace FarmManagement.Web.Controllers
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(PestIncident pest)
     {
-        // Remove navigation property from validation
         ModelState.Remove("Crop");
 
         if (!ModelState.IsValid)

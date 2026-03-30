@@ -36,5 +36,7 @@ public class CropViewModel
     public int FieldId { get; set; }
 
     public string? Status { get; set; }
+
+    // Dropdown list
     public IEnumerable<SelectListItem> Fields { get; set; } = new List<SelectListItem>();
 }

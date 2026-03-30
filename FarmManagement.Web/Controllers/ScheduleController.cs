@@ -1,10 +1,9 @@
-﻿using FarmManagement.Models.ViewModels;
-using FarmManagement.Services.Interfaces;
+﻿using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
 using FarmManagement.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FarmManagement.Controllers;
+namespace FarmManagement.Web.Controllers;
 
 public class ScheduleController : Controller
 {

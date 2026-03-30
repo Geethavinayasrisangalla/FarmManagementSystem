@@ -1,9 +1,7 @@
 ﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
-using FarmManagement.Web.Models.Enums;
+using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
-using FarmManagement.Web.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace FarmManagement.Web.Services;
@@ -20,7 +18,7 @@ public class FieldService : IFieldService
 
     public async Task<Field?> GetByIdAsync(int id) =>
         await _db.Fields.Include(f => f.Crops)
-                        .Include(f => f.ResourceUsages).ThenInclude(ru => ru.Resource)
+                        .Include(f => f.PlantingSchedules)
                         .FirstOrDefaultAsync(f => f.FieldId == id);
 
     public async Task CreateAsync(FieldViewModel vm)

@@ -3,6 +3,6 @@
 public enum IncidentStatus
 {
     Active = 0,
-    UnderTreatment = 1,
+    Monitoring = 1,    // fixed: was UnderTreatment
     Resolved = 2
 }

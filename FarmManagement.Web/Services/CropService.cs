@@ -1,12 +1,14 @@
 ﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
+using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
-namespace FarmManagement.Web.Services
+namespace FarmManagement.Web.Services;
+
+public class CropService : ICropService
 {
-    public class CropService : ICropService
-    {
     private readonly FarmDbContext _db;
     public CropService(FarmDbContext db) => _db = db;
 
@@ -35,7 +37,6 @@ namespace FarmManagement.Web.Services
         });
         await _db.SaveChangesAsync();
     }
-}
 
     public async Task UpdateAsync(CropViewModel vm)
     {

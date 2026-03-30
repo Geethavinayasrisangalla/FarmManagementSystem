@@ -1,63 +1,203 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model FarmManagement.Web.Models.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="hero-section d-flex align-items-center justify-content-center">
-    <div class="overlay"></div>
-    <div class="content-box text-center text-white p-5 shadow-lg">
-        <h1 class="display-1 fw-bold mb-3">🌱 FarmAdmin</h1>
-        <p class="lead mb-4 fs-3">Precision Agriculture & Field Management System</p>
-        <hr class="bg-white border-2 border-top border-white opacity-50 mb-4">
-        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-            <a asp-action="Index" asp-controller="Crop" class="btn btn-success btn-lg px-4 gap-3 fw-bold">Open Crop Registry</a>
-            <a asp-controller="Field" asp-action="Index" class="btn btn-outline-light btn-lg px-4 fw-bold">View Field Mapping</a>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2"></i> Farm Dashboard</h2>
+    <span class="text-muted">@DateTime.Now.ToString("dddd, dd MMMM yyyy")</span>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- ── Summary Cards ───────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                    <i class="bi bi-grid-3x3-gap fs-3 text-success"></i>
+                </div>
+                <div>
+                    <div class="fs-2 fw-bold text-success">@Model.TotalFields</div>
+                    <div class="text-muted small">Total Fields</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-controller="Field" asp-action="Index"
+                   class="btn btn-sm btn-outline-success w-100">View Fields</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+                    <i class="bi bi-flower1 fs-3 text-primary"></i>
+                </div>
+                <div>
+                    <div class="fs-2 fw-bold text-primary">@Model.TotalCrops</div>
+                    <div class="text-muted small">Total Crops</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-controller="Crop" asp-action="Index"
+                   class="btn btn-sm btn-outline-primary w-100">View Crops</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-danger bg-opacity-10 p-3">
+                    <i class="bi bi-bug fs-3 text-danger"></i>
+                </div>
+                <div>
+                    <div class="fs-2 fw-bold text-danger">@Model.ActivePestIncidents</div>
+                    <div class="text-muted small">Active Pest Incidents</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-controller="Pest" asp-action="Index"
+                   class="btn btn-sm btn-outline-danger w-100">View Incidents</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-warning bg-opacity-10 p-3">
+                    <i class="bi bi-exclamation-triangle fs-3 text-warning"></i>
+                </div>
+                <div>
+                    <div class="fs-2 fw-bold text-warning">@Model.LowStockResources</div>
+                    <div class="text-muted small">Low Stock Resources</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-controller="Resource" asp-action="Index"
+                   class="btn btn-sm btn-outline-warning w-100">View Resources</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-info bg-opacity-10 p-3">
+                    <i class="bi bi-calendar-check fs-3 text-info"></i>
+                </div>
+                <div>
+                    <div class="fs-2 fw-bold text-info">@Model.UpcomingHarvests</div>
+                    <div class="text-muted small">Upcoming Harvests (30 days)</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-controller="Schedule" asp-action="HarvestList"
+                   class="btn btn-sm btn-outline-info w-100">View Schedules</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                    <i class="bi bi-graph-up-arrow fs-3 text-success"></i>
+                </div>
+                <div>
+                    <div class="fs-2 fw-bold text-success">
+                        @Model.TotalYieldThisSeason.ToString("N0") kg
+                    </div>
+                    <div class="text-muted small">Total Yield This Year</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-controller="Report" asp-action="YieldAnalytics"
+                   class="btn btn-sm btn-outline-success w-100">View Analytics</a>
+            </div>
         </div>
     </div>
 </div>
 
-<style>
-    /* 1. Remove padding from the default container so the image hits the edges */
-    main.container {
-        max-width: 100% !important;
-        padding: 0 !important;
-    }
+<!-- ── Recent Schedules & Pest Alerts ────────────────────────── -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white d-flex justify-content-between">
+                <span><i class="bi bi-calendar3"></i> Upcoming Schedules</span>
+                <a asp-controller="Schedule" asp-action="Index"
+                   class="text-white small">View All</a>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.RecentSchedules == null || !Model.RecentSchedules.Any())
+                {
+                    <p class="text-muted p-3 mb-0">No upcoming schedules.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var schedule in Model.RecentSchedules)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">
+                                        @(schedule.Crop?.CropName ?? "Unknown Crop")
+                                    </div>
+                                    <small class="text-muted">
+                                        @schedule.ScheduledDate.ToString("dd MMM yyyy")
+                                    </small>
+                                </div>
+                                <span class="badge bg-primary">Scheduled</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
 
-    /* 2. Style the main wrapper/hero section */
-    .hero-section {
-        /* Set your new background image URL */
-        background-image: url('https://tse2.mm.bing.net/th/id/OIP.QHPUN4-tiVhg7iKF_t86dAHaEa?rs=1&pid=ImgDetMain&o=7&rm=3');
-        /* Ensure the image covers the whole area without stretching weirdly */
-        background-size: cover;
-        background-position: center center;
-        background-repeat: no-repeat;
-        /* Set the height. You can use 100vh for full screen minus the nav/footer */
-        height: 85vh;
-        position: relative;
-        display: flex;
-        align-items: center; /* Center vertically */
-        justify-content: center; /* Center horizontally */
-        /* Keep these for polish */
-        border-radius: 15px;
-        overflow: hidden;
-        margin-top: 10px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-
-        /* 3. This dark overlay makes the white text readable on ANY image */
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.45); /* Adjusted for readability */
-            z-index: 1;
-        }
-
-        /* 4. This ensures your content stays on top of the overlay */
-        .hero-section .container {
-            position: relative;
-            z-index: 2;
-        }
-</style>
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-danger text-white d-flex justify-content-between">
+                <span><i class="bi bi-bug"></i> Active Pest Alerts</span>
+                <a asp-controller="Pest" asp-action="Index"
+                   class="text-white small">View All</a>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.RecentPestAlerts == null || !Model.RecentPestAlerts.Any())
+                {
+                    <p class="text-muted p-3 mb-0">No active pest alerts.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var pest in Model.RecentPestAlerts)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">@pest.PestName</div>
+                                    <small class="text-muted">
+                                        @(pest.Crop?.CropName ?? "Unknown Crop") —
+                                        @pest.ReportedDate.ToString("dd MMM yyyy")
+                                    </small>
+                                </div>
+                                <span class="badge bg-danger">Active</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</div>

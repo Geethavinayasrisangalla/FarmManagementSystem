@@ -1,30 +1,37 @@
 ﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
+using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
-namespace FarmManagement.Web.Services
+namespace FarmManagement.Web.Services;
+
+public class ScheduleService : IScheduleService
 {
-    public class ScheduleService : IScheduleService
-    {
     private readonly FarmDbContext _db;
     public ScheduleService(FarmDbContext db) => _db = db;
 
     public async Task<IEnumerable<PlantingSchedule>> GetAllAsync() =>
-        await _db.PlantingSchedules.Include(ps => ps.Crop)
-                                   .OrderBy(ps => ps.ScheduledDate)
-                                   .ToListAsync();
+        await _db.PlantingSchedules
+                 .Include(ps => ps.Crop)
+                 .Include(ps => ps.Field)
+                 .OrderBy(ps => ps.ScheduledDate)
+                 .ToListAsync();
 
     public async Task<PlantingSchedule?> GetByIdAsync(int id) =>
-        await _db.PlantingSchedules.Include(ps => ps.Crop)
-                                   .Include(ps => ps.Harvest)
-                                   .FirstOrDefaultAsync(ps => ps.PlantingScheduleId == id);
+        await _db.PlantingSchedules
+                 .Include(ps => ps.Crop)
+                 .Include(ps => ps.Field)
+                 .Include(ps => ps.Harvests)  // fixed: was singular .Harvest
+                 .FirstOrDefaultAsync(ps => ps.ScheduleId == id); // fixed: was PlantingScheduleId
 
     public async Task CreateAsync(ScheduleViewModel vm)
     {
         _db.PlantingSchedules.Add(new PlantingSchedule
         {
             CropId = vm.CropId,
+            FieldId = vm.FieldId,       // added: was missing
             ScheduledDate = vm.ScheduledDate,
             ExpectedYieldKg = vm.ExpectedYieldKg,
             Notes = vm.Notes,
@@ -35,9 +42,10 @@ namespace FarmManagement.Web.Services
 
     public async Task UpdateAsync(ScheduleViewModel vm)
     {
-        var ps = await _db.PlantingSchedules.FindAsync(vm.PlantingScheduleId)
+        var ps = await _db.PlantingSchedules.FindAsync(vm.ScheduleId) // fixed: was PlantingScheduleId
                  ?? throw new KeyNotFoundException("Schedule not found.");
         ps.CropId = vm.CropId;
+        ps.FieldId = vm.FieldId;        // added: was missing
         ps.ScheduledDate = vm.ScheduledDate;
         ps.ExpectedYieldKg = vm.ExpectedYieldKg;
         ps.Notes = vm.Notes;
@@ -57,24 +65,28 @@ namespace FarmManagement.Web.Services
         ps.Status = "Completed";
         _db.Harvests.Add(new Harvest
         {
-            PlantingScheduleId = scheduleId,
+            ScheduleId = scheduleId,         // fixed: was PlantingScheduleId
             ActualYieldKg = actualYield,
-            QualityNotes = notes,
+            Notes = notes,              // fixed: was QualityNotes
             HarvestedDate = DateTime.Now
         });
         await _db.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<PlantingSchedule>> GetUpcomingAsync(int days = 30) =>
-        await _db.PlantingSchedules.Include(ps => ps.Crop)
-                                   .Where(ps => ps.ScheduledDate <= DateTime.Today.AddDays(days)
-                                             && ps.Status == "Scheduled")
-                                   .OrderBy(ps => ps.ScheduledDate)
-                                   .ToListAsync();
+        await _db.PlantingSchedules
+                 .Include(ps => ps.Crop)
+                 .Include(ps => ps.Field)
+                 .Where(ps => ps.ScheduledDate >= DateTime.Today
+                           && ps.ScheduledDate <= DateTime.Today.AddDays(days)
+                           && ps.Status == "Scheduled")
+                 .OrderBy(ps => ps.ScheduledDate)
+                 .ToListAsync();
 
     public async Task<ScheduleViewModel> PrepareViewModelAsync(ScheduleViewModel? vm = null)
     {
         vm ??= new ScheduleViewModel();
+
         var crops = await _db.Crops.Where(c => c.Status == "Growing")
                                    .OrderBy(c => c.CropName)
                                    .ToListAsync();
@@ -84,7 +96,15 @@ namespace FarmManagement.Web.Services
             Text = c.CropName,
             Selected = c.CropId == vm.CropId
         }).ToList();
+
+        var fields = await _db.Fields.OrderBy(f => f.FieldName).ToListAsync();
+        vm.Fields = fields.Select(f => new SelectListItem  // added: Fields dropdown
+        {
+            Value = f.FieldId.ToString(),
+            Text = $"{f.FieldName} ({f.Location})",
+            Selected = f.FieldId == vm.FieldId
+        }).ToList();
+
         return vm;
-    }
     }
 }

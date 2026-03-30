@@ -1,5 +1,83 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<FarmManagement.Web.Models.Entities.Field>
+
 @{
+    ViewData["Title"] = "Fields";
 }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Field Management</h2>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Add New Field
+    </a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-hover table-bordered align-middle mb-0">
+            <thead class="table-success">
+                <tr>
+                    <th>#</th>
+                    <th>Field Name</th>
+                    <th>Area (Hectares)</th>
+                    <th>Soil Type</th>
+                    <th>Location</th>
+                    <th>Total Crops</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">No fields found.</td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.FieldId</td>
+                        <td>@item.FieldName</td>
+                        <td>@item.AreaHectares</td>
+                        <td>@item.SoilType</td>
+                        <td>@item.Location</td>
+                        <td>
+                            <span class="badge bg-primary">
+                                @(item.Crops?.Count() ?? 0)
+                            </span>
+                        </td>
+                        <td>@item.CreatedAt.ToString("dd MMM yyyy")</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.FieldId"
+                               class="btn btn-sm btn-info">Details</a>
+                            <a asp-action="Edit" asp-route-id="@item.FieldId"
+                               class="btn btn-sm btn-warning">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@item.FieldId"
+                                  method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete @item.FieldName?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
