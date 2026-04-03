@@ -1,63 +1,114 @@
-﻿@model FarmManagement.Models.HarvestSchedule
+﻿@model FarmManagement.Web.Models.Entities.PlantingSchedule
+
 @{
     ViewData["Title"] = "Record Harvest";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-semibold">Record Harvest</h2>
-        <a asp-action="HarvestList" class="btn btn-outline-secondary">← Back</a>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-basket"></i> Record Harvest</h2>
+    <a asp-action="HarvestList" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Harvest List
+    </a>
+</div>
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light fw-semibold">Schedule Summary</div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <small class="text-muted">Crop</small>
-                    <p class="fw-semibold mb-0">@Model.Crop?.CropName</p>
-                </div>
-                <div class="col-md-4">
-                    <small class="text-muted">Scheduled Date</small>
-                    <p class="fw-semibold mb-0">@Model.ScheduledDate.ToString("dd MMM yyyy")</p>
-                </div>
-                <div class="col-md-4">
-                    <small class="text-muted">Expected Yield</small>
-                    <p class="fw-semibold mb-0">@Model.ExpectedYieldKg kg</p>
-                </div>
+<div class="row g-4">
+    <!-- Schedule Summary -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-success h-100">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-calendar3"></i> Schedule Summary
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Crop</dt>
+                    <dd class="col-sm-7 fw-semibold">
+                        @(Model.Crop?.CropName ?? "-")
+                    </dd>
+
+                    <dt class="col-sm-5">Field</dt>
+                    <dd class="col-sm-7">
+                        @(Model.Field?.FieldName ?? "-")
+                    </dd>
+
+                    <dt class="col-sm-5">Scheduled</dt>
+                    <dd class="col-sm-7">
+                        @Model.ScheduledDate.ToString("dd MMM yyyy")
+                    </dd>
+
+                    <dt class="col-sm-5">Expected</dt>
+                    <dd class="col-sm-7">
+                        <span class="fw-semibold text-primary">
+                            @Model.ExpectedYieldKg kg
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-5">Status</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-primary">@Model.Status</span>
+                    </dd>
+                </dl>
             </div>
         </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-success text-white fw-semibold">Enter Actual Harvest Data</div>
-        <div class="card-body">
-            <form asp-action="RecordHarvest" method="post">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@Model.HarvestScheduleId" />
+    <!-- Record Harvest Form -->
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-pencil-square"></i> Enter Harvest Details
+            </div>
+            <div class="card-body">
+                <form asp-action="RecordHarvest" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.ScheduleId" />
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Actual Yield (kg)</label>
-                    <div class="input-group">
-                        <input type="number" name="actualYield" class="form-control"
-                               step="0.01" min="0.01" required
-                               placeholder="Enter actual yield in kg" />
-                        <span class="input-group-text">kg</span>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Actual Yield (kg)
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" name="actualYield"
+                                       class="form-control"
+                                       min="0.1" step="0.1"
+                                       placeholder="e.g. 3200"
+                                       required />
+                                <span class="input-group-text">kg</span>
+                            </div>
+                            <small class="text-muted">
+                                Expected: @Model.ExpectedYieldKg kg
+                            </small>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            <textarea name="notes" class="form-control"
+                                  rows="4"
+                                      placeholder="Describe harvest quality, conditions, observations...">
+                            </textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="alert alert-info mb-0">
+                                <i class="bi bi-info-circle"></i>
+                                Recording this harvest will mark the schedule as
+                                <strong>Completed</strong> and save the actual
+                                yield against the expected yield of
+                                <strong>@Model.ExpectedYieldKg kg</strong>.
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-text">Expected was @Model.ExpectedYieldKg kg</div>
-                </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Quality Notes (optional)</label>
-                    <textarea name="notes" class="form-control" rows="3"
-                              placeholder="e.g. Good quality, minor pest damage on 10%..."></textarea>
-                </div>
-
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-success">Save Harvest Record</button>
-                    <a asp-action="HarvestList" class="btn btn-outline-secondary">Cancel</a>
-                </div>
-            </form>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Save Harvest
+                        </button>
+                        <a asp-action="HarvestList"
+                           class="btn btn-secondary ms-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

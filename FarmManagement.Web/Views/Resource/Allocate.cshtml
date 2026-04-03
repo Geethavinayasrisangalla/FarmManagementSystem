@@ -1,53 +1,151 @@
-﻿@model FarmManagement.Models.Resource
-@{
+﻿@{
     ViewData["Title"] = "Allocate Resource";
+    var resource = ViewBag.Resource as FarmManagement.Web.Models.Entities.Resource;
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-semibold">Allocate Resource</h2>
-        <a asp-action="Index" class="btn btn-outline-secondary">← Back to Inventory</a>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-arrow-right-circle"></i> Allocate Resource</h2>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Inventory
+    </a>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row g-4">
+    <!-- Resource Summary Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-primary h-100">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-box-seam"></i> Resource Details
+            </div>
+            <div class="card-body">
+                @if (resource != null)
+                {
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Name</dt>
+                        <dd class="col-sm-7 fw-semibold">@resource.Name</dd>
+
+                        <dt class="col-sm-5">Type</dt>
+                        <dd class="col-sm-7">
+                            <span class="badge bg-secondary">@resource.Type</span>
+                        </dd>
+
+                        <dt class="col-sm-5">Available</dt>
+                        <dd class="col-sm-7">
+                            <span class="fw-bold
+                                @(resource.Quantity <= 10 ? "text-danger" : "text-success")">
+                                @resource.Quantity @resource.Unit
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-5">Last Updated</dt>
+                        <dd class="col-sm-7">
+                            @resource.LastUpdated.ToString("dd MMM yyyy")
+                        </dd>
+                    </dl>
+
+                    @if (resource.Quantity <= 10)
+                    {
+                        <div class="alert alert-warning mt-3 mb-0 py-2">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <small>Low stock — allocate carefully.</small>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="mb-4 p-3 bg-light rounded">
-                <h5 class="mb-1">@Model.Name</h5>
-                <span class="text-muted">Available: <strong>@Model.Quantity @Model.Unit</strong></span>
+    <!-- Allocation Form -->
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-plus-circle"></i> Allocate to Schedule
             </div>
+            <div class="card-body">
+                <form asp-action="Allocate" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="resourceId"
+                           value="@resource?.ResourceId" />
 
-            <form asp-action="Allocate" method="post">
-                <input type="hidden" name="resourceId" value="@Model.ResourceId" />
-                @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Planting Schedule
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select name="scheduleId" class="form-select" required>
+                                <option value="">-- Select Schedule --</option>
+                                @if (ViewBag.Schedules != null)
+                                {
+                                    @foreach (var schedule in ViewBag.Schedules)
+                                    {
+                                        <option value="@schedule.ScheduleId">
+                                            @schedule.Crop?.CropName —
+                                            @schedule.ScheduledDate.ToString("dd MMM yyyy")
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Field</label>
-                    <select name="fieldId" class="form-select" required>
-                        <option value="">-- Select Field --</option>
-                        @foreach (var field in ViewBag.Fields as IEnumerable<FarmManagement.Models.Field>)
-                        {
-                            <option value="@field.FieldId">@field.FieldName (@field.Location)</option>
-                        }
-                    </select>
-                </div>
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Quantity to Allocate
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <input type="number" name="qty"
+                                       class="form-control"
+                                       min="0.1" step="0.1"
+                                       max="@resource?.Quantity"
+                                       placeholder="e.g. 25.5"
+                                       required />
+                                <span class="input-group-text">
+                                    @(resource?.Unit ?? "units")
+                                </span>
+                            </div>
+                            <small class="text-muted">
+                                Max available: @resource?.Quantity @resource?.Unit
+                            </small>
+                        </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Quantity to Allocate (@Model.Unit)</label>
-                    <input type="number" name="qty" class="form-control" step="0.01"
-                           min="0.01" max="@Model.Quantity" required />
-                </div>
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            <textarea name="notes" class="form-control"
+                                  rows="3"
+                                      placeholder="Optional — describe how this resource will be used...">
+                            </textarea>
+                        </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Notes (optional)</label>
-                    <textarea name="notes" class="form-control" rows="3"
-                              placeholder="e.g. Applied to north section"></textarea>
-                </div>
+                        <div class="col-12">
+                            <div class="alert alert-info mb-0">
+                                <i class="bi bi-info-circle"></i>
+                                Allocating will deduct the entered quantity from
+                                available stock and link it to the selected
+                                planting schedule.
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-success">Allocate</button>
-                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-                </div>
-            </form>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success"
+                            @(resource?.Quantity <= 0 ? "disabled" : "")>
+                            <i class="bi bi-check-circle"></i> Confirm Allocation
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

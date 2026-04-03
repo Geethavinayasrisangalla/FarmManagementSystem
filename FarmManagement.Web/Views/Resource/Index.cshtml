@@ -1,84 +1,149 @@
-﻿@model IEnumerable<FarmManagement.Models.Resource>
+﻿@model IEnumerable<FarmManagement.Web.Models.Entities.Resource>
+
 @{
-    ViewData["Title"] = "Inventory";
+    ViewData["Title"] = "Resource Inventory";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-semibold">Inventory Management</h2>
-        <a asp-action="Create" class="btn btn-success">+ Add Resource</a>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-box-seam"></i> Resource Inventory</h2>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Add Resource
+    </a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
+}
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
+<!-- ── Low Stock Alert Banner ─────────────────────────────────── -->
+@if (Model.Any(r => r.Quantity <= 10))
+{
+    <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <div>
+            <strong>Low Stock Warning!</strong>
+            @Model.Count(r => r.Quantity <= 10) resource(s) are running low
+            (quantity &le; 10).
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-hover table-bordered align-middle mb-0">
+            <thead class="table-success">
+                <tr>
+                    <th>#</th>
+                    <th>Resource Name</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Stock Status</th>
+                    <th>Last Updated</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
                     <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Quantity</th>
-                        <th>Unit</th>
-                        <th>Last Updated</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <td colspan="8" class="text-center text-muted">
+                            No resources found.
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td class="fw-semibold">@item.Name</td>
-                            <td>@item.Type</td>
-                            <td>@item.Quantity</td>
-                            <td>@item.Unit</td>
-                            <td>@item.LastUpdated.ToString("dd MMM yyyy")</td>
-                            <td>
-                                @if (item.Quantity <= 10)
-                                {
-                                    <span class="badge bg-danger">Low Stock</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-success">In Stock</span>
-                                }
-                            </td>
-                            <td>
-                                <a asp-action="Details" asp-route-id="@item.ResourceId"
-                                   class="btn btn-sm btn-outline-info">Details</a>
-                                <a asp-action="Edit" asp-route-id="@item.ResourceId"
-                                   class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a asp-action="Allocate" asp-route-id="@item.ResourceId"
-                                   class="btn btn-sm btn-outline-warning">Allocate</a>
-                                <form asp-action="Delete" method="post" class="d-inline"
-                                      onsubmit="return confirm('Delete this resource?')">
-                                    <input type="hidden" name="id" value="@item.ResourceId" />
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                    @if (!Model.Any())
-                    {
-                        <tr><td colspan="7" class="text-center text-muted py-4">No resources found. Add one to get started.</td></tr>
-                    }
-                </tbody>
-            </table>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr class="@(item.Quantity <= 10 ? "table-warning" : "")">
+                        <td>@item.ResourceId</td>
+                        <td>@item.Name</td>
+                        <td>
+                            <span class="badge bg-secondary">@item.Type</span>
+                        </td>
+                        <td class="fw-semibold @(item.Quantity <= 10 ? "text-danger" : "text-success")">
+                            @item.Quantity
+                        </td>
+                        <td>@item.Unit</td>
+                        <td>
+                            @if (item.Quantity <= 10)
+                            {
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-exclamation-triangle"></i> Low Stock
+                                </span>
+                            }
+                            else if (item.Quantity <= 50)
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-dash-circle"></i> Medium
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> In Stock
+                                </span>
+                            }
+                        </td>
+                        <td>@item.LastUpdated.ToString("dd MMM yyyy")</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.ResourceId"
+                               class="btn btn-sm btn-info">Details</a>
+                            <a asp-action="Edit" asp-route-id="@item.ResourceId"
+                               class="btn btn-sm btn-warning">Edit</a>
+                            <a asp-action="Allocate" asp-route-id="@item.ResourceId"
+                               class="btn btn-sm btn-primary">Allocate</a>
+                            <form asp-action="Delete" asp-route-id="@item.ResourceId"
+                                  method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete @item.Name?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit"
+                                        class="btn btn-sm btn-danger"
+                                    @(item.ResourceId > 0 ? "" : "disabled")>
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ── Summary Footer ─────────────────────────────────────────── -->
+<div class="row g-3 mt-2">
+    <div class="col-md-4">
+        <div class="card border-0 bg-light text-center py-2">
+            <div class="fw-bold fs-5">@Model.Count()</div>
+            <div class="text-muted small">Total Resources</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 bg-light text-center py-2">
+            <div class="fw-bold fs-5 text-danger">
+                @Model.Count(r => r.Quantity <= 10)
+            </div>
+            <div class="text-muted small">Low Stock Items</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 bg-light text-center py-2">
+            <div class="fw-bold fs-5 text-success">
+                @Model.Count(r => r.Quantity > 50)
+            </div>
+            <div class="text-muted small">Well Stocked Items</div>
         </div>
     </div>
 </div>

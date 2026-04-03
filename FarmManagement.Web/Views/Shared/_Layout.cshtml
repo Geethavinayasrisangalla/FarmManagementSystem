@@ -3,112 +3,271 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Farm Management System</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <title>@ViewData["Title"] — FarmManagement</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
+          rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet" />
+
     <style>
-        .navbar-brand { font-weight: 600; letter-spacing: 0.5px; }
-        .nav-link.active { font-weight: 600; }
-        .sidebar { min-height: calc(100vh - 56px); background: #f8f9fa; border-right: 1px solid #dee2e6; }
-        .sidebar .nav-link { color: #495057; border-radius: 6px; margin-bottom: 2px; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #e9ecef; color: #198754; }
-        .sidebar .nav-link .bi { margin-right: 8px; }
-        .content-area { padding: 1.5rem; }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            min-height: 100vh;
+            background-color: #1a3c2b;
+            width: 240px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            transition: width 0.3s;
+        }
+
+        #sidebar .sidebar-brand {
+            padding: 1.2rem 1rem;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #sidebar .nav-link {
+            color: rgba(255,255,255,0.75);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            margin: 2px 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        #sidebar .nav-link:hover,
+        #sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.12);
+            color: #fff;
+        }
+
+        #sidebar .nav-section {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.8rem 1rem 0.3rem;
+        }
+
+        /* Main content offset */
+        #main-content {
+            margin-left: 240px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top navbar */
+        #topbar {
+            background-color: #fff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0.6rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        /* Page content */
+        .page-content {
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #fff;
+            border-top: 1px solid #dee2e6;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            #sidebar { width: 0; overflow: hidden; }
+            #main-content { margin-left: 0; }
+        }
     </style>
 </head>
 <body>
-    <!-- Top Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                🌾 FarmManage
+
+<!-- ── Sidebar ────────────────────────────────────────────────── -->
+<nav id="sidebar">
+    <div class="sidebar-brand">
+        <i class="bi bi-tree-fill text-success fs-5"></i>
+        FarmManagement
+    </div>
+
+    <ul class="nav flex-column mt-2">
+
+        <li class="nav-section">Main</li>
+
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
+               asp-controller="Home" asp-action="Index">
+                <i class="bi bi-speedometer2"></i> Dashboard
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarTop">
-                <span class="navbar-toggler-icon"></span>
+        </li>
+
+        <li class="nav-section">Farm</li>
+
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Crop" ? "active" : "")"
+               asp-controller="Crop" asp-action="Index">
+                <i class="bi bi-flower1"></i> Crops
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Field" ? "active" : "")"
+               asp-controller="Field" asp-action="Index">
+                <i class="bi bi-grid-3x3-gap"></i> Fields
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Schedule" ? "active" : "")"
+               asp-controller="Schedule" asp-action="Index">
+                <i class="bi bi-calendar3"></i> Schedules
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Schedule" && ViewContext.RouteData.Values["action"]?.ToString() == "HarvestList" ? "active" : "")"
+               asp-controller="Schedule" asp-action="HarvestList">
+                <i class="bi bi-basket"></i> Harvests
+            </a>
+        </li>
+
+        <li class="nav-section">Management</li>
+
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Pest" ? "active" : "")"
+               asp-controller="Pest" asp-action="Index">
+                <i class="bi bi-bug"></i> Pest Incidents
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Resource" ? "active" : "")"
+               asp-controller="Resource" asp-action="Index">
+                <i class="bi bi-box-seam"></i> Resources
+            </a>
+        </li>
+
+        <li class="nav-section">Reports</li>
+
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" ? "active" : "")"
+               asp-controller="Report" asp-action="Index">
+                <i class="bi bi-bar-chart-line"></i> Reports
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" && ViewContext.RouteData.Values["action"]?.ToString() == "YieldAnalytics" ? "active" : "")"
+               asp-controller="Report" asp-action="YieldAnalytics">
+                <i class="bi bi-graph-up-arrow"></i> Yield Analytics
+            </a>
+        </li>
+
+    </ul>
+</nav>
+
+<!-- ── Main Content ───────────────────────────────────────────── -->
+<div id="main-content">
+
+    <!-- Top Bar -->
+    <div id="topbar">
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-secondary d-md-none"
+                    onclick="document.getElementById('sidebar').style.width =
+                             document.getElementById('sidebar').style.width === '240px'
+                             ? '0' : '240px'">
+                <i class="bi bi-list"></i>
             </button>
-            <div class="collapse navbar-collapse" id="navbarTop">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="Index">Dashboard</a>
-                    </li>
-                </ul>
-            </div>
+            <span class="text-muted small">
+                @ViewData["Title"]
+            </span>
         </div>
-    </nav>
-
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-2 d-none d-md-block sidebar py-3">
-                <ul class="nav flex-column px-2">
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
-                           asp-controller="Home" asp-action="Index">
-                            📊 Dashboard
-                        </a>
-                    </li>
-                    <hr class="my-2" />
-                    <small class="text-muted px-2 fw-semibold">FARM</small>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Field" ? "active" : "")"
-                           asp-controller="Field" asp-action="Index">
-                            🌍 Fields
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Crop" ? "active" : "")"
-                           asp-controller="Crop" asp-action="Index">
-                            🌱 Crops
-                        </a>
-                    </li>
-                    <hr class="my-2" />
-                    <small class="text-muted px-2 fw-semibold">MONITORING</small>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Pest" ? "active" : "")"
-                           asp-controller="Pest" asp-action="Index">
-                            🐛 Pest Incidents
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" ? "active" : "")"
-                           asp-controller="Report" asp-action="YieldAnalytics">
-                            📈 Yield Analytics
-                        </a>
-                    </li>
-                    <hr class="my-2" />
-                    <small class="text-muted px-2 fw-semibold">OPERATIONS</small>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Resource" ? "active" : "")"
-                           asp-controller="Resource" asp-action="Index">
-                            📦 Inventory
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Schedule" ? "active" : "")"
-                           asp-controller="Schedule" asp-action="Index">
-                            📅 Schedules
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Schedule" ? "active" : "")"
-                           asp-controller="Schedule" asp-action="HarvestList">
-                            🌾 Harvest List
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- Main Content -->
-            <main class="col-md-10 content-area">
-                @RenderBody()
-            </main>
+        <div class="d-flex align-items-center gap-3">
+            <span class="text-muted small">
+                <i class="bi bi-calendar3"></i>
+                @DateTime.Now.ToString("dd MMM yyyy")
+            </span>
+            <a asp-controller="Home" asp-action="Privacy"
+               class="text-muted small text-decoration-none">
+                <i class="bi bi-shield-lock"></i> Privacy
+            </a>
         </div>
     </div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <!-- Page Content -->
+    <div class="page-content">
+
+        @* TempData alerts — global so every page gets them *@
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle"></i> @TempData["Success"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @RenderBody()
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="d-flex justify-content-between">
+            <span>
+                &copy; @DateTime.Now.Year FarmManagement System
+            </span>
+            <span>
+                Built with ASP.NET Core MVC &amp; Bootstrap 5
+            </span>
+        </div>
+    </footer>
+
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js">
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

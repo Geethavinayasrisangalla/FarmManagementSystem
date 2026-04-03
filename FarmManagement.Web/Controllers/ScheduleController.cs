@@ -1,6 +1,5 @@
 ﻿using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
-using FarmManagement.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FarmManagement.Web.Controllers;

@@ -12,6 +12,12 @@ public class ReportController : Controller
         _reportService = reportService;
     }
 
+    // GET: /Report
+    public IActionResult Index()
+    {
+        return View();
+    }
+
     // GET: /Report/YieldAnalytics
     public async Task<IActionResult> YieldAnalytics()
     {

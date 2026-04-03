@@ -1,5 +1,137 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Reports";
 }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-bar-chart-line"></i> Reports</h2>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="row g-4">
+    <!-- Yield Analytics Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-success">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-graph-up-arrow"></i> Yield Analytics
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    View harvest yield records across all crops and seasons.
+                    Includes total yield, average yield and crop-wise breakdown.
+                </p>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-action="YieldAnalytics" class="btn btn-success w-100">
+                    <i class="bi bi-bar-chart"></i> View Yield Analytics
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pest Summary Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-danger">
+            <div class="card-header bg-danger text-white">
+                <i class="bi bi-bug"></i> Pest Incident Summary
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Overview of all pest incidents reported across crops.
+                    Filter by status — Active, Monitoring or Resolved.
+                </p>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-controller="Pest" asp-action="Index"
+                       class="btn btn-danger w-100">
+                    <i class="bi bi-bug"></i> View Pest Incidents
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resource Usage Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-warning">
+            <div class="card-header bg-warning text-dark">
+                <i class="bi bi-box-seam"></i> Resource Inventory
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Check current stock levels for all resources.
+                    Highlights low stock items that need restocking.
+                </p>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-controller="Resource" asp-action="Index"
+                       class="btn btn-warning w-100">
+                    <i class="bi bi-box-seam"></i> View Inventory
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Overview Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-primary">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-calendar3"></i> Schedule Overview
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    View all planting schedules including upcoming harvests
+                    within the next 30 days.
+                </p>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-controller="Schedule" asp-action="HarvestList"
+                       class="btn btn-primary w-100">
+                    <i class="bi bi-calendar-check"></i> View Upcoming Harvests
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crop Overview Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-info">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-flower1"></i> Crop Overview
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    View all crops currently growing across all fields
+                    with season and status information.
+                </p>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-controller="Crop" asp-action="Index"
+                       class="btn btn-info w-100">
+                    <i class="bi bi-flower1"></i> View Crops
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Field Overview Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-secondary">
+            <div class="card-header bg-secondary text-white">
+                <i class="bi bi-grid-3x3-gap"></i> Field Overview
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    View all registered fields with area, soil type,
+                    location and number of assigned crops.
+                </p>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a asp-controller="Field" asp-action="Index"
+                       class="btn btn-secondary w-100">
+                    <i class="bi bi-grid-3x3-gap"></i> View Fields
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

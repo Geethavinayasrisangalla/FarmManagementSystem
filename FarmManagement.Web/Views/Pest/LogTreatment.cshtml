@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Log Treatment";
+    var currentStatus = Model.Status.ToString();
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -35,9 +36,9 @@
                     <dd class="col-sm-7">
                         <span class="badge
                             @(Model.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Active
-                                ? "bg-danger" :
-                              Model.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring
-                                ? "bg-warning text-dark" : "bg-success")">
+                                                              ? "bg-danger" :
+                                                            Model.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring
+                                                              ? "bg-warning text-dark" : "bg-success")">
                             @Model.Status
                         </span>
                     </dd>
@@ -63,38 +64,38 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Update Status</label>
-                            <select name="status" class="form-select">
-                                <option value="Active"
-                                    @(Model.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Active
-                                        ? "selected" : "")>
-                                    Active
-                                </option>
-                                <option value="Monitoring"
-                                    @(Model.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring
-                                        ? "selected" : "")>
-                                    Monitoring
-                                </option>
-                                <option value="Resolved"
-                                    @(Model.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Resolved
-                                        ? "selected" : "")>
-                                    Resolved
-                                </option>
-                            </select>
+                            <!-- fixed: use Html.DropDownList instead of
+                                 manual option tags with inline C# -->
+                            @Html.DropDownList("status",
+                                new SelectList(
+                                    new[]
+                                    {
+                                        new { Value = "Active",     Text = "Active"     },
+                                        new { Value = "Monitoring", Text = "Monitoring" },
+                                        new { Value = "Resolved",   Text = "Resolved"   }
+                                    },
+                                    "Value",
+                                    "Text",
+                                    currentStatus
+                                ),
+                                new { @class = "form-select" }
+                            )
                         </div>
 
                         <div class="col-12">
                             <label class="form-label">Treatment Notes</label>
-                            <textarea name="treatmentNotes" class="form-control"
+                            <textarea name="treatmentNotes"
+                                      class="form-control"
                                       rows="5"
-                                      placeholder="Describe the treatment applied, chemicals used, dosage, etc.">@Model.TreatmentNotes</textarea>
+                                      placeholder="Describe treatment applied, chemicals used, dosage etc.">@Model.TreatmentNotes</textarea>
                         </div>
 
                         <div class="col-12">
                             <div class="alert alert-info mb-0">
                                 <i class="bi bi-info-circle"></i>
-                                Updating to <strong>Resolved</strong> will mark this
-                                incident as closed. Treatment notes will be saved
-                                directly on this incident record.
+                                Updating to <strong>Resolved</strong> will mark
+                                this incident as closed. Treatment notes will be
+                                saved directly on this incident record.
                             </div>
                         </div>
                     </div>

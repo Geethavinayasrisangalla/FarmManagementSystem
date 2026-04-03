@@ -7,10 +7,13 @@ namespace FarmManagement.Web.Controllers;
 public class ResourceController : Controller
 {
     private readonly IResourceService _resourceService;
+    private readonly IScheduleService _scheduleService;  // added
 
-    public ResourceController(IResourceService resourceService)
+    public ResourceController(IResourceService resourceService,
+                               IScheduleService scheduleService)  // added
     {
         _resourceService = resourceService;
+        _scheduleService = scheduleService;  // added
     }
 
     // GET: /Resource
@@ -84,18 +87,19 @@ public class ResourceController : Controller
         if (resource == null) return NotFound();
 
         ViewBag.Resource = resource;
+        ViewBag.Schedules = await _scheduleService.GetAllAsync();  // added
         return View();
     }
 
     // POST: /Resource/Allocate
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Allocate(int resourceId, int fieldId,
+    public async Task<IActionResult> Allocate(int resourceId, int scheduleId,  // fixed: fieldId → scheduleId
                                                decimal qty, string? notes)
     {
         try
         {
-            await _resourceService.AllocateAsync(resourceId, fieldId, qty, notes);
+            await _resourceService.AllocateAsync(resourceId, scheduleId, qty, notes);  // fixed
             TempData["Success"] = "Resource allocated successfully.";
         }
         catch (InvalidOperationException ex)
