@@ -21,7 +21,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<CropValidator>();
 
-// ── Services (DI) ─────────────────────────────────────────────
+// ── Services (Dependency Injection) ───────────────────────────
 builder.Services.AddScoped<ICropService, CropService>();
 builder.Services.AddScoped<IFieldService, FieldService>();
 builder.Services.AddScoped<IPestService, PestService>();
@@ -32,10 +32,19 @@ builder.Services.AddScoped<IReportService, ReportService>();
 var app = builder.Build();
 
 // ── Seed Database ─────────────────────────────────────────────
+// This section runs at startup to ensure the DB is created and populated
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<FarmDbContext>();
-    await DbInitializer.SeedAsync(db);
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<FarmDbContext>();
+        await DbInitializer.SeedAsync(db);
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+    }
 }
 
 // ── Middleware ────────────────────────────────────────────────
@@ -47,7 +56,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(

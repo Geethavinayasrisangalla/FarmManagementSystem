@@ -8,8 +8,9 @@ public static class DbInitializer
 {
     public static async Task SeedAsync(FarmDbContext context)
     {
-        // Apply any pending migrations automatically
-        await context.Database.MigrateAsync();
+        // Force the creation of the database and tables if they don't exist
+        // This fixes the "Invalid object name" error immediately.
+        await context.Database.EnsureCreatedAsync();
 
         // ── Fields ────────────────────────────────────────────────────
         if (!await context.Fields.AnyAsync())
@@ -58,8 +59,8 @@ public static class DbInitializer
                     CropName            = "Wheat",
                     CropType            = "Grain",
                     Season              = SeasonType.Rabi,
-                    PlantingDate        = new DateTime(2024, 11, 1),
-                    ExpectedHarvestDate = new DateTime(2025, 4, 15),
+                    PlantingDate        = new DateTime(2025, 11, 1),
+                    ExpectedHarvestDate = new DateTime(2026, 4, 15),
                     FieldId             = fields[0].FieldId,
                     Status              = "Growing"
                 },
@@ -78,8 +79,8 @@ public static class DbInitializer
                     CropName            = "Tomato",
                     CropType            = "Vegetable",
                     Season              = SeasonType.Zaid,
-                    PlantingDate        = new DateTime(2025, 3, 1),
-                    ExpectedHarvestDate = new DateTime(2025, 7, 1),
+                    PlantingDate        = new DateTime(2026, 3, 1),
+                    ExpectedHarvestDate = new DateTime(2026, 7, 1),
                     FieldId             = fields[2].FieldId,
                     Status              = "Harvested"
                 }
@@ -101,7 +102,7 @@ public static class DbInitializer
                 {
                     CropId          = crops[0].CropId,
                     FieldId         = fields[0].FieldId,
-                    ScheduledDate   = new DateTime(2025, 4, 15),
+                    ScheduledDate   = new DateTime(2026, 4, 15),
                     ExpectedYieldKg = 4500.00m,
                     Status          = "Scheduled",
                     Notes           = "First wheat harvest of the Rabi season"
@@ -119,7 +120,7 @@ public static class DbInitializer
                 {
                     CropId          = crops[2].CropId,
                     FieldId         = fields[2].FieldId,
-                    ScheduledDate   = new DateTime(2025, 7, 1),
+                    ScheduledDate   = new DateTime(2026, 7, 1),
                     ExpectedYieldKg = 3000.00m,
                     Status          = "Completed",
                     Notes           = "Zaid tomato harvest completed"
@@ -143,7 +144,7 @@ public static class DbInitializer
                     new Harvest
                     {
                         ScheduleId    = completedSchedule.ScheduleId,
-                        HarvestedDate = new DateTime(2025, 7, 1),
+                        HarvestedDate = new DateTime(2026, 7, 1),
                         ActualYieldKg = 3200.00m,
                         Notes         = "Good yield despite dry spell"
                     }
@@ -199,46 +200,11 @@ public static class DbInitializer
         {
             var resources = new List<Resource>
             {
-                new Resource
-                {
-                    Name        = "NPK Fertilizer",
-                    Type        = ResourceType.Fertilizer,
-                    Quantity    = 500.00m,
-                    Unit        = "kg",
-                    LastUpdated = DateTime.Now
-                },
-                new Resource
-                {
-                    Name        = "Chlorpyrifos",
-                    Type        = ResourceType.Pesticide,
-                    Quantity    = 8.00m,        // low stock — triggers dashboard alert
-                    Unit        = "liters",
-                    LastUpdated = DateTime.Now
-                },
-                new Resource
-                {
-                    Name        = "Wheat Seeds",
-                    Type        = ResourceType.Seeds,
-                    Quantity    = 200.00m,
-                    Unit        = "kg",
-                    LastUpdated = DateTime.Now
-                },
-                new Resource
-                {
-                    Name        = "Tractor",
-                    Type        = ResourceType.Equipment,
-                    Quantity    = 2.00m,
-                    Unit        = "units",
-                    LastUpdated = DateTime.Now
-                },
-                new Resource
-                {
-                    Name        = "Irrigation Water",
-                    Type        = ResourceType.Water,
-                    Quantity    = 5.00m,        // low stock — triggers dashboard alert
-                    Unit        = "kiloliters",
-                    LastUpdated = DateTime.Now
-                }
+                new Resource { Name = "NPK Fertilizer", Type = ResourceType.Fertilizer, Quantity = 500.00m, Unit = "kg", LastUpdated = DateTime.Now },
+                new Resource { Name = "Chlorpyrifos", Type = ResourceType.Pesticide, Quantity = 8.00m, Unit = "liters", LastUpdated = DateTime.Now },
+                new Resource { Name = "Wheat Seeds", Type = ResourceType.Seeds, Quantity = 200.00m, Unit = "kg", LastUpdated = DateTime.Now },
+                new Resource { Name = "Tractor", Type = ResourceType.Equipment, Quantity = 2.00m, Unit = "units", LastUpdated = DateTime.Now },
+                new Resource { Name = "Irrigation Water", Type = ResourceType.Water, Quantity = 5.00m, Unit = "kiloliters", LastUpdated = DateTime.Now }
             };
 
             await context.Resources.AddRangeAsync(resources);
@@ -277,30 +243,9 @@ public static class DbInitializer
 
             var yieldReports = new List<YieldReport>
             {
-                new YieldReport
-                {
-                    CropId       = crops[0].CropId,
-                    TotalYieldKg = 4500.00m,
-                    Season       = SeasonType.Rabi,
-                    Year         = 2025,
-                    GeneratedAt  = DateTime.Now
-                },
-                new YieldReport
-                {
-                    CropId       = crops[1].CropId,
-                    TotalYieldKg = 3800.00m,
-                    Season       = SeasonType.Kharif,
-                    Year         = 2025,
-                    GeneratedAt  = DateTime.Now
-                },
-                new YieldReport
-                {
-                    CropId       = crops[2].CropId,
-                    TotalYieldKg = 3200.00m,
-                    Season       = SeasonType.Zaid,
-                    Year         = 2025,
-                    GeneratedAt  = DateTime.Now
-                }
+                new YieldReport { CropId = crops[0].CropId, TotalYieldKg = 4500.00m, Season = SeasonType.Rabi, Year = 2026, GeneratedAt = DateTime.Now },
+                new YieldReport { CropId = crops[1].CropId, TotalYieldKg = 3800.00m, Season = SeasonType.Kharif, Year = 2025, GeneratedAt = DateTime.Now },
+                new YieldReport { CropId = crops[2].CropId, TotalYieldKg = 3200.00m, Season = SeasonType.Zaid, Year = 2026, GeneratedAt = DateTime.Now }
             };
 
             await context.YieldReports.AddRangeAsync(yieldReports);

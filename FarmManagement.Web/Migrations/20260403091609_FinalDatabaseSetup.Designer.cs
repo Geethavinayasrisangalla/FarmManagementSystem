@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FarmManagement.Web.Migrations
 {
     [DbContext(typeof(FarmDbContext))]
-    [Migration("20260403045238_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260403091609_FinalDatabaseSetup")]
+    partial class FinalDatabaseSetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -180,6 +180,7 @@ namespace FarmManagement.Web.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("ExpectedYieldKg")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("FieldId")

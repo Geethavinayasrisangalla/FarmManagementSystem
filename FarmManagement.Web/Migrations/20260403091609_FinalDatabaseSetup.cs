@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FarmManagement.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class FinalDatabaseSetup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -103,7 +103,7 @@ namespace FarmManagement.Web.Migrations
                     CropId = table.Column<int>(type: "int", nullable: false),
                     FieldId = table.Column<int>(type: "int", nullable: false),
                     ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExpectedYieldKg = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ExpectedYieldKg = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
                 },
