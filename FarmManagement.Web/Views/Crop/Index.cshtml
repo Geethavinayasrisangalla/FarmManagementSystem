@@ -1,86 +1,124 @@
-﻿@model IEnumerable<FarmManagement.Web.Models.Entities.Crop>
+@model IEnumerable<FarmManagement.Web.Models.Entities.Crop>
 
 @{
     ViewData["Title"] = "Crops";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Crop Inventory</h2>
-    <a asp-action="Create" class="btn btn-success">
-        <i class="bi bi-plus-circle"></i> Add New Crop
-    </a>
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>
+            <span class="ph-icon" style="background:#dbeafe;color:#2563eb;">
+                <i class="bi bi-flower1"></i>
+            </span>
+            Crop Inventory
+        </h1>
+        <p>Manage and monitor all crops across your fields.</p>
+    </div>
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Supervisor"))
+    {
+        <a asp-action="Create" class="btn-fm btn-primary-fm">
+            <i class="bi bi-plus-circle"></i> Add Crop
+        </a>
+    }
 </div>
 
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show">
-        @TempData["Success"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="fm-alert fm-alert-success mb-3">
+        <i class="bi bi-check-circle-fill"></i>
+        <span>@TempData["Success"]</span>
     </div>
 }
-
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show">
-        @TempData["Error"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="fm-alert fm-alert-danger mb-3">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>@TempData["Error"]</span>
     </div>
 }
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <table class="table table-hover table-bordered align-middle mb-0">
-            <thead class="table-success">
-                <tr>
-                    <th>#</th>
-                    <th>Crop Name</th>
-                    <th>Crop Type</th>
-                    <th>Season</th>
-                    <th>Field</th>
-                    <th>Planting Date</th>
-                    <th>Expected Harvest</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Any())
-                {
-                    <tr>
-                        <td colspan="9" class="text-center text-muted">No crops found.</td>
-                    </tr>
-                }
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.CropId</td>
-                        <td>@item.CropName</td>
-                        <td>@item.CropType</td>
-                        <td>@item.Season</td>
-                        <td>@(item.Field?.FieldName ?? "-")</td>
-                        <td>@item.PlantingDate.ToString("dd MMM yyyy")</td>
-                        <td>@item.ExpectedHarvestDate.ToString("dd MMM yyyy")</td>
-                        <td>
-                            <span class="badge @(item.Status == "Growing" ? "bg-success" :
-                                                                                                                    item.Status == "Harvested" ? "bg-secondary" : "bg-warning")">
-                                @item.Status
-                            </span>
-                        </td>
-                        <td>
-                            <a asp-action="Details" asp-route-id="@item.CropId"
-                               class="btn btn-sm btn-info">Details</a>
-                            <a asp-action="Edit" asp-route-id="@item.CropId"
-                               class="btn btn-sm btn-warning">Edit</a>
-                            <form asp-action="Delete" asp-route-id="@item.CropId"
-                                  method="post" class="d-inline"
-                                  onsubmit="return confirm('Delete @item.CropName?')">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+<div class="fm-card">
+    <div class="fm-card-header">
+        <span class="ch-title">
+            <i class="bi bi-table" style="color:var(--fm-green);"></i>
+            All Crops
+        </span>
+        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.Count() records</span>
     </div>
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="bi bi-flower1"></i>
+            <p>No crops found. Add your first crop to get started.</p>
+        </div>
+    }
+    else
+    {
+        <div style="overflow-x:auto;">
+            <table class="fm-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Crop Name</th>
+                        <th>Type</th>
+                        <th>Season</th>
+                        <th>Field</th>
+                        <th>Planting Date</th>
+                        <th>Expected Harvest</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@item.CropId</td>
+                            <td style="font-weight:600;">@item.CropName</td>
+                            <td>@item.CropType</td>
+                            <td>@item.Season</td>
+                            <td>
+                                <span class="badge-pill badge-gray">@(item.Field?.FieldName ?? "—")</span>
+                            </td>
+                            <td>@item.PlantingDate.ToString("dd MMM yyyy")</td>
+                            <td>@item.ExpectedHarvestDate.ToString("dd MMM yyyy")</td>
+                            <td>
+                                @{
+                                    var cropBadge = item.Status switch {
+                                        "Growing"   => "badge-green",
+                                        "Harvested" => "badge-gray",
+                                        _           => "badge-yellow"
+                                    };
+                                }
+                                <span class="badge-pill @cropBadge">@item.Status</span>
+                            </td>
+                            <td>
+                                <div style="display:flex;gap:.3rem;flex-wrap:wrap;">
+                                    <a asp-action="Details" asp-route-id="@item.CropId"
+                                       class="btn-fm btn-info-fm btn-sm-fm">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Supervisor"))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.CropId"
+                                           class="btn-fm btn-warn-fm btn-sm-fm">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@item.CropId"
+                                              method="post" class="d-inline"
+                                              onsubmit="return confirm('Delete @item.CropName?')">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn-fm btn-danger-fm btn-sm-fm">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>

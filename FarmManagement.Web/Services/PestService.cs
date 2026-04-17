@@ -1,4 +1,4 @@
-﻿using FarmManagement.Web.Data;
+using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Enums;
 using FarmManagement.Web.Models.Interfaces;
@@ -19,7 +19,6 @@ public class PestService : IPestService
     public async Task<PestIncident?> GetByIdAsync(int id) =>
         await _db.PestIncidents.Include(p => p.Crop)
                                .FirstOrDefaultAsync(p => p.PestIncidentId == id);
-    // removed: .Include(p => p.Treatments) — Treatment entity removed
 
     public async Task<IEnumerable<PestIncident>> GetActivesAsync() =>
         await _db.PestIncidents.Include(p => p.Crop)
@@ -39,7 +38,6 @@ public class PestService : IPestService
 
         pest.Status = Enum.Parse<IncidentStatus>(status);
 
-        // fixed: store notes directly on entity instead of creating Treatment object
         if (!string.IsNullOrWhiteSpace(treatmentNotes))
             pest.TreatmentNotes = treatmentNotes;
 

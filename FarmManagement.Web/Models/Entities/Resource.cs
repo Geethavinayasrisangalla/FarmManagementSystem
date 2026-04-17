@@ -1,4 +1,4 @@
-﻿using FarmManagement.Web.Models.Enums;
+using FarmManagement.Web.Models.Enums;
 
 namespace FarmManagement.Web.Models.Entities;
 
@@ -11,6 +11,5 @@ public class Resource
     public string Unit { get; set; } = string.Empty;
     public DateTime LastUpdated { get; set; } = DateTime.Now;
 
-    // ── Navigation Property ───────────────────────────────────────
     public ICollection<ResourceUsage> ResourceUsages { get; set; } = new List<ResourceUsage>();
 }

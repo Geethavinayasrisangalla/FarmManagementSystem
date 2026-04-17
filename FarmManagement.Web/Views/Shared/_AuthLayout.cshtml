@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — FarmManagement</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .auth-bg {
+            min-height: 100vh;
+            width: 100%;
+            background-image: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #1a3c2b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            position: relative;
+        }
+
+        .auth-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(10,40,20,0.72) 0%, rgba(26,60,43,0.65) 100%);
+        }
+
+        .auth-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 460px;
+        }
+
+        .auth-brand {
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .auth-brand .brand-icon {
+            width: 68px;
+            height: 68px;
+            background: rgba(255,255,255,0.12);
+            border: 2px solid rgba(255,255,255,0.25);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #6ddb8b;
+            margin-bottom: 0.75rem;
+            backdrop-filter: blur(6px);
+        }
+
+        .auth-brand h1 {
+            color: #fff;
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .auth-brand p {
+            color: rgba(255,255,255,0.65);
+            font-size: 0.88rem;
+            margin-top: 0.25rem;
+        }
+
+        .auth-card {
+            background: rgba(255,255,255,0.97);
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+            overflow: hidden;
+        }
+
+        .auth-card-body {
+            padding: 2.2rem 2.2rem 1.6rem;
+        }
+
+        .auth-card-footer {
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            padding: 1rem 2.2rem;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #344054;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1.5px solid #d0d5dd;
+            padding: 0.65rem 0.9rem;
+            font-size: 0.92rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #1a3c2b;
+            box-shadow: 0 0 0 3px rgba(26,60,43,0.12);
+        }
+
+        .btn-auth {
+            background: linear-gradient(135deg, #1a3c2b 0%, #2d6a4f 100%);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.75rem;
+            width: 100%;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+
+        .btn-auth:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+            color: #fff;
+        }
+
+        .auth-footer-text {
+            color: #667085;
+        }
+
+        .auth-footer-link {
+            color: #1a3c2b;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .auth-footer-link:hover {
+            text-decoration: underline;
+            color: #2d6a4f;
+        }
+
+        .field-tag {
+            display: inline-block;
+            background: rgba(26,60,43,0.08);
+            color: #1a3c2b;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.55rem;
+            border-radius: 20px;
+            margin: 0.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-bg">
+        <div class="auth-wrapper">
+            <div class="auth-brand">
+                <div>
+                    <span class="brand-icon"><i class="bi bi-tree-fill"></i></span>
+                </div>
+                <h1>FarmManagement</h1>
+                <p>Smart farming, better harvests</p>
+            </div>
+
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

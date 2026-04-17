@@ -1,272 +1,269 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] — FarmManagement</title>
-
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
-          rel="stylesheet" />
-
-    <!-- Bootstrap Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
-          rel="stylesheet" />
-
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        /* Sidebar */
-        #sidebar {
-            min-height: 100vh;
-            background-color: #1a3c2b;
-            width: 240px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 100;
-            transition: width 0.3s;
-        }
-
-        #sidebar .sidebar-brand {
-            padding: 1.2rem 1rem;
-            color: #fff;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        #sidebar .nav-link {
-            color: rgba(255,255,255,0.75);
-            padding: 0.6rem 1rem;
-            border-radius: 6px;
-            margin: 2px 8px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        #sidebar .nav-link:hover,
-        #sidebar .nav-link.active {
-            background-color: rgba(255,255,255,0.12);
-            color: #fff;
-        }
-
-        #sidebar .nav-section {
-            color: rgba(255,255,255,0.4);
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 0.8rem 1rem 0.3rem;
-        }
-
-        /* Main content offset */
-        #main-content {
-            margin-left: 240px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Top navbar */
-        #topbar {
-            background-color: #fff;
-            border-bottom: 1px solid #dee2e6;
-            padding: 0.6rem 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 99;
-        }
-
-        /* Page content */
-        .page-content {
-            padding: 1.5rem;
-            flex: 1;
-        }
-
-        /* Footer */
-        footer {
-            background-color: #fff;
-            border-top: 1px solid #dee2e6;
-            padding: 0.8rem 1.5rem;
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-
-        /* Responsive */
-        @@media (max-width: 768px) {
-            #sidebar { width: 0; overflow: hidden; }
-            #main-content { margin-left: 0; }
-        }
-    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/farm.css" />
 </head>
 <body>
 
-<!-- ── Sidebar ────────────────────────────────────────────────── -->
-<nav id="sidebar">
-    <div class="sidebar-brand">
-        <i class="bi bi-tree-fill text-success fs-5"></i>
-        FarmManagement
-    </div>
+@{
+    var ctrl   = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
 
-    <ul class="nav flex-column mt-2">
+    var isAdmin      = User.IsInRole("Admin");
+    var isManager    = User.IsInRole("Manager");
+    var isSupervisor = User.IsInRole("Supervisor");
+    var isWorker     = User.IsInRole("Worker");
+    var isViewer     = User.IsInRole("Viewer");
 
-        <li class="nav-section">Main</li>
+    var canViewCrops     = isAdmin || isManager || isSupervisor || isViewer;
+    var canViewSchedules = isAdmin || isManager || isSupervisor || isWorker || isViewer;
+    var canViewPest      = isAdmin || isManager || isSupervisor || isWorker;
+    var canViewResources = isAdmin || isManager || isWorker;
+    var canViewReports   = isAdmin || isManager || isSupervisor || isViewer;
+    var canManageUsers   = isAdmin;
 
-        <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
+    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
+    var roleCss  = userRole.ToLower() switch {
+        "admin"      => "role-admin",
+        "manager"    => "role-manager",
+        "supervisor" => "role-supervisor",
+        "worker"     => "role-worker",
+        _            => "role-viewer"
+    };
+}
+
+<!-- ═══════════  TOP NAVBAR  ═══════════ -->
+<header class="fm-topnav">
+    <div class="fm-topnav-inner">
+
+        <!-- Brand -->
+        <a class="fm-brand" asp-controller="Home" asp-action="Index">
+            <div class="fm-brand-logo"><i class="bi bi-tree-fill"></i></div>
+            <div class="fm-brand-text">
+                <span class="fm-brand-name">FarmManagement</span>
+                <span class="fm-brand-sub">Agricultural System</span>
+            </div>
+        </a>
+
+        <!-- Hamburger (mobile only) -->
+        <button class="fm-hamburger" id="navToggle" aria-label="Menu">
+            <i class="bi bi-list"></i>
+        </button>
+
+        <!-- Nav -->
+        <nav class="fm-nav" id="fmNav">
+
+            <a class="fm-nav-link @(ctrl == "Home" ? "fm-nav-active" : "")"
                asp-controller="Home" asp-action="Index">
-                <i class="bi bi-speedometer2"></i> Dashboard
+                <i class="bi bi-speedometer2"></i><span>Dashboard</span>
             </a>
-        </li>
 
-        <li class="nav-section">Farm</li>
+            @if (canViewCrops)
+            {
+                <div class="fm-dropdown @(ctrl=="Crop"||ctrl=="Field" ? "fm-dd-active" : "")">
+                    <button class="fm-nav-link fm-dd-toggle">
+                        <i class="bi bi-flower1"></i><span>Farm</span><i class="bi bi-chevron-down fm-caret"></i>
+                    </button>
+                    <div class="fm-dd-menu">
+                        <div class="fm-dd-label">Farm Management</div>
+                        <a class="fm-dd-item @(ctrl=="Crop"?"fm-dd-item-active":"")" asp-controller="Crop" asp-action="Index">
+                            <span class="fm-dd-icon" style="background:#dbeafe;color:#2563eb;"><i class="bi bi-flower1"></i></span>
+                            <div><div class="fm-dd-title">Crops</div><div class="fm-dd-sub">Manage crop records</div></div>
+                        </a>
+                        <a class="fm-dd-item @(ctrl=="Field"?"fm-dd-item-active":"")" asp-controller="Field" asp-action="Index">
+                            <span class="fm-dd-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-grid-3x3-gap"></i></span>
+                            <div><div class="fm-dd-title">Fields</div><div class="fm-dd-sub">View and edit farm fields</div></div>
+                        </a>
+                    </div>
+                </div>
+            }
 
-        <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Crop" ? "active" : "")"
-               asp-controller="Crop" asp-action="Index">
-                <i class="bi bi-flower1"></i> Crops
-            </a>
-        </li>
+            @if (canViewSchedules)
+            {
+                <div class="fm-dropdown @(ctrl=="Schedule" ? "fm-dd-active" : "")">
+                    <button class="fm-nav-link fm-dd-toggle">
+                        <i class="bi bi-calendar3"></i><span>Planning</span><i class="bi bi-chevron-down fm-caret"></i>
+                    </button>
+                    <div class="fm-dd-menu">
+                        <div class="fm-dd-label">Planning &amp; Scheduling</div>
+                        <a class="fm-dd-item @(ctrl=="Schedule"&&action!="HarvestList"?"fm-dd-item-active":"")"
+                           asp-controller="Schedule" asp-action="Index">
+                            <span class="fm-dd-icon" style="background:#fef9c3;color:#ca8a04;"><i class="bi bi-calendar3"></i></span>
+                            <div><div class="fm-dd-title">Schedules</div><div class="fm-dd-sub">Planting &amp; harvest schedules</div></div>
+                        </a>
+                        <a class="fm-dd-item @(ctrl=="Schedule"&&action=="HarvestList"?"fm-dd-item-active":"")"
+                           asp-controller="Schedule" asp-action="HarvestList">
+                            <span class="fm-dd-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-basket"></i></span>
+                            <div><div class="fm-dd-title">Harvests</div><div class="fm-dd-sub">Upcoming &amp; recorded harvests</div></div>
+                        </a>
+                    </div>
+                </div>
+            }
 
-        <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Field" ? "active" : "")"
-               asp-controller="Field" asp-action="Index">
-                <i class="bi bi-grid-3x3-gap"></i> Fields
-            </a>
-        </li>
+            @if (canViewPest || canViewResources)
+            {
+                <div class="fm-dropdown @(ctrl=="Pest"||ctrl=="Resource" ? "fm-dd-active" : "")">
+                    <button class="fm-nav-link fm-dd-toggle">
+                        <i class="bi bi-tools"></i><span>Operations</span><i class="bi bi-chevron-down fm-caret"></i>
+                    </button>
+                    <div class="fm-dd-menu">
+                        <div class="fm-dd-label">Operations</div>
+                        @if (canViewPest)
+                        {
+                            <a class="fm-dd-item @(ctrl=="Pest"?"fm-dd-item-active":"")" asp-controller="Pest" asp-action="Index">
+                                <span class="fm-dd-icon" style="background:#fee2e2;color:#dc2626;"><i class="bi bi-bug"></i></span>
+                                <div><div class="fm-dd-title">Pest Incidents</div><div class="fm-dd-sub">Track and treat pests</div></div>
+                            </a>
+                        }
+                        @if (canViewResources)
+                        {
+                            <a class="fm-dd-item @(ctrl=="Resource"?"fm-dd-item-active":"")" asp-controller="Resource" asp-action="Index">
+                                <span class="fm-dd-icon" style="background:#ffedd5;color:#ea580c;"><i class="bi bi-box-seam"></i></span>
+                                <div><div class="fm-dd-title">Resources</div><div class="fm-dd-sub">Inventory &amp; allocation</div></div>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
 
-        <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Schedule" ? "active" : "")"
-               asp-controller="Schedule" asp-action="Index">
-                <i class="bi bi-calendar3"></i> Schedules
-            </a>
-        </li>
+            @if (canViewReports)
+            {
+                <div class="fm-dropdown @(ctrl=="Report" ? "fm-dd-active" : "")">
+                    <button class="fm-nav-link fm-dd-toggle">
+                        <i class="bi bi-bar-chart-line"></i><span>Reports</span><i class="bi bi-chevron-down fm-caret"></i>
+                    </button>
+                    <div class="fm-dd-menu">
+                        <div class="fm-dd-label">Analytics &amp; Reports</div>
+                        <a class="fm-dd-item @(ctrl=="Report"&&action=="Index"?"fm-dd-item-active":"")"
+                           asp-controller="Report" asp-action="Index">
+                            <span class="fm-dd-icon" style="background:#ede9fe;color:#7c3aed;"><i class="bi bi-bar-chart-line"></i></span>
+                            <div><div class="fm-dd-title">Reports</div><div class="fm-dd-sub">Farm-wide summary</div></div>
+                        </a>
+                        <a class="fm-dd-item @(ctrl=="Report"&&action=="YieldAnalytics"?"fm-dd-item-active":"")"
+                           asp-controller="Report" asp-action="YieldAnalytics">
+                            <span class="fm-dd-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-graph-up-arrow"></i></span>
+                            <div><div class="fm-dd-title">Yield Analytics</div><div class="fm-dd-sub">Crop yield trends &amp; charts</div></div>
+                        </a>
+                    </div>
+                </div>
+            }
 
-        <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Schedule" && ViewContext.RouteData.Values["action"]?.ToString() == "HarvestList" ? "active" : "")"
-               asp-controller="Schedule" asp-action="HarvestList">
-                <i class="bi bi-basket"></i> Harvests
-            </a>
-        </li>
+            @if (canManageUsers)
+            {
+                <div class="fm-dropdown @(ctrl=="UserManagement"||ctrl=="Activity" ? "fm-dd-active" : "")">
+                    <button class="fm-nav-link fm-dd-toggle">
+                        <i class="bi bi-shield-fill"></i><span>Admin</span><i class="bi bi-chevron-down fm-caret"></i>
+                    </button>
+                    <div class="fm-dd-menu">
+                        <div class="fm-dd-label">Administration</div>
+                        <a class="fm-dd-item @(ctrl=="UserManagement"?"fm-dd-item-active":"")"
+                           asp-controller="UserManagement" asp-action="Index">
+                            <span class="fm-dd-icon" style="background:#fee2e2;color:#dc2626;"><i class="bi bi-people"></i></span>
+                            <div><div class="fm-dd-title">User Management</div><div class="fm-dd-sub">Accounts, roles &amp; access</div></div>
+                        </a>
+                        <a class="fm-dd-item @(ctrl=="Activity"?"fm-dd-item-active":"")"
+                           asp-controller="Activity" asp-action="Index">
+                            <span class="fm-dd-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-activity"></i></span>
+                            <div><div class="fm-dd-title">Activity Log</div><div class="fm-dd-sub">Full system audit trail</div></div>
+                        </a>
+                    </div>
+                </div>
+            }
 
-        <li class="nav-section">Management</li>
+        </nav>
 
-        <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Pest" ? "active" : "")"
-               asp-controller="Pest" asp-action="Index">
-                <i class="bi bi-bug"></i> Pest Incidents
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Resource" ? "active" : "")"
-               asp-controller="Resource" asp-action="Index">
-                <i class="bi bi-box-seam"></i> Resources
-            </a>
-        </li>
-
-        <li class="nav-section">Reports</li>
-
-        <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" ? "active" : "")"
-               asp-controller="Report" asp-action="Index">
-                <i class="bi bi-bar-chart-line"></i> Reports
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Report" && ViewContext.RouteData.Values["action"]?.ToString() == "YieldAnalytics" ? "active" : "")"
-               asp-controller="Report" asp-action="YieldAnalytics">
-                <i class="bi bi-graph-up-arrow"></i> Yield Analytics
-            </a>
-        </li>
-
-    </ul>
-</nav>
-
-<!-- ── Main Content ───────────────────────────────────────────── -->
-<div id="main-content">
-
-    <!-- Top Bar -->
-    <div id="topbar">
-        <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-sm btn-outline-secondary d-md-none"
-                    onclick="document.getElementById('sidebar').style.width =
-                             document.getElementById('sidebar').style.width === '240px'
-                             ? '0' : '240px'">
-                <i class="bi bi-list"></i>
-            </button>
-            <span class="text-muted small">
-                @ViewData["Title"]
-            </span>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-            <span class="text-muted small">
+        <!-- Right: date + user -->
+        <div class="fm-topnav-right">
+            <span class="fm-date">
                 <i class="bi bi-calendar3"></i>
                 @DateTime.Now.ToString("dd MMM yyyy")
             </span>
-            <a asp-controller="Home" asp-action="Privacy"
-               class="text-muted small text-decoration-none">
-                <i class="bi bi-shield-lock"></i> Privacy
-            </a>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="fm-dropdown">
+                    <button class="fm-user-chip fm-dd-toggle">
+                        <div class="fm-user-avatar"><i class="bi bi-person-fill"></i></div>
+                        <div class="fm-user-info">
+                            <span class="fm-user-name">@User.Identity.Name</span>
+                            <span class="urole @roleCss" style="font-size:.6rem;padding:.05rem .38rem;">@userRole</span>
+                        </div>
+                        <i class="bi bi-chevron-down fm-caret" style="font-size:.6rem;color:rgba(255,255,255,.4);"></i>
+                    </button>
+                    <div class="fm-dd-menu fm-dd-menu-end">
+                        <div class="fm-dd-label">Signed in as @User.Identity.Name</div>
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="fm-dd-item" style="width:100%;border:none;cursor:pointer;background:none;">
+                                <span class="fm-dd-icon" style="background:#fee2e2;color:#dc2626;"><i class="bi bi-box-arrow-left"></i></span>
+                                <div><div class="fm-dd-title">Logout</div><div class="fm-dd-sub">End your session</div></div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="btn-fm btn-outline-fm btn-sm-fm">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+                <a asp-controller="Account" asp-action="Register" class="btn-fm btn-primary-fm btn-sm-fm">
+                    <i class="bi bi-person-plus"></i> Register
+                </a>
+            }
         </div>
+
+    </div>
+</header>
+
+<!-- ═══════════  PAGE BODY  ═══════════ -->
+<div id="main-content">
+    <div class="fm-subnav">
+        <span class="fm-subnav-title">
+            <i class="bi bi-house-fill" style="color:var(--fm-green);font-size:.72rem;"></i>
+            @ViewData["Title"]
+        </span>
     </div>
 
-    <!-- Page Content -->
     <div class="page-content">
-
-        @* TempData alerts — global so every page gets them *@
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle"></i> @TempData["Success"]
-                <button type="button" class="btn-close"
-                        data-bs-dismiss="alert"></button>
-            </div>
-        }
-
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
-                <button type="button" class="btn-close"
-                        data-bs-dismiss="alert"></button>
-            </div>
-        }
-
         @RenderBody()
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="d-flex justify-content-between">
-            <span>
-                &copy; @DateTime.Now.Year FarmManagement System
-            </span>
-            <span>
-                Built with ASP.NET Core MVC &amp; Bootstrap 5
-            </span>
-        </div>
+    <footer class="site-footer">
+        <span>&copy; @DateTime.Now.Year FarmManagement System</span>
+        <span>Built with ASP.NET Core MVC</span>
     </footer>
-
 </div>
 
-<!-- Bootstrap 5 JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+(function(){
+    // Mobile hamburger
+    var toggle = document.getElementById('navToggle');
+    var nav    = document.getElementById('fmNav');
+    if(toggle && nav){
+        toggle.addEventListener('click', function(){ nav.classList.toggle('open'); });
+    }
+    // Dropdowns
+    document.querySelectorAll('.fm-dd-toggle').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+            e.stopPropagation();
+            var parent = this.closest('.fm-dropdown');
+            var isOpen = parent.classList.contains('open');
+            document.querySelectorAll('.fm-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
+            if(!isOpen) parent.classList.add('open');
+        });
+    });
+    document.addEventListener('click', function(){
+        document.querySelectorAll('.fm-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
+    });
+})();
 </script>
-
 @await RenderSectionAsync("Scripts", required: false)
 
 </body>

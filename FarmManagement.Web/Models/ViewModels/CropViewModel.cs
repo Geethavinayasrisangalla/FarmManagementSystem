@@ -1,4 +1,4 @@
-﻿using FarmManagement.Web.Models.Enums;
+using FarmManagement.Web.Models.Enums;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
@@ -37,6 +37,5 @@ public class CropViewModel
 
     public string? Status { get; set; }
 
-    // Dropdown list
     public IEnumerable<SelectListItem> Fields { get; set; } = new List<SelectListItem>();
 }

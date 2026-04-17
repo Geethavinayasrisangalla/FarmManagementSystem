@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace FarmManagement.Web.Models.ViewModels;
 
 public class ScheduleViewModel
 {
-    public int ScheduleId { get; set; }         // fixed: was PlantingScheduleId
+    public int ScheduleId { get; set; }
 
     [Required(ErrorMessage = "Please select a crop.")]
     [Display(Name = "Crop")]
@@ -13,7 +13,7 @@ public class ScheduleViewModel
 
     [Required(ErrorMessage = "Please select a field.")]
     [Display(Name = "Field")]
-    public int FieldId { get; set; }            // added: was missing — caused red in validator
+    public int FieldId { get; set; }
 
     [Required]
     [DataType(DataType.Date)]
@@ -31,9 +31,8 @@ public class ScheduleViewModel
 
     public string? Status { get; set; }
     public string? CropName { get; set; }
-    public string? FieldName { get; set; }      // added: useful for display
+    public string? FieldName { get; set; }
 
-    // Dropdown lists
     public IEnumerable<SelectListItem> Crops { get; set; } = new List<SelectListItem>();
-    public IEnumerable<SelectListItem> Fields { get; set; } = new List<SelectListItem>(); // added
+    public IEnumerable<SelectListItem> Fields { get; set; } = new List<SelectListItem>();
 }

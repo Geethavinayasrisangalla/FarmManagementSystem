@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace FarmManagement.Web.Models.ViewModels;
 
@@ -14,7 +14,7 @@ public class FieldViewModel
     [Required]
     [Range(0.1, 10000)]
     [Display(Name = "Area (Hectares)")]
-    public decimal AreaHectares { get; set; }   // fixed: was double, must match Field entity
+    public decimal AreaHectares { get; set; }
 
     [Required(ErrorMessage = "Soil type is required.")]
     [Display(Name = "Soil Type")]

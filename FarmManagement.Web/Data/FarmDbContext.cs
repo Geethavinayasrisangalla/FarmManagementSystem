@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using FarmManagement.Web.Models.Entities;
 
 namespace FarmManagement.Web.Data;
@@ -7,27 +7,21 @@ public class FarmDbContext : DbContext
 {
     public FarmDbContext(DbContextOptions<FarmDbContext> options) : base(options) { }
 
-    // ── Crop & Field ─────────────────────────────────────────────────
     public DbSet<Crop> Crops { get; set; }
     public DbSet<Field> Fields { get; set; }
-
-    // ── Resources ────────────────────────────────────────────────────
     public DbSet<Resource> Resources { get; set; }
     public DbSet<ResourceUsage> ResourceUsages { get; set; }
-
-    // ── Schedule & Harvest ───────────────────────────────────────────
     public DbSet<PlantingSchedule> PlantingSchedules { get; set; }
     public DbSet<Harvest> Harvests { get; set; }
-
-    // ── Pest Incidents ───────────────────────────────────────────────
     public DbSet<PestIncident> PestIncidents { get; set; }
-    // Add this DbSet with the others
     public DbSet<YieldReport> YieldReports { get; set; }
+    public DbSet<AppUser> AppUsers { get; set; }
+    public DbSet<ActivityLog> ActivityLogs { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // ── Crop ─────────────────────────────────────────────────────
         modelBuilder.Entity<Crop>(entity =>
         {
             entity.HasKey(c => c.CropId);
@@ -37,7 +31,6 @@ public class FarmDbContext : DbContext
             entity.Property(c => c.Status).HasMaxLength(50);
         });
 
-        // ── Field ─────────────────────────────────────────────────────
         modelBuilder.Entity<Field>(entity =>
         {
             entity.HasKey(f => f.FieldId);
@@ -47,7 +40,6 @@ public class FarmDbContext : DbContext
             entity.Property(f => f.AreaHectares).HasColumnType("decimal(10,2)");
         });
 
-        // ── PlantingSchedule ──────────────────────────────────────────
         modelBuilder.Entity<PlantingSchedule>(entity =>
         {
             entity.HasKey(ps => ps.ScheduleId);
@@ -65,7 +57,6 @@ public class FarmDbContext : DbContext
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
-        // ── Harvest ───────────────────────────────────────────────────
         modelBuilder.Entity<Harvest>(entity =>
         {
             entity.HasKey(h => h.HarvestId);
@@ -78,7 +69,6 @@ public class FarmDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ── PestIncident ──────────────────────────────────────────────
         modelBuilder.Entity<PestIncident>(entity =>
         {
             entity.HasKey(p => p.PestIncidentId);
@@ -92,7 +82,6 @@ public class FarmDbContext : DbContext
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
-        // ── Resource ──────────────────────────────────────────────────
         modelBuilder.Entity<Resource>(entity =>
         {
             entity.HasKey(r => r.ResourceId);
@@ -101,7 +90,6 @@ public class FarmDbContext : DbContext
             entity.Property(r => r.Quantity).HasColumnType("decimal(10,2)");
         });
 
-        // ── ResourceUsage ─────────────────────────────────────────────
         modelBuilder.Entity<ResourceUsage>(entity =>
         {
             entity.HasKey(ru => ru.ResourceUsageId);
@@ -118,7 +106,7 @@ public class FarmDbContext : DbContext
                   .HasForeignKey(ru => ru.ScheduleId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
-        // ── YieldReport ───────────────────────────────────────────────
+
         modelBuilder.Entity<YieldReport>(entity =>
         {
             entity.HasKey(y => y.YieldReportId);
@@ -128,6 +116,26 @@ public class FarmDbContext : DbContext
                   .WithMany(c => c.YieldReports)
                   .HasForeignKey(y => y.CropId)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<AppUser>(entity =>
+        {
+            entity.HasKey(u => u.UserId);
+            entity.Property(u => u.FullName).IsRequired().HasMaxLength(100);
+            entity.Property(u => u.Email).IsRequired().HasMaxLength(200);
+            entity.HasIndex(u => u.Email).IsUnique();
+            entity.Property(u => u.PasswordHash).IsRequired();
+            entity.Property(u => u.Role).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<ActivityLog>(entity =>
+        {
+            entity.HasKey(a => a.ActivityLogId);
+            entity.Property(a => a.UserName).IsRequired().HasMaxLength(100);
+            entity.Property(a => a.UserRole).HasMaxLength(50);
+            entity.Property(a => a.Action).HasMaxLength(50);
+            entity.Property(a => a.EntityType).HasMaxLength(50);
+            entity.Property(a => a.Description).HasMaxLength(500);
         });
     }
 }

@@ -1,4 +1,4 @@
-﻿using FarmManagement.Web.Data;
+using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
@@ -17,7 +17,7 @@ public class ResourceService : IResourceService
     public async Task<Resource?> GetByIdAsync(int id) =>
         await _db.Resources
                  .Include(r => r.ResourceUsages)
-                     .ThenInclude(ru => ru.PlantingSchedule) // fixed: was ru.Field
+                     .ThenInclude(ru => ru.PlantingSchedule)
                  .FirstOrDefaultAsync(r => r.ResourceId == id);
 
     public async Task CreateAsync(InventoryViewModel vm)
@@ -52,7 +52,7 @@ public class ResourceService : IResourceService
     }
 
     public async Task AllocateAsync(int resourceId, int scheduleId, decimal qty, string? notes)
-    {                                           // fixed: fieldId → scheduleId
+    {
         var resource = await _db.Resources.FindAsync(resourceId)
                        ?? throw new KeyNotFoundException("Resource not found.");
 
@@ -66,7 +66,7 @@ public class ResourceService : IResourceService
         _db.ResourceUsages.Add(new ResourceUsage
         {
             ResourceId = resourceId,
-            ScheduleId = scheduleId,          // fixed: was FieldId
+            ScheduleId = scheduleId,
             QuantityUsed = qty,
             Notes = notes,
             UsedDate = DateTime.Now

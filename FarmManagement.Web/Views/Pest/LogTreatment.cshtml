@@ -1,62 +1,75 @@
-﻿@model FarmManagement.Web.Models.Entities.PestIncident
+@model FarmManagement.Web.Models.Entities.PestIncident
 
 @{
     ViewData["Title"] = "Log Treatment";
     var currentStatus = Model.Status.ToString();
+    var pestBadge = Model.Status switch {
+        FarmManagement.Web.Models.Enums.IncidentStatus.Active     => "badge-red",
+        FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring => "badge-yellow",
+        _                                                          => "badge-green"
+    };
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-capsule"></i> Log Treatment</h2>
-    <a asp-action="Index" class="btn btn-secondary">
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>
+            <span class="ph-icon" style="background:#fef9c3;color:#ca8a04;">
+                <i class="bi bi-capsule"></i>
+            </span>
+            Log Treatment
+        </h1>
+        <p>Update the status and treatment notes for this pest incident.</p>
+    </div>
+    <a asp-action="Index" class="btn-fm btn-outline-fm">
         <i class="bi bi-arrow-left"></i> Back to List
     </a>
 </div>
 
 <div class="row g-4">
-    <!-- Incident Summary -->
     <div class="col-md-4">
-        <div class="card shadow-sm border-danger">
-            <div class="card-header bg-danger text-white">
-                <i class="bi bi-bug"></i> Incident Summary
+        <div class="fm-card h-100">
+            <div class="fm-card-header">
+                <span class="ch-title">
+                    <i class="bi bi-bug" style="color:#dc2626;"></i>
+                    Incident Summary
+                </span>
             </div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-5">Pest</dt>
-                    <dd class="col-sm-7">@Model.PestName</dd>
-
-                    <dt class="col-sm-5">Crop</dt>
-                    <dd class="col-sm-7">@(Model.Crop?.CropName ?? "-")</dd>
-
-                    <dt class="col-sm-5">Reported</dt>
-                    <dd class="col-sm-7">
-                        @Model.ReportedDate.ToString("dd MMM yyyy")
-                    </dd>
-
-                    <dt class="col-sm-5">Status</dt>
-                    <dd class="col-sm-7">
-                        <span class="badge
-                            @(Model.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Active
-                                                              ? "bg-danger" :
-                                                            Model.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring
-                                                              ? "bg-warning text-dark" : "bg-success")">
-                            @Model.Status
-                        </span>
-                    </dd>
-
-                    <dt class="col-sm-5">Description</dt>
-                    <dd class="col-sm-7">@(Model.Description ?? "-")</dd>
-                </dl>
+            <div class="fm-card-body">
+                <table style="width:100%;font-size:.875rem;">
+                    <tr>
+                        <td style="color:var(--fm-muted);padding:.35rem 0;width:45%;">Pest</td>
+                        <td style="font-weight:600;">@Model.PestName</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--fm-muted);padding:.35rem 0;">Crop</td>
+                        <td>@(Model.Crop?.CropName ?? "—")</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--fm-muted);padding:.35rem 0;">Reported</td>
+                        <td>@Model.ReportedDate.ToString("dd MMM yyyy")</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--fm-muted);padding:.35rem 0;">Status</td>
+                        <td><span class="badge-pill @pestBadge">@Model.Status</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--fm-muted);padding:.35rem 0;">Description</td>
+                        <td>@(Model.Description ?? "—")</td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Treatment Form -->
     <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-warning text-dark">
-                <i class="bi bi-pencil-square"></i> Update Status & Treatment
+        <div class="fm-card">
+            <div class="fm-card-header">
+                <span class="ch-title">
+                    <i class="bi bi-pencil-square" style="color:#ca8a04;"></i>
+                    Update Status & Treatment
+                </span>
             </div>
-            <div class="card-body">
+            <div class="fm-card-body fm-form">
                 <form asp-action="UpdateStatus" method="post">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@Model.PestIncidentId" />
@@ -64,8 +77,6 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Update Status</label>
-                            <!-- fixed: use Html.DropDownList instead of
-                                 manual option tags with inline C# -->
                             @Html.DropDownList("status",
                                 new SelectList(
                                     new[]
@@ -74,39 +85,29 @@
                                         new { Value = "Monitoring", Text = "Monitoring" },
                                         new { Value = "Resolved",   Text = "Resolved"   }
                                     },
-                                    "Value",
-                                    "Text",
-                                    currentStatus
+                                    "Value", "Text", currentStatus
                                 ),
-                                new { @class = "form-select" }
+                                new { @class = "form-select form-control" }
                             )
                         </div>
-
                         <div class="col-12">
                             <label class="form-label">Treatment Notes</label>
-                            <textarea name="treatmentNotes"
-                                      class="form-control"
-                                      rows="5"
+                            <textarea name="treatmentNotes" class="form-control" rows="5"
                                       placeholder="Describe treatment applied, chemicals used, dosage etc.">@Model.TreatmentNotes</textarea>
                         </div>
-
                         <div class="col-12">
-                            <div class="alert alert-info mb-0">
+                            <div class="fm-alert fm-alert-warning">
                                 <i class="bi bi-info-circle"></i>
-                                Updating to <strong>Resolved</strong> will mark
-                                this incident as closed. Treatment notes will be
-                                saved directly on this incident record.
+                                <span>Updating to <strong>Resolved</strong> will mark this incident as closed. Treatment notes will be saved on this incident record.</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-warning">
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn-fm btn-warn-fm">
                             <i class="bi bi-check-circle"></i> Save Treatment
                         </button>
-                        <a asp-action="Index" class="btn btn-secondary ms-2">
-                            Cancel
-                        </a>
+                        <a asp-action="Index" class="btn-fm btn-ghost-fm">Cancel</a>
                     </div>
                 </form>
             </div>

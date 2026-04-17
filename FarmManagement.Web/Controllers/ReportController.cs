@@ -1,8 +1,10 @@
-﻿using FarmManagement.Web.Models.Interfaces;
+using FarmManagement.Web.Models.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FarmManagement.Web.Controllers;
 
+[Authorize(Roles = "Admin,Manager,Supervisor,Viewer")]
 public class ReportController : Controller
 {
     private readonly IReportService _reportService;
@@ -12,13 +14,11 @@ public class ReportController : Controller
         _reportService = reportService;
     }
 
-    // GET: /Report
     public IActionResult Index()
     {
         return View();
     }
 
-    // GET: /Report/YieldAnalytics
     public async Task<IActionResult> YieldAnalytics()
     {
         var vm = await _reportService.GetYieldAnalyticsAsync();

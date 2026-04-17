@@ -1,111 +1,103 @@
-﻿@model FarmManagement.Web.Models.Entities.PlantingSchedule
+@model FarmManagement.Web.Models.Entities.PlantingSchedule
 
 @{
     ViewData["Title"] = "Record Harvest";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2><i class="bi bi-basket"></i> Record Harvest</h2>
-    <a asp-action="HarvestList" class="btn btn-secondary">
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>
+            <span class="ph-icon" style="background:#dcfce7;color:#16a34a;">
+                <i class="bi bi-basket"></i>
+            </span>
+            Record Harvest
+        </h1>
+        <p>Enter the actual yield for this completed harvest.</p>
+    </div>
+    <a asp-action="HarvestList" class="btn-fm btn-outline-fm">
         <i class="bi bi-arrow-left"></i> Back to Harvest List
     </a>
 </div>
 
 <div class="row g-4">
-    <!-- Schedule Summary -->
     <div class="col-md-4">
-        <div class="card shadow-sm border-success h-100">
-            <div class="card-header bg-success text-white">
-                <i class="bi bi-calendar3"></i> Schedule Summary
+        <div class="fm-card h-100">
+            <div class="fm-card-header">
+                <span class="ch-title">
+                    <i class="bi bi-calendar3" style="color:#2563eb;"></i>
+                    Schedule Summary
+                </span>
             </div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-5">Crop</dt>
-                    <dd class="col-sm-7 fw-semibold">
-                        @(Model.Crop?.CropName ?? "-")
-                    </dd>
-
-                    <dt class="col-sm-5">Field</dt>
-                    <dd class="col-sm-7">
-                        @(Model.Field?.FieldName ?? "-")
-                    </dd>
-
-                    <dt class="col-sm-5">Scheduled</dt>
-                    <dd class="col-sm-7">
-                        @Model.ScheduledDate.ToString("dd MMM yyyy")
-                    </dd>
-
-                    <dt class="col-sm-5">Expected</dt>
-                    <dd class="col-sm-7">
-                        <span class="fw-semibold text-primary">
-                            @Model.ExpectedYieldKg kg
-                        </span>
-                    </dd>
-
-                    <dt class="col-sm-5">Status</dt>
-                    <dd class="col-sm-7">
-                        <span class="badge bg-primary">@Model.Status</span>
-                    </dd>
-                </dl>
+            <div class="fm-card-body">
+                <table style="width:100%;font-size:.875rem;">
+                    <tr>
+                        <td style="color:var(--fm-muted);padding:.35rem 0;width:45%;">Crop</td>
+                        <td style="font-weight:600;">@(Model.Crop?.CropName ?? "—")</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--fm-muted);padding:.35rem 0;">Field</td>
+                        <td>@(Model.Field?.FieldName ?? "—")</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--fm-muted);padding:.35rem 0;">Scheduled</td>
+                        <td>@Model.ScheduledDate.ToString("dd MMM yyyy")</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--fm-muted);padding:.35rem 0;">Expected</td>
+                        <td style="font-weight:700;color:#2563eb;">@Model.ExpectedYieldKg kg</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--fm-muted);padding:.35rem 0;">Status</td>
+                        <td><span class="badge-pill badge-blue">@Model.Status</span></td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Record Harvest Form -->
     <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-success text-white">
-                <i class="bi bi-pencil-square"></i> Enter Harvest Details
+        <div class="fm-card">
+            <div class="fm-card-header">
+                <span class="ch-title">
+                    <i class="bi bi-pencil-square" style="color:#16a34a;"></i>
+                    Enter Harvest Details
+                </span>
             </div>
-            <div class="card-body">
+            <div class="fm-card-body fm-form">
                 <form asp-action="RecordHarvest" method="post">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@Model.ScheduleId" />
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">
-                                Actual Yield (kg)
-                                <span class="text-danger">*</span>
-                            </label>
+                            <label class="form-label">Actual Yield (kg) <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input type="number" name="actualYield"
-                                       class="form-control"
-                                       min="0.1" step="0.1"
-                                       placeholder="e.g. 3200"
-                                       required />
+                                <input type="number" name="actualYield" class="form-control"
+                                       min="0.1" step="0.1" placeholder="e.g. 3200" required />
                                 <span class="input-group-text">kg</span>
                             </div>
-                            <small class="text-muted">
+                            <small style="color:var(--fm-muted);font-size:.78rem;">
                                 Expected: @Model.ExpectedYieldKg kg
                             </small>
                         </div>
-
                         <div class="col-12">
                             <label class="form-label">Notes</label>
-                            <textarea name="notes" class="form-control"
-                                  rows="4"
-                                      placeholder="Describe harvest quality, conditions, observations...">
-                            </textarea>
+                            <textarea name="notes" class="form-control" rows="4"
+                                      placeholder="Describe harvest quality, conditions, observations..."></textarea>
                         </div>
-
                         <div class="col-12">
-                            <div class="alert alert-info mb-0">
+                            <div class="fm-alert fm-alert-success">
                                 <i class="bi bi-info-circle"></i>
-                                Recording this harvest will mark the schedule as
-                                <strong>Completed</strong> and save the actual
-                                yield against the expected yield of
-                                <strong>@Model.ExpectedYieldKg kg</strong>.
+                                <span>Recording this harvest will mark the schedule as <strong>Completed</strong> and save the actual yield against the expected yield of <strong>@Model.ExpectedYieldKg kg</strong>.</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-success">
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn-fm btn-primary-fm">
                             <i class="bi bi-check-circle"></i> Save Harvest
                         </button>
-                        <a asp-action="HarvestList"
-                           class="btn btn-secondary ms-2">Cancel</a>
+                        <a asp-action="HarvestList" class="btn-fm btn-ghost-fm">Cancel</a>
                     </div>
                 </form>
             </div>

@@ -1,39 +1,48 @@
-﻿@model FarmManagement.Web.Models.ViewModels.FieldViewModel
+@model FarmManagement.Web.Models.ViewModels.FieldViewModel
 
 @{
     ViewData["Title"] = "Edit Field";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Edit Field</h2>
-    <a asp-action="Index" class="btn btn-secondary">
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>
+            <span class="ph-icon" style="background:#fef9c3;color:#ca8a04;">
+                <i class="bi bi-pencil"></i>
+            </span>
+            Edit Field
+        </h1>
+        <p>Update the details for this field.</p>
+    </div>
+    <a asp-action="Index" class="btn-fm btn-outline-fm">
         <i class="bi bi-arrow-left"></i> Back to List
     </a>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-body">
+<div class="fm-card" style="max-width:720px;">
+    <div class="fm-card-header">
+        <span class="ch-title"><i class="bi bi-grid-3x3-gap" style="color:#16a34a;"></i> Field Details</span>
+    </div>
+    <div class="fm-card-body fm-form">
         <form asp-action="Edit" asp-route-id="@Model.FieldId" method="post">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="FieldId" />
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="fm-alert fm-alert-danger mb-3"></div>
 
             <div class="row g-3">
                 <div class="col-md-6">
                     <label asp-for="FieldName" class="form-label"></label>
                     <input asp-for="FieldName" class="form-control" />
-                    <span asp-validation-for="FieldName" class="text-danger"></span>
+                    <span asp-validation-for="FieldName" class="text-danger small"></span>
                 </div>
-
                 <div class="col-md-6">
                     <label asp-for="AreaHectares" class="form-label"></label>
                     <div class="input-group">
                         <input asp-for="AreaHectares" class="form-control" />
                         <span class="input-group-text">ha</span>
                     </div>
-                    <span asp-validation-for="AreaHectares" class="text-danger"></span>
+                    <span asp-validation-for="AreaHectares" class="text-danger small"></span>
                 </div>
-
                 <div class="col-md-6">
                     <label asp-for="SoilType" class="form-label"></label>
                     <select asp-for="SoilType" class="form-select">
@@ -46,28 +55,25 @@
                         <option value="Peaty">Peaty</option>
                         <option value="Chalky">Chalky</option>
                     </select>
-                    <span asp-validation-for="SoilType" class="text-danger"></span>
+                    <span asp-validation-for="SoilType" class="text-danger small"></span>
                 </div>
-
                 <div class="col-md-6">
                     <label asp-for="Location" class="form-label"></label>
                     <input asp-for="Location" class="form-control" />
-                    <span asp-validation-for="Location" class="text-danger"></span>
+                    <span asp-validation-for="Location" class="text-danger small"></span>
                 </div>
             </div>
 
-            <div class="mt-4">
-                <button type="submit" class="btn btn-warning">
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn-fm btn-warn-fm">
                     <i class="bi bi-pencil"></i> Update Field
                 </button>
-                <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+                <a asp-action="Index" class="btn-fm btn-ghost-fm">Cancel</a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

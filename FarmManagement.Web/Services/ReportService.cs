@@ -52,8 +52,8 @@ public class ReportService : IReportService
         var records = await _db.Harvests
                                .Include(h => h.PlantingSchedule)
                                    .ThenInclude(ps => ps.Crop)
-                               .Include(h => h.PlantingSchedule)  // added
-                                   .ThenInclude(ps => ps.Field)   // added
+                               .Include(h => h.PlantingSchedule)
+                                   .ThenInclude(ps => ps.Field)
                                .OrderByDescending(h => h.HarvestedDate)
                                .ToListAsync();
 

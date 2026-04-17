@@ -1,26 +1,33 @@
-﻿using FarmManagement.Web.Models.ViewModels;
+using FarmManagement.Web.Models.ViewModels;
 using FarmManagement.Web.Models.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FarmManagement.Web.Controllers;
 
+[Authorize(Roles = "Admin,Manager,Supervisor,Viewer")]
 public class CropController : Controller
 {
-    private readonly ICropService _cropService;
+    private readonly ICropService     _cropService;
+    private readonly IActivityService _activityService;
 
-    public CropController(ICropService cropService)
+    public CropController(ICropService cropService, IActivityService activityService)
     {
-        _cropService = cropService;
+        _cropService      = cropService;
+        _activityService  = activityService;
     }
 
-    // GET: /Crop
+    private int    CurrentUserId   => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+    private string CurrentUserName => User.FindFirstValue(ClaimTypes.Name) ?? "Unknown";
+    private string CurrentUserRole => User.FindFirstValue(ClaimTypes.Role) ?? "Unknown";
+
     public async Task<IActionResult> Index()
     {
         var crops = await _cropService.GetAllAsync();
         return View(crops);
     }
 
-    // GET: /Crop/Details/5
     public async Task<IActionResult> Details(int id)
     {
         var crop = await _cropService.GetByIdAsync(id);
@@ -28,16 +35,16 @@ public class CropController : Controller
         return View(crop);
     }
 
-    // GET: /Crop/Create
+    [Authorize(Roles = "Admin,Manager,Supervisor")]
     public async Task<IActionResult> Create()
     {
         var vm = await _cropService.PrepareViewModelAsync();
         return View(vm);
     }
 
-    // POST: /Crop/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Manager,Supervisor")]
     public async Task<IActionResult> Create(CropViewModel vm)
     {
         if (!ModelState.IsValid)
@@ -47,11 +54,15 @@ public class CropController : Controller
         }
 
         await _cropService.CreateAsync(vm);
+
+        await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
+            "Created", "Crop", $"Added crop '{vm.CropName}' ({vm.CropType}) for {vm.Season} season");
+
         TempData["Success"] = $"Crop '{vm.CropName}' added successfully.";
         return RedirectToAction(nameof(Index));
     }
 
-    // GET: /Crop/Edit/5
+    [Authorize(Roles = "Admin,Manager,Supervisor")]
     public async Task<IActionResult> Edit(int id)
     {
         var crop = await _cropService.GetByIdAsync(id);
@@ -59,23 +70,23 @@ public class CropController : Controller
 
         var vm = new CropViewModel
         {
-            CropId = crop.CropId,
-            CropName = crop.CropName,
-            CropType = crop.CropType,
-            Season = crop.Season,
-            PlantingDate = crop.PlantingDate,
-            ExpectedHarvestDate = crop.ExpectedHarvestDate,
-            FieldId = crop.FieldId,
-            Status = crop.Status
+            CropId               = crop.CropId,
+            CropName             = crop.CropName,
+            CropType             = crop.CropType,
+            Season               = crop.Season,
+            PlantingDate         = crop.PlantingDate,
+            ExpectedHarvestDate  = crop.ExpectedHarvestDate,
+            FieldId              = crop.FieldId,
+            Status               = crop.Status
         };
 
         var prepared = await _cropService.PrepareViewModelAsync(vm);
         return View(prepared);
     }
 
-    // POST: /Crop/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Manager,Supervisor")]
     public async Task<IActionResult> Edit(int id, CropViewModel vm)
     {
         if (id != vm.CropId) return BadRequest();
@@ -87,19 +98,27 @@ public class CropController : Controller
         }
 
         await _cropService.UpdateAsync(vm);
+
+        await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
+            "Updated", "Crop", $"Updated crop '{vm.CropName}' — status: {vm.Status}");
+
         TempData["Success"] = $"Crop '{vm.CropName}' updated successfully.";
         return RedirectToAction(nameof(Index));
     }
 
-    // POST: /Crop/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Manager,Supervisor")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var crop = await _cropService.GetByIdAsync(id);
         if (crop == null) return NotFound();
 
         await _cropService.DeleteAsync(id);
+
+        await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
+            "Deleted", "Crop", $"Deleted crop '{crop.CropName}'");
+
         TempData["Success"] = $"Crop '{crop.CropName}' deleted.";
         return RedirectToAction(nameof(Index));
     }

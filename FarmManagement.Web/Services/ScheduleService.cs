@@ -1,4 +1,4 @@
-﻿using FarmManagement.Web.Data;
+using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
@@ -23,15 +23,15 @@ public class ScheduleService : IScheduleService
         await _db.PlantingSchedules
                  .Include(ps => ps.Crop)
                  .Include(ps => ps.Field)
-                 .Include(ps => ps.Harvests)  // fixed: was singular .Harvest
-                 .FirstOrDefaultAsync(ps => ps.ScheduleId == id); // fixed: was PlantingScheduleId
+                 .Include(ps => ps.Harvests)
+                 .FirstOrDefaultAsync(ps => ps.ScheduleId == id);
 
     public async Task CreateAsync(ScheduleViewModel vm)
     {
         _db.PlantingSchedules.Add(new PlantingSchedule
         {
             CropId = vm.CropId,
-            FieldId = vm.FieldId,       // added: was missing
+            FieldId = vm.FieldId,
             ScheduledDate = vm.ScheduledDate,
             ExpectedYieldKg = vm.ExpectedYieldKg,
             Notes = vm.Notes,
@@ -42,10 +42,10 @@ public class ScheduleService : IScheduleService
 
     public async Task UpdateAsync(ScheduleViewModel vm)
     {
-        var ps = await _db.PlantingSchedules.FindAsync(vm.ScheduleId) // fixed: was PlantingScheduleId
+        var ps = await _db.PlantingSchedules.FindAsync(vm.ScheduleId)
                  ?? throw new KeyNotFoundException("Schedule not found.");
         ps.CropId = vm.CropId;
-        ps.FieldId = vm.FieldId;        // added: was missing
+        ps.FieldId = vm.FieldId;
         ps.ScheduledDate = vm.ScheduledDate;
         ps.ExpectedYieldKg = vm.ExpectedYieldKg;
         ps.Notes = vm.Notes;
@@ -65,9 +65,9 @@ public class ScheduleService : IScheduleService
         ps.Status = "Completed";
         _db.Harvests.Add(new Harvest
         {
-            ScheduleId = scheduleId,         // fixed: was PlantingScheduleId
+            ScheduleId = scheduleId,
             ActualYieldKg = actualYield,
-            Notes = notes,              // fixed: was QualityNotes
+            Notes = notes,
             HarvestedDate = DateTime.Now
         });
         await _db.SaveChangesAsync();
@@ -98,7 +98,7 @@ public class ScheduleService : IScheduleService
         }).ToList();
 
         var fields = await _db.Fields.OrderBy(f => f.FieldName).ToListAsync();
-        vm.Fields = fields.Select(f => new SelectListItem  // added: Fields dropdown
+        vm.Fields = fields.Select(f => new SelectListItem
         {
             Value = f.FieldId.ToString(),
             Text = $"{f.FieldName} ({f.Location})",
