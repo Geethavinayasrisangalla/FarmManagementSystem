@@ -47,8 +47,16 @@ public class ResourceService : IResourceService
 
     public async Task DeleteAsync(int id)
     {
-        var resource = await _db.Resources.FindAsync(id);
-        if (resource != null) { _db.Resources.Remove(resource); await _db.SaveChangesAsync(); }
+        var resource = await _db.Resources
+            .Include(r => r.ResourceUsages)
+            .FirstOrDefaultAsync(r => r.ResourceId == id);
+
+        if (resource != null)
+        {
+            _db.ResourceUsages.RemoveRange(resource.ResourceUsages);
+            _db.Resources.Remove(resource);
+            await _db.SaveChangesAsync();
+        }
     }
 
     public async Task AllocateAsync(int resourceId, int scheduleId, decimal qty, string? notes)

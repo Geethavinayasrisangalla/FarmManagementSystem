@@ -126,6 +126,7 @@ public class FarmDbContext : DbContext
             entity.HasIndex(u => u.Email).IsUnique();
             entity.Property(u => u.PasswordHash).IsRequired();
             entity.Property(u => u.Role).HasMaxLength(50);
+            entity.Property(u => u.PasswordHint).HasMaxLength(200).HasDefaultValue(string.Empty);
         });
 
         modelBuilder.Entity<ActivityLog>(entity =>

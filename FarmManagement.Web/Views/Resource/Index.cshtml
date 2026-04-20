@@ -168,7 +168,7 @@
                                     {
                                         <form asp-action="Delete" asp-route-id="@item.ResourceId"
                                               method="post" class="d-inline"
-                                              onsubmit="return confirm('Delete @item.Name?')">
+                                              onsubmit="return confirm('Delete @Html.Raw(item.Name.Replace("'", "\\'"))?')">
                                             @Html.AntiForgeryToken()
                                             <button type="submit" class="btn-fm btn-danger-fm btn-sm-fm">
                                                 <i class="bi bi-trash"></i>

@@ -135,12 +135,20 @@ public class ResourceController : Controller
         var resource = await _resourceService.GetByIdAsync(id);
         if (resource == null) return NotFound();
 
-        await _resourceService.DeleteAsync(id);
+        try
+        {
+            await _resourceService.DeleteAsync(id);
 
-        await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
-            "Deleted", "Resource", $"Deleted resource '{resource.Name}'");
+            await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
+                "Deleted", "Resource", $"Deleted resource '{resource.Name}'");
 
-        TempData["Success"] = $"Resource '{resource.Name}' deleted.";
+            TempData["Success"] = $"Resource '{resource.Name}' deleted.";
+        }
+        catch (Exception)
+        {
+            TempData["Error"] = $"Could not delete '{resource.Name}'. Please try again.";
+        }
+
         return RedirectToAction(nameof(Index));
     }
 }

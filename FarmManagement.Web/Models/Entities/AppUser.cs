@@ -10,4 +10,5 @@ public class AppUser
     public string PasswordHash { get; set; } = string.Empty;
     public UserRole Role { get; set; } = UserRole.Viewer;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public string PasswordHint { get; set; } = string.Empty;
 }

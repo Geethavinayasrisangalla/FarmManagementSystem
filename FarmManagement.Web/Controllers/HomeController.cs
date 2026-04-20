@@ -30,4 +30,15 @@ public class HomeController : Controller
             RequestId = HttpContext.TraceIdentifier
         });
     }
+
+    [AllowAnonymous]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult StatusCode(int code)
+    {
+        return View(new ErrorViewModel
+        {
+            RequestId = HttpContext.TraceIdentifier,
+            StatusCode = code
+        });
+    }
 }

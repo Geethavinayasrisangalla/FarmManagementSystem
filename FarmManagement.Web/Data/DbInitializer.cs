@@ -9,7 +9,7 @@ public static class DbInitializer
 {
     public static async Task SeedAsync(FarmDbContext context)
     {
-        await context.Database.EnsureCreatedAsync();
+        await context.Database.MigrateAsync();
 
         if (!await context.AppUsers.AnyAsync())
         {
@@ -19,7 +19,8 @@ public static class DbInitializer
                 Email = "admin@farmmanagement.com",
                 PasswordHash = PasswordHelper.Hash("Admin@123"),
                 Role = UserRole.Admin,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                PasswordHint = "Default admin hint"
             });
             await context.SaveChangesAsync();
         }
