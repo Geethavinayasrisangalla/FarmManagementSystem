@@ -30,4 +30,9 @@ public class RegisterViewModel
     [Compare("Password", ErrorMessage = "Passwords do not match.")]
     [Display(Name = "Confirm Password")]
     public string ConfirmPassword { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Password hint is required.")]
+    [StringLength(200, ErrorMessage = "Hint must be under 200 characters.")]
+    [Display(Name = "Password Hint")]
+    public string PasswordHint { get; set; } = string.Empty;
 }

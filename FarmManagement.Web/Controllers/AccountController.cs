@@ -104,4 +104,50 @@ public class AccountController : Controller
     {
         return View();
     }
+
+    public IActionResult ForgotPassword()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel vm)
+    {
+        if (!ModelState.IsValid) return View(vm);
+
+        var hint = await _accountService.GetPasswordHintAsync(vm.Email);
+        if (hint == null)
+        {
+            ModelState.AddModelError(string.Empty, "No account found with that email.");
+            return View(vm);
+        }
+
+        return RedirectToAction(nameof(ResetPassword), new { email = vm.Email });
+    }
+
+    public IActionResult ResetPassword(string email)
+    {
+        if (string.IsNullOrEmpty(email))
+            return RedirectToAction(nameof(ForgotPassword));
+
+        return View(new ResetPasswordViewModel { Email = email });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel vm)
+    {
+        if (!ModelState.IsValid) return View(vm);
+
+        var success = await _accountService.ResetPasswordAsync(vm.Email, vm.Hint, vm.NewPassword);
+        if (!success)
+        {
+            ModelState.AddModelError(string.Empty, "The hint you entered is incorrect.");
+            return View(vm);
+        }
+
+        TempData["Success"] = "Password reset successfully. Please log in with your new password.";
+        return RedirectToAction(nameof(Login));
+    }
 }

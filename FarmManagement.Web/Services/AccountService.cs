@@ -28,7 +28,8 @@ public class AccountService : IAccountService
             Email = vm.Email.ToLower(),
             PasswordHash = PasswordHelper.Hash(vm.Password),
             Role = vm.Role,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
+            PasswordHint = vm.PasswordHint
         });
         await _db.SaveChangesAsync();
         return true;
@@ -36,4 +37,21 @@ public class AccountService : IAccountService
 
     public async Task<bool> EmailExistsAsync(string email) =>
         await _db.AppUsers.AnyAsync(u => u.Email == email.ToLower());
+
+    public async Task<string?> GetPasswordHintAsync(string email)
+    {
+        var user = await _db.AppUsers.FirstOrDefaultAsync(u => u.Email == email.ToLower());
+        return user?.PasswordHint;
+    }
+
+    public async Task<bool> ResetPasswordAsync(string email, string hint, string newPassword)
+    {
+        var user = await _db.AppUsers.FirstOrDefaultAsync(u => u.Email == email.ToLower());
+        if (user == null || !string.Equals(user.PasswordHint, hint, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        user.PasswordHash = PasswordHelper.Hash(newPassword);
+        await _db.SaveChangesAsync();
+        return true;
+    }
 }

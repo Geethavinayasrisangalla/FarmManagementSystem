@@ -197,9 +197,9 @@
                     </button>
                     <div class="fm-dd-menu fm-dd-menu-end">
                         <div class="fm-dd-label">Signed in as @User.Identity.Name</div>
-                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0" id="logoutForm">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="fm-dd-item" style="width:100%;border:none;cursor:pointer;background:none;">
+                            <button type="button" class="fm-dd-item" style="width:100%;border:none;cursor:pointer;background:none;" onclick="confirmLogout()">
                                 <span class="fm-dd-icon" style="background:#fee2e2;color:#dc2626;"><i class="bi bi-box-arrow-left"></i></span>
                                 <div><div class="fm-dd-title">Logout</div><div class="fm-dd-sub">End your session</div></div>
                             </button>
@@ -240,6 +240,25 @@
     </footer>
 </div>
 
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;border:none;">
+            <div class="modal-body text-center p-4">
+                <div style="width:64px;height:64px;background:#fee2e2;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1rem;">
+                    <i class="bi bi-box-arrow-left" style="font-size:1.5rem;color:#dc2626;"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Confirm Logout</h5>
+                <p class="text-muted small mb-4">Are you sure you want to log out of your account?</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" style="border-radius:10px;">Cancel</button>
+                    <button type="button" class="btn btn-danger px-4" style="border-radius:10px;" onclick="document.getElementById('logoutForm').submit();">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 <script>
 (function(){
@@ -263,6 +282,10 @@
         document.querySelectorAll('.fm-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
     });
 })();
+function confirmLogout() {
+    var modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+    modal.show();
+}
 </script>
 @await RenderSectionAsync("Scripts", required: false)
 
