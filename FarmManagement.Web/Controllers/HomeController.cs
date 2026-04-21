@@ -33,7 +33,7 @@ public class HomeController : Controller
 
     [AllowAnonymous]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult StatusCode(int code)
+    public new IActionResult StatusCode(int code)
     {
         return View(new ErrorViewModel
         {
