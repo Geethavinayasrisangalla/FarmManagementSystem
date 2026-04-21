@@ -12,12 +12,14 @@ public class FieldService : IFieldService
     public FieldService(FarmDbContext db) => _db = db;
 
     public async Task<IEnumerable<Field>> GetAllAsync() =>
-        await _db.Fields.Include(f => f.Crops)
+        await _db.Fields.AsNoTracking()
+                        .Include(f => f.Crops)
                         .OrderByDescending(f => f.FieldId)
                         .ToListAsync();
 
     public async Task<Field?> GetByIdAsync(int id) =>
-        await _db.Fields.Include(f => f.Crops)
+        await _db.Fields.AsNoTracking()
+                        .Include(f => f.Crops)
                         .Include(f => f.PlantingSchedules)
                         .FirstOrDefaultAsync(f => f.FieldId == id);
 

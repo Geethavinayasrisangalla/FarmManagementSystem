@@ -13,12 +13,14 @@ public class CropService : ICropService
     public CropService(FarmDbContext db) => _db = db;
 
     public async Task<IEnumerable<Crop>> GetAllAsync() =>
-        await _db.Crops.Include(c => c.Field)
+        await _db.Crops.AsNoTracking()
+                       .Include(c => c.Field)
                        .OrderByDescending(c => c.CropId)
                        .ToListAsync();
 
     public async Task<Crop?> GetByIdAsync(int id) =>
-        await _db.Crops.Include(c => c.Field)
+        await _db.Crops.AsNoTracking()
+                       .Include(c => c.Field)
                        .Include(c => c.PestIncidents)
                        .Include(c => c.PlantingSchedules)
                        .FirstOrDefaultAsync(c => c.CropId == id);

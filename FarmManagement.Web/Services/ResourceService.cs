@@ -12,7 +12,7 @@ public class ResourceService : IResourceService
     public ResourceService(FarmDbContext db) => _db = db;
 
     public async Task<IEnumerable<Resource>> GetAllAsync() =>
-        await _db.Resources.OrderBy(r => r.Name).ToListAsync();
+        await _db.Resources.AsNoTracking().OrderBy(r => r.Name).ToListAsync();
 
     public async Task<Resource?> GetByIdAsync(int id) =>
         await _db.Resources

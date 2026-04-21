@@ -13,14 +13,14 @@ public class ScheduleService : IScheduleService
     public ScheduleService(FarmDbContext db) => _db = db;
 
     public async Task<IEnumerable<PlantingSchedule>> GetAllAsync() =>
-        await _db.PlantingSchedules
+        await _db.PlantingSchedules.AsNoTracking()
                  .Include(ps => ps.Crop)
                  .Include(ps => ps.Field)
                  .OrderBy(ps => ps.ScheduledDate)
                  .ToListAsync();
 
     public async Task<PlantingSchedule?> GetByIdAsync(int id) =>
-        await _db.PlantingSchedules
+        await _db.PlantingSchedules.AsNoTracking()
                  .Include(ps => ps.Crop)
                  .Include(ps => ps.Field)
                  .Include(ps => ps.Harvests)

@@ -16,7 +16,7 @@ public class UserManagementService : IUserManagementService
     }
 
     public async Task<IEnumerable<AppUser>> GetAllUsersAsync()
-        => await _db.AppUsers.OrderBy(u => u.CreatedAt).ToListAsync();
+        => await _db.AppUsers.AsNoTracking().OrderBy(u => u.CreatedAt).ToListAsync();
 
     public async Task<AppUser?> GetByIdAsync(int userId)
         => await _db.AppUsers.FindAsync(userId);

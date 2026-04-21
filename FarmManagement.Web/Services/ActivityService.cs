@@ -27,7 +27,7 @@ public class ActivityService : IActivityService
     }
 
     public async Task<IEnumerable<ActivityLog>> GetRecentAsync(int count = 60)
-        => await _db.ActivityLogs
+        => await _db.ActivityLogs.AsNoTracking()
                     .OrderByDescending(a => a.Timestamp)
                     .Take(count)
                     .ToListAsync();

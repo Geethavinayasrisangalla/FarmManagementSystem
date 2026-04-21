@@ -32,14 +32,14 @@ public class ReportService : IReportService
                                             .Where(h => h.HarvestedDate.Year == DateTime.Today.Year)
                                             .SumAsync(h => (decimal?)h.ActualYieldKg) ?? 0,
 
-            RecentSchedules = await _db.PlantingSchedules
+            RecentSchedules = await _db.PlantingSchedules.AsNoTracking()
                                            .Include(ps => ps.Crop)
                                            .Where(ps => ps.Status == "Scheduled")
                                            .OrderBy(ps => ps.ScheduledDate)
                                            .Take(5)
                                            .ToListAsync(),
 
-            RecentPestAlerts = await _db.PestIncidents
+            RecentPestAlerts = await _db.PestIncidents.AsNoTracking()
                                            .Include(p => p.Crop)
                                            .Where(p => p.Status == IncidentStatus.Active)
                                            .OrderByDescending(p => p.ReportedDate)
@@ -49,7 +49,7 @@ public class ReportService : IReportService
 
     public async Task<YieldAnalyticsViewModel> GetYieldAnalyticsAsync()
     {
-        var records = await _db.Harvests
+        var records = await _db.Harvests.AsNoTracking()
                                .Include(h => h.PlantingSchedule)
                                    .ThenInclude(ps => ps.Crop)
                                .Include(h => h.PlantingSchedule)

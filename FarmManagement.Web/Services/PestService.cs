@@ -12,16 +12,19 @@ public class PestService : IPestService
     public PestService(FarmDbContext db) => _db = db;
 
     public async Task<IEnumerable<PestIncident>> GetAllAsync() =>
-        await _db.PestIncidents.Include(p => p.Crop)
+        await _db.PestIncidents.AsNoTracking()
+                               .Include(p => p.Crop)
                                .OrderByDescending(p => p.ReportedDate)
                                .ToListAsync();
 
     public async Task<PestIncident?> GetByIdAsync(int id) =>
-        await _db.PestIncidents.Include(p => p.Crop)
+        await _db.PestIncidents.AsNoTracking()
+                               .Include(p => p.Crop)
                                .FirstOrDefaultAsync(p => p.PestIncidentId == id);
 
     public async Task<IEnumerable<PestIncident>> GetActivesAsync() =>
-        await _db.PestIncidents.Include(p => p.Crop)
+        await _db.PestIncidents.AsNoTracking()
+                               .Include(p => p.Crop)
                                .Where(p => p.Status == IncidentStatus.Active)
                                .ToListAsync();
 
