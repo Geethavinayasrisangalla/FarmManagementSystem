@@ -2,10 +2,13 @@ using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Enums;
 using FarmManagement.Web.Models.Interfaces;
+using FarmManagement.Web.States;
 using Microsoft.EntityFrameworkCore;
 
 namespace FarmManagement.Web.Services;
 
+// State Pattern — UpdateStatusAsync now delegates all transition logic to PestStateMachine.
+// Invalid transitions (e.g. Active → Resolved) throw InvalidOperationException automatically.
 public class PestService : IPestService
 {
     private readonly FarmDbContext _db;
@@ -34,12 +37,14 @@ public class PestService : IPestService
         await _db.SaveChangesAsync();
     }
 
+    // State Pattern — PestStateMachine enforces valid transitions and throws on invalid ones
     public async Task UpdateStatusAsync(int id, string status, string? treatmentNotes)
     {
         var pest = await _db.PestIncidents.FindAsync(id)
                    ?? throw new KeyNotFoundException("Incident not found.");
 
-        pest.Status = Enum.Parse<IncidentStatus>(status);
+        // Delegates transition logic to the State Machine
+        PestStateMachine.Transition(pest, status);
 
         if (!string.IsNullOrWhiteSpace(treatmentNotes))
             pest.TreatmentNotes = treatmentNotes;

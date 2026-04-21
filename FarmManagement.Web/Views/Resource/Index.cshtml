@@ -14,7 +14,7 @@
         </h1>
         <p>Monitor farm supplies, equipment, and stock levels.</p>
     </div>
-    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+    @if (User.IsInRole("Admin") || User.IsInRole("Farmer"))
     {
         <a asp-action="Create" class="btn-fm btn-primary-fm">
             <i class="bi bi-plus-circle"></i> Add Resource
@@ -153,7 +153,7 @@
                                        class="btn-fm btn-info-fm btn-sm-fm">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Farmer"))
                                     {
                                         <a asp-action="Edit" asp-route-id="@item.ResourceId"
                                            class="btn-fm btn-warn-fm btn-sm-fm">
@@ -164,7 +164,7 @@
                                        class="btn-fm btn-primary-fm btn-sm-fm">
                                         <i class="bi bi-arrow-right-circle"></i> Allocate
                                     </a>
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Farmer"))
                                     {
                                         <form asp-action="Delete" asp-route-id="@item.ResourceId"
                                               method="post" class="d-inline delete-form">

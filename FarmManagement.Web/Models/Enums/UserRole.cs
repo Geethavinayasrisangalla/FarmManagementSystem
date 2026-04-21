@@ -2,9 +2,9 @@ namespace FarmManagement.Web.Models.Enums;
 
 public enum UserRole
 {
-    Admin      = 0,
-    Manager    = 1,
-    Supervisor = 2,
-    Worker     = 3,
-    Viewer     = 4
+    Admin           = 0,
+    Farmer          = 1,
+    FieldSupervisor = 2,
+    Storekeeper     = 3,
+    Agronomist      = 4
 }

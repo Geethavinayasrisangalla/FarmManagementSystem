@@ -41,27 +41,27 @@
             <div class="mb-3">
                 <label asp-for="Role" class="form-label">Role</label>
                 <select asp-for="Role" class="form-select">
-                    <option value="@((int)UserRole.Viewer)">Viewer — Read-only monitoring</option>
-                    <option value="@((int)UserRole.Worker)">Worker — Execution &amp; logging</option>
-                    <option value="@((int)UserRole.Supervisor)">Supervisor — Planning &amp; oversight</option>
-                    <option value="@((int)UserRole.Manager)">Manager — Resource &amp; inventory</option>
-                    <option value="@((int)UserRole.Admin)">Admin — System oversight</option>
+                    <option value="@((int)UserRole.Agronomist)">Agronomist — Pest monitoring &amp; analytics</option>
+                    <option value="@((int)UserRole.Storekeeper)">Storekeeper — Resource &amp; inventory</option>
+                    <option value="@((int)UserRole.FieldSupervisor)">Field Supervisor — Planning &amp; oversight</option>
+                    <option value="@((int)UserRole.Farmer)">Farmer — Crop &amp; field management</option>
+                    <option value="@((int)UserRole.Admin)">Admin — System oversight (max 5)</option>
                 </select>
                 <div class="mt-2" style="display:flex;flex-wrap:wrap;gap:.3rem;">
                     <span class="field-tag" style="background:rgba(239,68,68,.1);color:#dc2626;">
                         <i class="bi bi-shield-fill me-1"></i>Admin
                     </span>
                     <span class="field-tag" style="background:rgba(59,130,246,.1);color:#2563eb;">
-                        <i class="bi bi-briefcase me-1"></i>Manager
+                        <i class="bi bi-flower1 me-1"></i>Farmer
                     </span>
                     <span class="field-tag" style="background:rgba(139,92,246,.1);color:#7c3aed;">
-                        <i class="bi bi-clipboard-check me-1"></i>Supervisor
+                        <i class="bi bi-clipboard-check me-1"></i>Field Supervisor
                     </span>
                     <span class="field-tag" style="background:rgba(249,115,22,.1);color:#ea580c;">
-                        <i class="bi bi-tools me-1"></i>Worker
+                        <i class="bi bi-box-seam me-1"></i>Storekeeper
                     </span>
                     <span class="field-tag" style="background:rgba(107,114,128,.1);color:#374151;">
-                        <i class="bi bi-eye me-1"></i>Viewer
+                        <i class="bi bi-eyedropper me-1"></i>Agronomist
                     </span>
                 </div>
                 <span asp-validation-for="Role" class="text-danger small"></span>

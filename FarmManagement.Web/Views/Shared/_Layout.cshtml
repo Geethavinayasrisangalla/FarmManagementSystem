@@ -15,25 +15,25 @@
     var action = ViewContext.RouteData.Values["action"]?.ToString();
 
     var isAdmin      = User.IsInRole("Admin");
-    var isManager    = User.IsInRole("Manager");
-    var isSupervisor = User.IsInRole("Supervisor");
-    var isWorker     = User.IsInRole("Worker");
-    var isViewer     = User.IsInRole("Viewer");
+    var isManager    = User.IsInRole("Farmer");
+    var isSupervisor = User.IsInRole("FieldSupervisor");
+    var isWorker     = User.IsInRole("Storekeeper");
+    var isViewer     = User.IsInRole("Agronomist");
 
     var canViewCrops     = isAdmin || isManager || isSupervisor || isViewer;
     var canViewSchedules = isAdmin || isManager || isSupervisor || isWorker || isViewer;
     var canViewPest      = isAdmin || isManager || isSupervisor || isWorker;
-    var canViewResources = isAdmin || isManager || isWorker;
+    var canViewResources = isAdmin || isWorker;
     var canViewReports   = isAdmin || isManager || isSupervisor || isViewer;
     var canManageUsers   = isAdmin;
 
     var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
     var roleCss  = userRole.ToLower() switch {
-        "admin"      => "role-admin",
-        "manager"    => "role-manager",
-        "supervisor" => "role-supervisor",
-        "worker"     => "role-worker",
-        _            => "role-viewer"
+        "admin"           => "role-admin",
+        "farmer"          => "role-manager",
+        "fieldsupervisor" => "role-supervisor",
+        "storekeeper"     => "role-worker",
+        _                 => "role-viewer"
     };
 }
 

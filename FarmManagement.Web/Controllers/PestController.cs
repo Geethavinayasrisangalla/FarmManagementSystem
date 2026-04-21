@@ -1,33 +1,48 @@
+using FarmManagement.Web.Events;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Enums;
 using FarmManagement.Web.Models.Interfaces;
+using FarmManagement.Web.States;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace FarmManagement.Web.Controllers;
 
-[Authorize(Roles = "Admin,Manager,Supervisor,Worker")]
+// Patterns used:
+//   State    — PestStateMachine enforces valid status transitions (Active→Monitoring→Resolved)
+//   Observer — IEventDispatcher replaces direct IActivityService calls
+//   Facade   — IFarmFacade handles Delete (service + event in one call)
+[Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper")]
 public class PestController : Controller
 {
-    private readonly IPestService     _pestService;
-    private readonly ICropService     _cropService;
-    private readonly IActivityService _activityService;
+    private readonly IPestService      _pestService;
+    private readonly ICropService      _cropService;
+    private readonly IEventDispatcher  _dispatcher;
+    private readonly IFarmFacade       _facade;
 
-    public PestController(IPestService pestService, ICropService cropService, IActivityService activityService)
+    public PestController(IPestService pestService, ICropService cropService,
+                          IEventDispatcher dispatcher, IFarmFacade facade)
     {
-        _pestService     = pestService;
-        _cropService     = cropService;
-        _activityService = activityService;
+        _pestService = pestService;
+        _cropService = cropService;
+        _dispatcher  = dispatcher;
+        _facade      = facade;
     }
 
     private int    CurrentUserId   => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
     private string CurrentUserName => User.FindFirstValue(ClaimTypes.Name) ?? "Unknown";
     private string CurrentUserRole => User.FindFirstValue(ClaimTypes.Role) ?? "Unknown";
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? search)
     {
         var incidents = await _pestService.GetAllAsync();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            incidents = incidents.Where(p => p.PestName.Contains(search, StringComparison.OrdinalIgnoreCase)
+                                          || (p.Crop?.CropName ?? "").Contains(search, StringComparison.OrdinalIgnoreCase));
+        }
+        ViewBag.Search = search;
         return View(incidents);
     }
 
@@ -61,8 +76,9 @@ public class PestController : Controller
 
         await _pestService.CreateAsync(pest);
 
-        await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
-            "Reported", "Pest", $"Logged pest incident: '{pest.PestName}'");
+        // Observer Pattern
+        await _dispatcher.DispatchAsync(new PestReportedEvent(
+            CurrentUserId, CurrentUserName, CurrentUserRole, pest.PestName));
 
         TempData["Success"] = $"Pest incident '{pest.PestName}' reported successfully.";
         return RedirectToAction(nameof(Index));
@@ -75,27 +91,38 @@ public class PestController : Controller
         var incident = await _pestService.GetByIdAsync(id);
         if (incident == null) return NotFound();
 
-        await _pestService.UpdateStatusAsync(id, status, treatmentNotes);
+        try
+        {
+            // State Pattern — PestService uses PestStateMachine to validate the transition
+            await _pestService.UpdateStatusAsync(id, status, treatmentNotes);
 
-        await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
-            "Updated", "Pest", $"Updated '{incident.PestName}' status to {status}");
+            // Observer Pattern
+            await _dispatcher.DispatchAsync(new PestStatusUpdatedEvent(
+                CurrentUserId, CurrentUserName, CurrentUserRole,
+                incident.PestName, status));
 
-        TempData["Success"] = $"Status updated to '{status}' for '{incident.PestName}'.";
+            TempData["Success"] = $"Status updated to '{status}' for '{incident.PestName}'.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Farmer")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var incident = await _pestService.GetByIdAsync(id);
         if (incident == null) return NotFound();
 
-        await _pestService.DeleteAsync(id);
-
-        await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
-            "Deleted", "Pest", $"Deleted pest incident: '{incident.PestName}'");
+        // Facade Pattern — single call coordinates PestService + event dispatch
+        await _facade.DeletePestAsync(
+            id, incident.PestName,
+            CurrentUserId, CurrentUserName, CurrentUserRole);
 
         TempData["Success"] = $"Incident '{incident.PestName}' deleted.";
         return RedirectToAction(nameof(Index));

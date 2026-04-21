@@ -95,7 +95,7 @@
                                             data-bs-target="#statusModal-@item.PestIncidentId">
                                         <i class="bi bi-pencil"></i> Update
                                     </button>
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Farmer"))
                                     {
                                         <form asp-action="Delete"
                                               asp-route-id="@item.PestIncidentId"

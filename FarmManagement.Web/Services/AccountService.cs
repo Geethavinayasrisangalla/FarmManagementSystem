@@ -54,4 +54,7 @@ public class AccountService : IAccountService
         await _db.SaveChangesAsync();
         return true;
     }
+
+    public async Task<int> GetAdminCountAsync() =>
+        await _db.AppUsers.CountAsync(u => u.Role == Models.Enums.UserRole.Admin);
 }

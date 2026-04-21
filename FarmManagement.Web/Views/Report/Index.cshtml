@@ -52,8 +52,8 @@
                 </p>
             </div>
             <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
-                <a asp-controller="Pest" asp-action="Index" class="btn-fm btn-danger-fm" style="width:100%;justify-content:center;">
-                    <i class="bi bi-bug"></i> View Pest Incidents
+                <a asp-action="PestSummary" class="btn-fm btn-danger-fm" style="width:100%;justify-content:center;">
+                    <i class="bi bi-bug"></i> View Pest Summary
                 </a>
             </div>
         </div>
@@ -74,8 +74,8 @@
                 </p>
             </div>
             <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
-                <a asp-controller="Resource" asp-action="Index" class="btn-fm btn-warn-fm" style="width:100%;justify-content:center;">
-                    <i class="bi bi-box-seam"></i> View Inventory
+                <a asp-action="ResourceReport" class="btn-fm btn-warn-fm" style="width:100%;justify-content:center;">
+                    <i class="bi bi-box-seam"></i> View Resource Report
                 </a>
             </div>
         </div>
@@ -142,6 +142,50 @@
             <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
                 <a asp-controller="Field" asp-action="Index" class="btn-fm btn-outline-fm" style="width:100%;justify-content:center;">
                     <i class="bi bi-grid-3x3-gap"></i> View Fields
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="fm-card h-100" style="display:flex;flex-direction:column;">
+            <div class="fm-card-header">
+                <span class="ch-title">
+                    <i class="bi bi-clipboard-data" style="color:#7c3aed;"></i>
+                    Yield Reports
+                </span>
+            </div>
+            <div class="fm-card-body" style="flex:1;">
+                <p style="font-size:.875rem;color:var(--fm-muted);margin:0;">
+                    Generate and view saved yield reports with
+                    average yield per acre calculations.
+                </p>
+            </div>
+            <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
+                <a asp-action="YieldReports" class="btn-fm btn-primary-fm" style="width:100%;justify-content:center;">
+                    <i class="bi bi-clipboard-data"></i> View Yield Reports
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="fm-card h-100" style="display:flex;flex-direction:column;">
+            <div class="fm-card-header">
+                <span class="ch-title">
+                    <i class="bi bi-pie-chart" style="color:#0284c7;"></i>
+                    Farm Analytics
+                </span>
+            </div>
+            <div class="fm-card-body" style="flex:1;">
+                <p style="font-size:.875rem;color:var(--fm-muted);margin:0;">
+                    Combined farm-wide analytics with crop status,
+                    resource breakdown, and overall performance metrics.
+                </p>
+            </div>
+            <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
+                <a asp-action="FarmAnalytics" class="btn-fm btn-info-fm" style="width:100%;justify-content:center;">
+                    <i class="bi bi-pie-chart"></i> View Farm Analytics
                 </a>
             </div>
         </div>

@@ -14,7 +14,7 @@
         </h1>
         <p>View and manage all farm fields and their details.</p>
     </div>
-    @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Supervisor"))
+    @if (User.IsInRole("Admin") || User.IsInRole("Farmer") || User.IsInRole("FieldSupervisor"))
     {
         <a asp-action="Create" class="btn-fm btn-primary-fm">
             <i class="bi bi-plus-circle"></i> Add Field
@@ -87,7 +87,7 @@
                                        class="btn-fm btn-info-fm btn-sm-fm">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Supervisor"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Farmer") || User.IsInRole("FieldSupervisor"))
                                     {
                                         <a asp-action="Edit" asp-route-id="@item.FieldId"
                                            class="btn-fm btn-warn-fm btn-sm-fm">

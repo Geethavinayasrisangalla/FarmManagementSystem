@@ -43,11 +43,11 @@
 <div class="row g-3 mb-4">
     @{
         var roleGroups = new[] {
-            new { Label = "Admin",      Icon = "bi-shield-fill",    Bg = "#fee2e2", Fg = "#dc2626", Count = Model.Count(u => u.Role == UserRole.Admin) },
-            new { Label = "Manager",    Icon = "bi-briefcase",       Bg = "#dbeafe", Fg = "#2563eb", Count = Model.Count(u => u.Role == UserRole.Manager) },
-            new { Label = "Supervisor", Icon = "bi-clipboard-check", Bg = "#ede9fe", Fg = "#7c3aed", Count = Model.Count(u => u.Role == UserRole.Supervisor) },
-            new { Label = "Worker",     Icon = "bi-tools",           Bg = "#ffedd5", Fg = "#ea580c", Count = Model.Count(u => u.Role == UserRole.Worker) },
-            new { Label = "Viewer",     Icon = "bi-eye",             Bg = "#f1f5f9", Fg = "#475569", Count = Model.Count(u => u.Role == UserRole.Viewer) },
+            new { Label = "Admin",            Icon = "bi-shield-fill",      Bg = "#fee2e2", Fg = "#dc2626", Count = Model.Count(u => u.Role == UserRole.Admin) },
+            new { Label = "Farmer",           Icon = "bi-flower1",          Bg = "#dbeafe", Fg = "#2563eb", Count = Model.Count(u => u.Role == UserRole.Farmer) },
+            new { Label = "Field Supervisor", Icon = "bi-clipboard-check",  Bg = "#ede9fe", Fg = "#7c3aed", Count = Model.Count(u => u.Role == UserRole.FieldSupervisor) },
+            new { Label = "Storekeeper",      Icon = "bi-box-seam",         Bg = "#ffedd5", Fg = "#ea580c", Count = Model.Count(u => u.Role == UserRole.Storekeeper) },
+            new { Label = "Agronomist",       Icon = "bi-eyedropper",       Bg = "#f1f5f9", Fg = "#475569", Count = Model.Count(u => u.Role == UserRole.Agronomist) },
         };
     }
     @foreach (var g in roleGroups)
@@ -104,11 +104,11 @@
                             @foreach (var user in Model)
                             {
                                 var roleCss = user.Role switch {
-                                    UserRole.Admin      => "role-admin",
-                                    UserRole.Manager    => "role-manager",
-                                    UserRole.Supervisor => "role-supervisor",
-                                    UserRole.Worker     => "role-worker",
-                                    _                   => "role-viewer"
+                                    UserRole.Admin           => "role-admin",
+                                    UserRole.Farmer          => "role-manager",
+                                    UserRole.FieldSupervisor => "role-supervisor",
+                                    UserRole.Storekeeper     => "role-worker",
+                                    _                        => "role-viewer"
                                 };
                                 var isMe = user.UserId == currentUserId;
                                 <tr>

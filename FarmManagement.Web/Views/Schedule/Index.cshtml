@@ -14,7 +14,7 @@
         </h1>
         <p>Plan and track crop planting and harvest activities.</p>
     </div>
-    @if (User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+    @if (User.IsInRole("Admin") || User.IsInRole("FieldSupervisor"))
     {
         <a asp-action="Create" class="btn-fm btn-primary-fm">
             <i class="bi bi-plus-circle"></i> New Schedule
@@ -102,7 +102,7 @@
                                             <i class="bi bi-basket"></i> Harvest
                                         </a>
                                     }
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("FieldSupervisor"))
                                     {
                                         <form asp-action="Delete" asp-route-id="@item.ScheduleId"
                                               method="post" class="d-inline"

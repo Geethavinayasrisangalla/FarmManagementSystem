@@ -8,7 +8,7 @@ public class AppUser
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
-    public UserRole Role { get; set; } = UserRole.Viewer;
+    public UserRole Role { get; set; } = UserRole.Agronomist;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public string PasswordHint { get; set; } = string.Empty;
 }

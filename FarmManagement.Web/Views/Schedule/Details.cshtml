@@ -71,7 +71,7 @@
                             <i class="bi bi-basket"></i> Record Harvest
                         </a>
                     }
-                    @if (User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+                    @if (User.IsInRole("Admin") || User.IsInRole("FieldSupervisor"))
                     {
                         <form asp-action="Delete" asp-route-id="@Model.ScheduleId"
                               method="post" class="d-inline"

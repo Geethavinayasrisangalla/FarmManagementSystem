@@ -38,6 +38,16 @@ public class AccountController : Controller
             return View(vm);
         }
 
+        if (user.Role == Models.Enums.UserRole.Admin)
+        {
+            var adminCount = await _accountService.GetAdminCountAsync();
+            if (adminCount > 5)
+            {
+                ModelState.AddModelError(string.Empty, "Maximum admin accounts (5) reached. Contact system administrator.");
+                return View(vm);
+            }
+        }
+
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
@@ -78,6 +88,16 @@ public class AccountController : Controller
         {
             ModelState.AddModelError("Email", "This email address is already registered.");
             return View(vm);
+        }
+
+        if (vm.Role == Models.Enums.UserRole.Admin)
+        {
+            var adminCount = await _accountService.GetAdminCountAsync();
+            if (adminCount >= 5)
+            {
+                ModelState.AddModelError("Role", "Maximum admin accounts (5) reached. Choose a different role.");
+                return View(vm);
+            }
         }
 
         var success = await _accountService.RegisterAsync(vm);

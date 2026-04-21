@@ -58,7 +58,7 @@
                     </tr>
                 </table>
 
-                @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Supervisor"))
+                @if (User.IsInRole("Admin") || User.IsInRole("Farmer") || User.IsInRole("FieldSupervisor"))
                 {
                     <div class="mt-3 d-flex gap-2">
                         <a asp-action="Edit" asp-route-id="@Model.CropId" class="btn-fm btn-warn-fm btn-sm-fm">

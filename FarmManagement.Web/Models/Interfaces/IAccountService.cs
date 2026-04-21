@@ -10,4 +10,5 @@ public interface IAccountService
     Task<bool> EmailExistsAsync(string email);
     Task<string?> GetPasswordHintAsync(string email);
     Task<bool> ResetPasswordAsync(string email, string hint, string newPassword);
+    Task<int> GetAdminCountAsync();
 }

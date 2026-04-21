@@ -111,6 +111,8 @@ public class FarmDbContext : DbContext
         {
             entity.HasKey(y => y.YieldReportId);
             entity.Property(y => y.TotalYieldKg).HasColumnType("decimal(10,2)");
+            entity.Property(y => y.AverageYieldPerAcre).HasColumnType("decimal(10,2)");
+            entity.Property(y => y.Remarks).HasMaxLength(255);
 
             entity.HasOne(y => y.Crop)
                   .WithMany(c => c.YieldReports)

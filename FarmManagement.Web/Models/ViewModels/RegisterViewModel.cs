@@ -17,7 +17,7 @@ public class RegisterViewModel
 
     [Required]
     [Display(Name = "Role")]
-    public UserRole Role { get; set; } = UserRole.Viewer;
+    public UserRole Role { get; set; } = UserRole.Agronomist;
 
     [Required(ErrorMessage = "Password is required.")]
     [DataType(DataType.Password)]

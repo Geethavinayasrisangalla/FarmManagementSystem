@@ -59,10 +59,10 @@
                         <div class="col-12">
                             <label asp-for="Role" class="form-label">Assign Role</label>
                             <select asp-for="Role" class="form-select">
-                                <option value="@((int)UserRole.Viewer)">Viewer — Read-only monitoring</option>
-                                <option value="@((int)UserRole.Worker)">Worker — Execution &amp; logging</option>
-                                <option value="@((int)UserRole.Supervisor)">Supervisor — Planning &amp; oversight</option>
-                                <option value="@((int)UserRole.Manager)">Manager — Resource &amp; inventory</option>
+                                <option value="@((int)UserRole.Agronomist)">Agronomist — Pest monitoring &amp; analytics</option>
+                                <option value="@((int)UserRole.Storekeeper)">Storekeeper — Resource &amp; inventory</option>
+                                <option value="@((int)UserRole.FieldSupervisor)">Field Supervisor — Planning &amp; oversight</option>
+                                <option value="@((int)UserRole.Farmer)">Farmer — Crop &amp; field management</option>
                                 <option value="@((int)UserRole.Admin)">Admin — System oversight</option>
                             </select>
                             <span asp-validation-for="Role" class="text-danger" style="font-size:.78rem;"></span>
@@ -109,11 +109,11 @@
                 <div class="row g-2">
                     @{
                         var roles = new[] {
-                            new { Name="Admin",      Color="#dc2626", Bg="#fef2f2", Desc="Full access — users, all farm data, reports, system settings." },
-                            new { Name="Manager",    Color="#2563eb", Bg="#eff6ff", Desc="Stock, fields, crops, performance analysis." },
-                            new { Name="Supervisor", Color="#7c3aed", Bg="#f5f3ff", Desc="Schedules, field assignments, pest and soil monitoring." },
-                            new { Name="Worker",     Color="#ea580c", Bg="#fff7ed", Desc="Daily tasks, harvest logging, resource usage." },
-                            new { Name="Viewer",     Color="#475569", Bg="#f8fafc", Desc="Read-only: dashboard, crops, fields, reports." },
+                            new { Name="Admin",            Color="#dc2626", Bg="#fef2f2", Desc="Full access — users, all farm data, reports, system settings." },
+                            new { Name="Farmer",           Color="#2563eb", Bg="#eff6ff", Desc="Crop & field management, performance analysis." },
+                            new { Name="Field Supervisor", Color="#7c3aed", Bg="#f5f3ff", Desc="Schedules, field assignments, pest and soil monitoring." },
+                            new { Name="Storekeeper",      Color="#ea580c", Bg="#fff7ed", Desc="Resource inventory, allocation, stock management." },
+                            new { Name="Agronomist",       Color="#475569", Bg="#f8fafc", Desc="Pest monitoring, yield analytics, farm reports." },
                         };
                     }
                     @foreach (var r in roles)
