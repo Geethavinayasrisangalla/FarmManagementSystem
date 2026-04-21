@@ -2,14 +2,24 @@ using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
+using FarmManagement.Web.Services.Strategies;
 using Microsoft.EntityFrameworkCore;
 
 namespace FarmManagement.Web.Services;
 
+// Strategy Pattern — allocation behaviour is injected via IAllocationStrategy.
+// Swap StandardAllocationStrategy for ReserveAllocationStrategy in Program.cs
+// without changing any code here.
 public class ResourceService : IResourceService
 {
-    private readonly FarmDbContext _db;
-    public ResourceService(FarmDbContext db) => _db = db;
+    private readonly FarmDbContext       _db;
+    private readonly IAllocationStrategy _allocationStrategy;
+
+    public ResourceService(FarmDbContext db, IAllocationStrategy allocationStrategy)
+    {
+        _db                 = db;
+        _allocationStrategy = allocationStrategy;
+    }
 
     public async Task<IEnumerable<Resource>> GetAllAsync() =>
         await _db.Resources.OrderBy(r => r.Name).ToListAsync();
@@ -24,10 +34,10 @@ public class ResourceService : IResourceService
     {
         _db.Resources.Add(new Resource
         {
-            Name = vm.Name,
-            Type = vm.Type,
-            Quantity = vm.Quantity,
-            Unit = vm.Unit,
+            Name        = vm.Name,
+            Type        = vm.Type,
+            Quantity    = vm.Quantity,
+            Unit        = vm.Unit,
             LastUpdated = DateTime.Now
         });
         await _db.SaveChangesAsync();
@@ -37,10 +47,10 @@ public class ResourceService : IResourceService
     {
         var resource = await _db.Resources.FindAsync(vm.ResourceId)
                        ?? throw new KeyNotFoundException("Resource not found.");
-        resource.Name = vm.Name;
-        resource.Type = vm.Type;
-        resource.Quantity = vm.Quantity;
-        resource.Unit = vm.Unit;
+        resource.Name        = vm.Name;
+        resource.Type        = vm.Type;
+        resource.Quantity    = vm.Quantity;
+        resource.Unit        = vm.Unit;
         resource.LastUpdated = DateTime.Now;
         await _db.SaveChangesAsync();
     }
@@ -64,20 +74,18 @@ public class ResourceService : IResourceService
         var resource = await _db.Resources.FindAsync(resourceId)
                        ?? throw new KeyNotFoundException("Resource not found.");
 
-        if (resource.Quantity < qty)
-            throw new InvalidOperationException(
-                $"Insufficient stock. Available: {resource.Quantity} {resource.Unit}.");
+        // Strategy Pattern — delegates the allocation rule to the injected strategy
+        await _allocationStrategy.AllocateAsync(resource, qty);
 
-        resource.Quantity -= qty;
         resource.LastUpdated = DateTime.Now;
 
         _db.ResourceUsages.Add(new ResourceUsage
         {
-            ResourceId = resourceId,
-            ScheduleId = scheduleId,
+            ResourceId   = resourceId,
+            ScheduleId   = scheduleId,
             QuantityUsed = qty,
-            Notes = notes,
-            UsedDate = DateTime.Now
+            Notes        = notes,
+            UsedDate     = DateTime.Now
         });
         await _db.SaveChangesAsync();
     }

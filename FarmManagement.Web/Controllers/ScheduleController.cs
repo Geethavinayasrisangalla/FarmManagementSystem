@@ -1,3 +1,4 @@
+using FarmManagement.Web.Events;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -6,16 +7,23 @@ using System.Security.Claims;
 
 namespace FarmManagement.Web.Controllers;
 
+// Patterns used:
+//   Observer — IEventDispatcher replaces direct IActivityService calls
+//   Facade   — IFarmFacade handles RecordHarvest & Delete (multi-service ops)
 [Authorize(Roles = "Admin,Manager,Supervisor,Worker,Viewer")]
 public class ScheduleController : Controller
 {
-    private readonly IScheduleService _scheduleService;
-    private readonly IActivityService _activityService;
+    private readonly IScheduleService  _scheduleService;
+    private readonly IEventDispatcher  _dispatcher;
+    private readonly IFarmFacade       _facade;
 
-    public ScheduleController(IScheduleService scheduleService, IActivityService activityService)
+    public ScheduleController(IScheduleService scheduleService,
+                               IEventDispatcher dispatcher,
+                               IFarmFacade facade)
     {
         _scheduleService = scheduleService;
-        _activityService = activityService;
+        _dispatcher      = dispatcher;
+        _facade          = facade;
     }
 
     private int    CurrentUserId   => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
@@ -61,8 +69,10 @@ public class ScheduleController : Controller
 
         await _scheduleService.CreateAsync(vm);
 
-        await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
-            "Created", "Schedule", $"Scheduled harvest for {vm.ScheduledDate:dd MMM yyyy} — expected {vm.ExpectedYieldKg} kg");
+        // Observer Pattern
+        await _dispatcher.DispatchAsync(new ScheduleCreatedEvent(
+            CurrentUserId, CurrentUserName, CurrentUserRole,
+            vm.ScheduledDate, vm.ExpectedYieldKg));
 
         TempData["Success"] = "Harvest scheduled successfully.";
         return RedirectToAction(nameof(Index));
@@ -94,10 +104,10 @@ public class ScheduleController : Controller
             return RedirectToAction(nameof(RecordHarvest), new { id });
         }
 
-        await _scheduleService.RecordHarvestAsync(id, actualYield, notes);
-
-        await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
-            "Harvested", "Harvest", $"Recorded harvest #{id} — actual yield: {actualYield:N0} kg");
+        // Facade Pattern — single call coordinates ScheduleService + event dispatch
+        await _facade.RecordHarvestAsync(
+            id, actualYield, notes,
+            CurrentUserId, CurrentUserName, CurrentUserRole);
 
         TempData["Success"] = "Harvest recorded successfully.";
         return RedirectToAction(nameof(HarvestList));
@@ -108,10 +118,9 @@ public class ScheduleController : Controller
     [Authorize(Roles = "Admin,Supervisor")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        await _scheduleService.DeleteAsync(id);
-
-        await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
-            "Deleted", "Schedule", $"Deleted schedule #{id}");
+        // Facade Pattern — single call coordinates ScheduleService + event dispatch
+        await _facade.DeleteScheduleAsync(
+            id, CurrentUserId, CurrentUserName, CurrentUserRole);
 
         TempData["Success"] = "Schedule deleted.";
         return RedirectToAction(nameof(Index));
