@@ -25,4 +25,8 @@
     <Folder Include="wwwroot\Images\" />
   </ItemGroup>
 
+  <Target Name="CompileTypeScript" BeforeTargets="Build" Condition="Exists('tsconfig.json')">
+    <Exec Command="npx tsc" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+
 </Project>

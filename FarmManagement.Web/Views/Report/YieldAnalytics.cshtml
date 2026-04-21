@@ -61,16 +61,25 @@
 
 @if (Model.Records.Any())
 {
-    <div class="mb-4" style="border-radius:14px;overflow:hidden;border:1px solid #1e3a4a;box-shadow:0 4px 24px rgba(0,0,0,.18);">
-        <div style="background:#0d1b2a;padding:.85rem 1.25rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1e3a4a;">
-            <span style="font-weight:600;font-size:.92rem;color:#e2e8f0;display:flex;align-items:center;gap:.45rem;">
-                <i class="bi bi-graph-up-arrow" style="color:#16a34a;"></i>
+    <div class="mb-4" style="border-radius:16px;overflow:hidden;border:1px solid rgba(30,58,74,0.6);
+                              box-shadow:0 8px 32px rgba(0,0,0,.25), 0 1px 3px rgba(0,0,0,.1);">
+        <div style="background:linear-gradient(135deg, #0d1b2a 0%, #1b2a3d 100%);
+                     padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;
+                     border-bottom:1px solid rgba(30,58,74,0.5);">
+            <span style="font-weight:700;font-size:.95rem;color:#e2e8f0;display:flex;align-items:center;gap:.5rem;">
+                <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
+                             background:rgba(34,197,94,0.15);border-radius:8px;">
+                    <i class="bi bi-graph-up-arrow" style="color:#22c55e;font-size:.85rem;"></i>
+                </span>
                 Crop Yield Progress
             </span>
-            <span style="font-size:.75rem;color:#64748b;">Actual harvest yield (kg) per crop over time</span>
+            <span style="font-size:.72rem;color:#475569;background:rgba(71,85,105,0.15);padding:.25rem .75rem;
+                         border-radius:20px;border:1px solid rgba(71,85,105,0.2);">
+                <i class="bi bi-clock me-1"></i>Actual harvest yield (kg) per crop over time
+            </span>
         </div>
-        <div style="background:#0d1b2a;padding:1.5rem 1.25rem 1rem;">
-            <canvas id="yieldChart" height="85"></canvas>
+        <div style="background:linear-gradient(180deg, #0f1f30 0%, #0d1b2a 100%);padding:1.75rem 1.5rem 1.25rem;">
+            <canvas id="yieldChart" height="90"></canvas>
         </div>
     </div>
 }
@@ -140,9 +149,10 @@
 
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="~/js/yieldChart.js"></script>
     <script>
-        // Serialize all records with crop, field, date, yield
-        const allRecords = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        // Pass server data to the TypeScript-compiled chart function
+        const harvestRecords = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
             Model.Records
                 .OrderBy(r => r.HarvestedDate)
                 .Select(r => new {
@@ -152,130 +162,6 @@
                     yield = r.ActualYieldKg
                 })
         ));
-
-        // Unique sorted dates (x-axis labels)
-        const allDates = [...new Set(allRecords.map(r => r.date))];
-
-        // Unique crop names
-        const crops = [...new Set(allRecords.map(r => r.crop))];
-
-        // Color palette (looks good on dark background)
-        const palette = [
-            { line: '#f59e0b', point: '#f59e0b' },  // amber
-            { line: '#22c55e', point: '#22c55e' },  // green
-            { line: '#60a5fa', point: '#60a5fa' },  // blue
-            { line: '#a78bfa', point: '#a78bfa' },  // purple
-            { line: '#f87171', point: '#f87171' },  // red
-            { line: '#34d399', point: '#34d399' },  // emerald
-            { line: '#fb923c', point: '#fb923c' },  // orange
-            { line: '#38bdf8', point: '#38bdf8' },  // sky
-        ];
-
-        // Build one dataset per crop
-        const datasets = crops.map((cropName, i) => {
-            const color = palette[i % palette.length];
-            const cropData = allDates.map(date => {
-                const rec = allRecords.find(r => r.crop === cropName && r.date === date);
-                return rec ? Number(rec.yield) : null;
-            });
-            return {
-                label: cropName,
-                data: cropData,
-                borderColor: color.line,
-                backgroundColor: 'transparent',
-                pointBackgroundColor: color.point,
-                pointBorderColor: '#0d1b2a',
-                pointBorderWidth: 2,
-                pointRadius: 6,
-                pointHoverRadius: 9,
-                pointHoverBorderColor: '#fff',
-                borderWidth: 2.2,
-                tension: 0.35,
-                spanGaps: true
-            };
-        });
-
-        const ctx = document.getElementById('yieldChart').getContext('2d');
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: allDates,
-                datasets: datasets
-            },
-            options: {
-                responsive: true,
-                interaction: { mode: 'index', intersect: false },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'bottom',
-                        labels: {
-                            color: '#cbd5e1',
-                            font: { size: 12, family: "'Segoe UI', system-ui, sans-serif" },
-                            usePointStyle: true,
-                            pointStyleWidth: 14,
-                            padding: 20,
-                            boxHeight: 8
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'Crop Yield Progress Over Time',
-                        color: '#e2e8f0',
-                        font: { size: 14, weight: '600', family: "'Segoe UI', system-ui, sans-serif" },
-                        padding: { bottom: 20 }
-                    },
-                    tooltip: {
-                        backgroundColor: '#1e293b',
-                        titleColor: '#94a3b8',
-                        bodyColor: '#e2e8f0',
-                        borderColor: '#334155',
-                        borderWidth: 1,
-                        padding: 12,
-                        callbacks: {
-                            label: ctx => '  ' + ctx.dataset.label + ': ' + (ctx.parsed.y ?? 0).toLocaleString() + ' kg'
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Yield (kg)',
-                            color: '#94a3b8',
-                            font: { size: 11 }
-                        },
-                        grid: { color: 'rgba(255,255,255,.06)' },
-                        ticks: {
-                            callback: val => val.toLocaleString() + ' kg',
-                            color: '#94a3b8',
-                            font: { size: 11 }
-                        },
-                        border: { color: 'rgba(255,255,255,.1)' }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Harvest Date',
-                            color: '#94a3b8',
-                            font: { size: 11 }
-                        },
-                        grid: { color: 'rgba(255,255,255,.04)' },
-                        ticks: {
-                            color: '#94a3b8',
-                            font: { size: 11 },
-                            maxRotation: 30
-                        },
-                        border: { color: 'rgba(255,255,255,.1)' }
-                    }
-                },
-                animation: {
-                    duration: 900,
-                    easing: 'easeInOutCubic'
-                }
-            }
-        });
+        renderYieldChart('yieldChart', harvestRecords);
     </script>
 }

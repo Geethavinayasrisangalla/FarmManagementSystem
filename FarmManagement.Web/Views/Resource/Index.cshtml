@@ -167,10 +167,10 @@
                                     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                                     {
                                         <form asp-action="Delete" asp-route-id="@item.ResourceId"
-                                              method="post" class="d-inline"
-                                              onsubmit="return confirm('Delete @Html.Raw(item.Name.Replace("'", "\\'"))?')">
+                                              method="post" class="d-inline delete-form">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn-fm btn-danger-fm btn-sm-fm">
+                                            <button type="button" class="btn-fm btn-danger-fm btn-sm-fm btn-delete"
+                                                    data-name="@item.Name">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -181,6 +181,19 @@
                     }
                 </tbody>
             </table>
+                 </div>
+            }
         </div>
-    }
-</div>
+
+        @section Scripts {
+            <script>
+                document.querySelectorAll('.btn-delete').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        var name = this.getAttribute('data-name');
+                        if (confirm('Are you sure you want to delete "' + name + '"?')) {
+                            this.closest('form').submit();
+                        }
+                    });
+                });
+            </script>
+        }

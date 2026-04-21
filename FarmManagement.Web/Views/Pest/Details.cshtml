@@ -1,0 +1,58 @@
+@model FarmManagement.Web.Models.Entities.PestIncident
+@{
+    ViewData["Title"] = "Pest Incident Details";
+}
+
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>
+            <span class="ph-icon" style="background:#fee2e2;color:#dc2626;">
+                <i class="bi bi-bug"></i>
+            </span>
+            Incident Details
+        </h1>
+        <p>Viewing details for <strong>@Model.PestName</strong>.</p>
+    </div>
+    <a asp-action="Index" class="btn-fm btn-outline-fm">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+</div>
+
+<div class="fm-card" style="max-width:720px;">
+    <div class="fm-card-header">
+        <span class="ch-title"><i class="bi bi-info-circle" style="color:#dc2626;"></i> @Model.PestName</span>
+    </div>
+    <div class="fm-card-body">
+        <table class="fm-table">
+            <tr><th style="width:40%;">Incident ID</th><td>@Model.PestIncidentId</td></tr>
+            <tr><th>Pest / Disease</th><td style="font-weight:600;">@Model.PestName</td></tr>
+            <tr><th>Affected Crop</th><td>@(Model.Crop?.CropName ?? "—")</td></tr>
+            <tr><th>Description</th><td>@Model.Description</td></tr>
+            <tr>
+                <th>Status</th>
+                <td>
+                    @switch (Model.Status)
+                    {
+                        case FarmManagement.Web.Models.Enums.IncidentStatus.Active:
+                            <span class="badge-pill badge-red"><i class="bi bi-exclamation-triangle"></i> Active</span>
+                            break;
+                        case FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring:
+                            <span class="badge-pill badge-yellow"><i class="bi bi-eye"></i> Monitoring</span>
+                            break;
+                        case FarmManagement.Web.Models.Enums.IncidentStatus.Resolved:
+                            <span class="badge-pill badge-green"><i class="bi bi-check-circle"></i> Resolved</span>
+                            break;
+                    }
+                </td>
+            </tr>
+            <tr><th>Reported Date</th><td>@Model.ReportedDate.ToString("dd MMM yyyy, hh:mm tt")</td></tr>
+            <tr><th>Treatment Notes</th><td>@(Model.TreatmentNotes ?? "—")</td></tr>
+        </table>
+
+        <div class="mt-4 d-flex gap-2">
+            <a asp-action="Index" class="btn-fm btn-outline-fm">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+</div>
