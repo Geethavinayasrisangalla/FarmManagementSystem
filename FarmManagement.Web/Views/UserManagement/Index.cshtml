@@ -91,16 +91,18 @@
                     <table class="fm-table">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>S.No</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Role</th>
+                                <th>Status</th>
                                 <th>Joined</th>
                                 <th>Change Role</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @{ var sno = 1; }
                             @foreach (var user in Model)
                             {
                                 var roleCss = user.Role switch {
@@ -112,7 +114,7 @@
                                 };
                                 var isMe = user.UserId == currentUserId;
                                 <tr>
-                                    <td style="color:var(--fm-muted);font-size:.8rem;">@user.UserId</td>
+                                    <td style="color:var(--fm-muted);font-size:.8rem;">@(sno++)</td>
                                     <td style="font-weight:600;">
                                         @user.FullName
                                         @if (isMe)
@@ -122,6 +124,16 @@
                                     </td>
                                     <td style="color:var(--fm-muted);">@user.Email</td>
                                     <td><span class="urole @roleCss">@(user.Role == UserRole.FieldSupervisor ? "Field Supervisor" : user.Role.ToString())</span></td>
+                                    <td>
+                                        @if (user.IsBlocked)
+                                        {
+                                            <span class="badge-pill badge-red"><i class="bi bi-lock-fill me-1"></i>Suspended</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-pill badge-green"><i class="bi bi-unlock-fill me-1"></i>Active</span>
+                                        }
+                                    </td>
                                     <td>@user.CreatedAt.ToString("dd MMM yyyy")</td>
                                     <td>
                                         @if (!isMe)
@@ -151,14 +163,35 @@
                                     <td>
                                         @if (!isMe)
                                         {
-                                            <form asp-action="Delete" method="post" class="d-inline"
-                                                  onsubmit="return confirm('Remove @user.FullName from the system?')">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="userId" value="@user.UserId" />
-                                                <button type="submit" class="btn-fm btn-danger-fm btn-sm-fm">
-                                                    <i class="bi bi-trash"></i> Remove
-                                                </button>
-                                            </form>
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <form asp-action="ToggleBlock" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="userId" value="@user.UserId" />
+                                                    @if (user.IsBlocked)
+                                                    {
+                                                        <button type="submit" class="btn-fm btn-primary-fm btn-sm-fm" title="Activate this account">
+                                                            <i class="bi bi-unlock"></i> Activate
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="submit" class="btn-fm btn-outline-fm btn-sm-fm"
+                                                                style="border-color:#f59e0b;color:#f59e0b;"
+                                                                title="Temporarily suspend this account"
+                                                                onclick="return confirm('Suspend access for @user.FullName?')">
+                                                            <i class="bi bi-lock"></i> Suspend
+                                                        </button>
+                                                    }
+                                                </form>
+                                                <form asp-action="Delete" method="post" class="d-inline"
+                                                      onsubmit="return confirm('Remove @user.FullName from the system?')">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="userId" value="@user.UserId" />
+                                                    <button type="submit" class="btn-fm btn-danger-fm btn-sm-fm">
+                                                        <i class="bi bi-trash"></i> Remove
+                                                    </button>
+                                                </form>
+                                            </div>
                                         }
                                     </td>
                                 </tr>

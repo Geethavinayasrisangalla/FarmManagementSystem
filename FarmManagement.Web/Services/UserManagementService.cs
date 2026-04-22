@@ -36,4 +36,14 @@ public class UserManagementService : IUserManagementService
         _db.AppUsers.Remove(user);
         await _db.SaveChangesAsync();
     }
+
+    public async Task ToggleBlockAsync(int userId)
+    {
+        var user = await _db.AppUsers.FindAsync(userId);
+        if (user != null)
+        {
+            user.IsBlocked = !user.IsBlocked;
+            await _db.SaveChangesAsync();
+        }
+    }
 }

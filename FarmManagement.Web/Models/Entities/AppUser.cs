@@ -11,4 +11,5 @@ public class AppUser
     public UserRole Role { get; set; } = UserRole.Agronomist;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public string PasswordHint { get; set; } = string.Empty;
+    public bool IsBlocked { get; set; } = false;
 }

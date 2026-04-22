@@ -110,4 +110,28 @@ public class UserManagementController : Controller
         TempData["Success"] = $"User '{user.FullName}' has been removed.";
         return RedirectToAction(nameof(Index));
     }
+
+    // ── Suspend / Activate user ─────────────────────────────────────
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ToggleBlock(int userId)
+    {
+        if (userId == CurrentUserId)
+        {
+            TempData["Error"] = "You cannot suspend your own account.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var user = await _userService.GetByIdAsync(userId);
+        if (user == null) return NotFound();
+
+        await _userService.ToggleBlockAsync(userId);
+
+        var action = user.IsBlocked ? "Activated" : "Suspended";
+        await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
+            action, "User", $"{action} account: {user.FullName} ({user.Email})");
+
+        TempData["Success"] = $"Account for '{user.FullName}' has been {action.ToLower()}.";
+        return RedirectToAction(nameof(Index));
+    }
 }

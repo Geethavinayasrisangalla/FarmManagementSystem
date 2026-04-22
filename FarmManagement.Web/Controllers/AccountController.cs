@@ -38,6 +38,12 @@ public class AccountController : Controller
             return View(vm);
         }
 
+        if (user.IsBlocked)
+        {
+            ModelState.AddModelError(string.Empty, "Your account has been suspended. Contact your administrator.");
+            return View(vm);
+        }
+
         if (user.Role == Models.Enums.UserRole.Admin)
         {
             var adminCount = await _accountService.GetAdminCountAsync();

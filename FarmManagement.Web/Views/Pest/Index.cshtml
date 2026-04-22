@@ -64,7 +64,7 @@
             <table class="fm-table">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>S.No</th>
                         <th>Pest Name</th>
                         <th>Crop</th>
                         <th>Description</th>
@@ -75,6 +75,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @{ var sno = 1; }
                     @foreach (var item in Model)
                     {
                         var pestBadge = item.Status switch {
@@ -83,7 +84,7 @@
                             _                                                          => "badge-green"
                         };
                         <tr>
-                            <td style="color:var(--fm-muted);font-size:.8rem;">@item.PestIncidentId</td>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@(sno++)</td>
                             <td style="font-weight:600;">@item.PestName</td>
                             <td>@(item.Crop?.CropName ?? "—")</td>
                             <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">

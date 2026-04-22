@@ -9,4 +9,5 @@ public interface IUserManagementService
     Task<AppUser?> GetByIdAsync(int userId);
     Task UpdateRoleAsync(int userId, UserRole newRole);
     Task DeleteUserAsync(int userId);
+    Task ToggleBlockAsync(int userId);
 }

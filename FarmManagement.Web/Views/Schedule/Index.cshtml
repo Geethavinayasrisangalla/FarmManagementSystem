@@ -67,7 +67,7 @@
             <table class="fm-table">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>S.No</th>
                         <th>Crop</th>
                         <th>Field</th>
                         <th>Scheduled Date</th>
@@ -78,6 +78,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @{ var sno = 1; }
                     @foreach (var item in Model)
                     {
                         var schBadge = item.Status switch {
@@ -87,7 +88,7 @@
                             _            => "badge-yellow"
                         };
                         <tr>
-                            <td style="color:var(--fm-muted);font-size:.8rem;">@item.ScheduleId</td>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@(sno++)</td>
                             <td style="font-weight:600;">@(item.Crop?.CropName ?? "—")</td>
                             <td>@(item.Field?.FieldName ?? "—")</td>
                             <td>@item.ScheduledDate.ToString("dd MMM yyyy")</td>

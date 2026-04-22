@@ -116,7 +116,7 @@
             <table class="fm-table">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>S.No</th>
                         <th>Crop</th>
                         <th>Field</th>
                         <th>Harvested Date</th>
@@ -127,13 +127,14 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @{ var sno = 1; }
                     @foreach (var record in Model.Records)
                     {
                         var expected = record.PlantingSchedule?.ExpectedYieldKg ?? 0;
                         var actual = record.ActualYieldKg;
                         var variance = actual - expected;
                         <tr>
-                            <td style="color:var(--fm-muted);font-size:.8rem;">@record.HarvestId</td>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@(sno++)</td>
                             <td style="font-weight:600;">@(record.PlantingSchedule?.Crop?.CropName ?? "—")</td>
                             <td>@(record.PlantingSchedule?.Field?.FieldName ?? "—")</td>
                             <td>@record.HarvestedDate.ToString("dd MMM yyyy")</td>

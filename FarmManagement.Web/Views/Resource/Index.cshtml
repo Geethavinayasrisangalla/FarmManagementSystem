@@ -114,7 +114,7 @@
             <table class="fm-table">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>S.No</th>
                         <th>Resource Name</th>
                         <th>Type</th>
                         <th>Quantity</th>
@@ -125,10 +125,11 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @{ var sno = 1; }
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td style="color:var(--fm-muted);font-size:.8rem;">@item.ResourceId</td>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@(sno++)</td>
                             <td style="font-weight:600;">@item.Name</td>
                             <td><span class="badge-pill badge-gray">@item.Type</span></td>
                             <td style="font-weight:700;color:@(item.Quantity <= 10 ? "#dc2626" : "#16a34a");">

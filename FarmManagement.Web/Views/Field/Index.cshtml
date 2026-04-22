@@ -58,7 +58,7 @@
             <table class="fm-table">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>S.No</th>
                         <th>Field Name</th>
                         <th>Area (ha)</th>
                         <th>Soil Type</th>
@@ -69,10 +69,11 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @{ var sno = 1; }
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td style="color:var(--fm-muted);font-size:.8rem;">@item.FieldId</td>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@(sno++)</td>
                             <td style="font-weight:600;">@item.FieldName</td>
                             <td>@item.AreaHectares ha</td>
                             <td>@item.SoilType</td>
