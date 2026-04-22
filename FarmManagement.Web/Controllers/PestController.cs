@@ -100,7 +100,6 @@ public class PestController : Controller
             await _dispatcher.DispatchAsync(new PestStatusUpdatedEvent(
                 CurrentUserId, CurrentUserName, CurrentUserRole,
                 incident.PestName, status));
-
             TempData["Success"] = $"Status updated to '{status}' for '{incident.PestName}'.";
         }
         catch (InvalidOperationException ex)
