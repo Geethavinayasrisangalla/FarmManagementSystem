@@ -163,7 +163,7 @@
                                        class="btn-fm btn-info-fm btn-sm-fm">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Farmer"))
+                                    @if ((User.IsInRole("Admin") || User.IsInRole("Farmer")) && item.Type == FarmManagement.Web.Models.Enums.ResourceType.Pesticide)
                                     {
                                         <a asp-action="Edit" asp-route-id="@item.ResourceId"
                                            class="btn-fm btn-warn-fm btn-sm-fm">

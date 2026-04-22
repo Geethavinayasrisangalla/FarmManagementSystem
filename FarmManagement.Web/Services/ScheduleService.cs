@@ -55,7 +55,13 @@ public class ScheduleService : IScheduleService
     public async Task DeleteAsync(int id)
     {
         var ps = await _db.PlantingSchedules.FindAsync(id);
-        if (ps != null) { _db.PlantingSchedules.Remove(ps); await _db.SaveChangesAsync(); }
+        if (ps != null)
+        {
+            var relatedUsages = _db.ResourceUsages.Where(r => r.ScheduleId == id);
+            _db.ResourceUsages.RemoveRange(relatedUsages);
+            _db.PlantingSchedules.Remove(ps);
+            await _db.SaveChangesAsync();
+        }
     }
 
     public async Task RecordHarvestAsync(int scheduleId, decimal actualYield, string? notes)

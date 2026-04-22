@@ -68,7 +68,34 @@ public class CropService : BaseEntityService<Crop, CropViewModel>, ICropService
     public async Task DeleteAsync(int id)
     {
         var crop = await _db.Crops.FindAsync(id);
-        if (crop != null) { _db.Crops.Remove(crop); await _db.SaveChangesAsync(); }
+        if (crop != null)
+        {
+            var scheduleIds = await _db.PlantingSchedules
+                .Where(ps => ps.CropId == id)
+                .Select(ps => ps.ScheduleId)
+                .ToListAsync();
+
+            if (scheduleIds.Count > 0)
+            {
+                var usages = _db.ResourceUsages.Where(r => scheduleIds.Contains(r.ScheduleId));
+                _db.ResourceUsages.RemoveRange(usages);
+
+                var harvests = _db.Harvests.Where(h => scheduleIds.Contains(h.ScheduleId));
+                _db.Harvests.RemoveRange(harvests);
+
+                var schedules = _db.PlantingSchedules.Where(ps => scheduleIds.Contains(ps.ScheduleId));
+                _db.PlantingSchedules.RemoveRange(schedules);
+            }
+
+            var pests = _db.PestIncidents.Where(p => p.CropId == id);
+            _db.PestIncidents.RemoveRange(pests);
+
+            var yieldReports = _db.YieldReports.Where(y => y.CropId == id);
+            _db.YieldReports.RemoveRange(yieldReports);
+
+            _db.Crops.Remove(crop);
+            await _db.SaveChangesAsync();
+        }
     }
 
     public async Task<CropViewModel> PrepareViewModelAsync(CropViewModel? vm = null)

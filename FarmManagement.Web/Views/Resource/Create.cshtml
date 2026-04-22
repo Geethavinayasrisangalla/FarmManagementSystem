@@ -18,7 +18,7 @@
     </a>
 </div>
 
-<div class="fm-card" style="max-width:720px;">
+<div class="fm-card">
     <div class="fm-card-header">
         <span class="ch-title"><i class="bi bi-box-seam" style="color:#ea580c;"></i> Resource Details</span>
     </div>
@@ -30,7 +30,29 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label asp-for="Name" class="form-label"></label>
-                    <input asp-for="Name" class="form-control" placeholder="e.g. NPK Fertilizer" />
+                    <select asp-for="Name" class="form-select">
+                        <option value="">-- Select Resource Name --</option>
+                        <option value="Tractor">Tractor</option>
+                        <option value="Harvester">Harvester</option>
+                        <option value="Plough">Plough</option>
+                        <option value="Seed Drill">Seed Drill</option>
+                        <option value="Rotavator">Rotavator</option>
+                        <option value="Cultivator">Cultivator</option>
+                        <option value="Harrow">Harrow</option>
+                        <option value="Bullock Cart">Bullock Cart</option>
+                        <option value="Trailer">Trailer</option>
+                        <option value="Farm Wagon">Farm Wagon</option>
+                        <option value="Sprayer">Sprayer</option>
+                        <option value="Combine Harvester">Combine Harvester</option>
+                        <option value="Thresher">Thresher</option>
+                        <option value="Paddy Transplanter">Paddy Transplanter</option>
+                        <option value="Power Tiller">Power Tiller</option>
+                        <option value="Water Tanker Truck">Water Tanker Truck</option>
+                        <option value="Pickup Truck">Pickup Truck</option>
+                        <option value="Mini Truck">Mini Truck</option>
+                        <option value="ATV">ATV</option>
+                        <option value="Irrigation Pump">Irrigation Pump</option>
+                    </select>
                     <span asp-validation-for="Name" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
