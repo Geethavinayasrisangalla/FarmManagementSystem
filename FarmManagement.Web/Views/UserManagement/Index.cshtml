@@ -121,7 +121,7 @@
                                         }
                                     </td>
                                     <td style="color:var(--fm-muted);">@user.Email</td>
-                                    <td><span class="urole @roleCss">@user.Role</span></td>
+                                    <td><span class="urole @roleCss">@(user.Role == UserRole.FieldSupervisor ? "Field Supervisor" : user.Role.ToString())</span></td>
                                     <td>@user.CreatedAt.ToString("dd MMM yyyy")</td>
                                     <td>
                                         @if (!isMe)
@@ -132,10 +132,11 @@
                                                 <input type="hidden" name="userId" value="@user.UserId" />
                                                 <select name="role" class="form-select form-select-sm"
                                                         style="font-size:.78rem;min-width:130px;border-radius:6px;border:1.5px solid #d1d5db;">
-                                                    @foreach (UserRole r in Enum.GetValues(typeof(UserRole)))
-                                                    {
-                                                        <option value="@((int)r)" selected="@(r == user.Role)">@r</option>
-                                                    }
+                                                    <option value="@((int)UserRole.Admin)" selected="@(user.Role == UserRole.Admin)">Admin</option>
+                                                    <option value="@((int)UserRole.Farmer)" selected="@(user.Role == UserRole.Farmer)">Farmer</option>
+                                                    <option value="@((int)UserRole.FieldSupervisor)" selected="@(user.Role == UserRole.FieldSupervisor)">Field Supervisor</option>
+                                                    <option value="@((int)UserRole.Storekeeper)" selected="@(user.Role == UserRole.Storekeeper)">Storekeeper</option>
+                                                    <option value="@((int)UserRole.Agronomist)" selected="@(user.Role == UserRole.Agronomist)">Agronomist</option>
                                                 </select>
                                                 <button type="submit" class="btn-fm btn-primary-fm btn-sm-fm">
                                                     <i class="bi bi-check"></i>
@@ -202,11 +203,11 @@
                             _          => ("bi-circle-fill",   "#94a3b8")
                         };
                         var roleCss = log.UserRole.ToLower() switch {
-                            "admin"      => "role-admin",
-                            "manager"    => "role-manager",
-                            "supervisor" => "role-supervisor",
-                            "worker"     => "role-worker",
-                            _            => "role-viewer"
+                            "admin"           => "role-admin",
+                            "farmer"          => "role-manager",
+                            "fieldsupervisor" => "role-supervisor",
+                            "storekeeper"     => "role-worker",
+                            _                 => "role-viewer"
                         };
                         <div style="display:flex;gap:.75rem;padding:.75rem 1.1rem;border-bottom:1px solid #f1f5f9;">
                             <div style="width:32px;height:32px;border-radius:8px;background:#f8fafc;
@@ -216,7 +217,7 @@
                             <div style="min-width:0;flex:1;">
                                 <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;">
                                     <span style="font-weight:600;font-size:.82rem;color:var(--fm-text);">@log.UserName</span>
-                                    <span class="urole @roleCss" style="font-size:.6rem;padding:.07rem .38rem;">@log.UserRole</span>
+                                    <span class="urole @roleCss" style="font-size:.6rem;padding:.07rem .38rem;">@(log.UserRole == "FieldSupervisor" ? "Field Supervisor" : log.UserRole)</span>
                                 </div>
                                 <div style="font-size:.8rem;color:var(--fm-muted);margin-top:.1rem;
                                             white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
@@ -251,26 +252,26 @@
             </div>
             <div class="col-md-4">
                 <div style="padding:.85rem;background:#eff6ff;border-radius:10px;border:1px solid #bfdbfe;">
-                    <div style="font-weight:700;color:#2563eb;margin-bottom:.4rem;"><i class="bi bi-briefcase me-1"></i> Manager</div>
-                    <p style="font-size:.8rem;color:#374151;margin:0;">Resource &amp; inventory control — manage stock, oversee fields and crops, analyze performance.</p>
+                    <div style="font-weight:700;color:#2563eb;margin-bottom:.4rem;"><i class="bi bi-flower1 me-1"></i> Farmer</div>
+                    <p style="font-size:.8rem;color:#374151;margin:0;">Crop &amp; field management — register crops, assign fields, track growth and status.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div style="padding:.85rem;background:#f5f3ff;border-radius:10px;border:1px solid #ddd6fe;">
-                    <div style="font-weight:700;color:#7c3aed;margin-bottom:.4rem;"><i class="bi bi-clipboard-check me-1"></i> Supervisor</div>
-                    <p style="font-size:.8rem;color:#374151;margin:0;">Planning &amp; oversight — create schedules, assign fields to crops, monitor pest data.</p>
+                    <div style="font-weight:700;color:#7c3aed;margin-bottom:.4rem;"><i class="bi bi-clipboard-check me-1"></i> Field Supervisor</div>
+                    <p style="font-size:.8rem;color:#374151;margin:0;">Planning &amp; oversight — create schedules, assign fields to crops, monitor pest and soil data.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div style="padding:.85rem;background:#fff7ed;border-radius:10px;border:1px solid #fed7aa;">
-                    <div style="font-weight:700;color:#ea580c;margin-bottom:.4rem;"><i class="bi bi-tools me-1"></i> Worker</div>
-                    <p style="font-size:.8rem;color:#374151;margin:0;">Execution &amp; logging — view task lists, record harvests, log pest incidents and resource usage.</p>
+                    <div style="font-weight:700;color:#ea580c;margin-bottom:.4rem;"><i class="bi bi-box-seam me-1"></i> Storekeeper</div>
+                    <p style="font-size:.8rem;color:#374151;margin:0;">Resource &amp; inventory — manage stock levels, allocate seeds, fertilizers and equipment.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div style="padding:.85rem;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">
-                    <div style="font-weight:700;color:#475569;margin-bottom:.4rem;"><i class="bi bi-eye me-1"></i> Viewer</div>
-                    <p style="font-size:.8rem;color:#374151;margin:0;">Read-only monitoring — dashboard stats, crop growth, field maps, and reports. No edit access.</p>
+                    <div style="font-weight:700;color:#475569;margin-bottom:.4rem;"><i class="bi bi-eyedropper me-1"></i> Agronomist</div>
+                    <p style="font-size:.8rem;color:#374151;margin:0;">Pest monitoring &amp; analytics — track incidents, view yield reports and farm performance.</p>
                 </div>
             </div>
         </div>

@@ -6,30 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FarmManagement.Web.Services;
 
-// Template Method Pattern — extends BaseEntityService which defines the Create skeleton.
-// FieldService implements BuildEntity and adds a location-required validation hook.
-public class FieldService : BaseEntityService<Field, FieldViewModel>, IFieldService
+public class FieldService : IFieldService
 {
-    public FieldService(FarmDbContext db) : base(db) { }
-
-    // ── Template Method hooks ────────────────────────────────────────────────
-
-    protected override void ValidateViewModel(FieldViewModel vm)
-    {
-        if (vm.AreaHectares <= 0)
-            throw new ArgumentException("Field area must be greater than zero.");
-    }
-
-    protected override Field BuildEntity(FieldViewModel vm) => new Field
-    {
-        FieldName    = vm.FieldName,
-        AreaHectares = vm.AreaHectares,
-        SoilType     = vm.SoilType,
-        Location     = vm.Location,
-        CreatedAt    = DateTime.Now
-    };
-
-    // ── IFieldService implementation ─────────────────────────────────────────
+    private readonly FarmDbContext _db;
+    public FieldService(FarmDbContext db) => _db = db;
 
     public async Task<IEnumerable<Field>> GetAllAsync() =>
         await _db.Fields.AsNoTracking()
@@ -43,8 +23,18 @@ public class FieldService : BaseEntityService<Field, FieldViewModel>, IFieldServ
                         .Include(f => f.PlantingSchedules)
                         .FirstOrDefaultAsync(f => f.FieldId == id);
 
-    // Delegates to the base template method — Validate → BuildEntity → Save → AfterCreate
-    public async Task CreateAsync(FieldViewModel vm) => await TemplateCreateAsync(vm);
+    public async Task CreateAsync(FieldViewModel vm)
+    {
+        _db.Fields.Add(new Field
+        {
+            FieldName = vm.FieldName,
+            AreaHectares = vm.AreaHectares,
+            SoilType = vm.SoilType,
+            Location = vm.Location,
+            CreatedAt = DateTime.Now
+        });
+        await _db.SaveChangesAsync();
+    }
 
     public async Task UpdateAsync(FieldViewModel vm)
     {
@@ -59,7 +49,39 @@ public class FieldService : BaseEntityService<Field, FieldViewModel>, IFieldServ
 
     public async Task DeleteAsync(int id)
     {
-        var field = await _db.Fields.FindAsync(id);
-        if (field != null) { _db.Fields.Remove(field); await _db.SaveChangesAsync(); }
+        var field = await _db.Fields
+            .Include(f => f.Crops).ThenInclude(c => c.PestIncidents)
+            .Include(f => f.Crops).ThenInclude(c => c.PlantingSchedules).ThenInclude(ps => ps.Harvests)
+            .Include(f => f.Crops).ThenInclude(c => c.PlantingSchedules).ThenInclude(ps => ps.ResourceUsages)
+            .Include(f => f.Crops).ThenInclude(c => c.YieldReports)
+            .Include(f => f.PlantingSchedules).ThenInclude(ps => ps.Harvests)
+            .Include(f => f.PlantingSchedules).ThenInclude(ps => ps.ResourceUsages)
+            .FirstOrDefaultAsync(f => f.FieldId == id);
+
+        if (field == null) return;
+
+        // Remove child records bottom-up to avoid FK constraint errors
+        foreach (var crop in field.Crops)
+        {
+            _db.PestIncidents.RemoveRange(crop.PestIncidents);
+            _db.YieldReports.RemoveRange(crop.YieldReports);
+            foreach (var ps in crop.PlantingSchedules)
+            {
+                _db.Harvests.RemoveRange(ps.Harvests);
+                _db.ResourceUsages.RemoveRange(ps.ResourceUsages);
+            }
+            _db.PlantingSchedules.RemoveRange(crop.PlantingSchedules);
+        }
+        _db.Crops.RemoveRange(field.Crops);
+
+        foreach (var ps in field.PlantingSchedules)
+        {
+            _db.Harvests.RemoveRange(ps.Harvests);
+            _db.ResourceUsages.RemoveRange(ps.ResourceUsages);
+        }
+        _db.PlantingSchedules.RemoveRange(field.PlantingSchedules);
+
+        _db.Fields.Remove(field);
+        await _db.SaveChangesAsync();
     }
 }

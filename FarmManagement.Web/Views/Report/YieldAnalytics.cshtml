@@ -61,30 +61,41 @@
 
 @if (Model.Records.Any())
 {
-    <div class="mb-4" style="border-radius:16px;overflow:hidden;border:1px solid rgba(30,58,74,0.6);
-                              box-shadow:0 8px 32px rgba(0,0,0,.25), 0 1px 3px rgba(0,0,0,.1);">
-        <div style="background:linear-gradient(135deg, #0d1b2a 0%, #1b2a3d 100%);
-                     padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;
-                     border-bottom:1px solid rgba(30,58,74,0.5);">
-            <span style="font-weight:700;font-size:.95rem;color:#e2e8f0;display:flex;align-items:center;gap:.5rem;">
-                <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
-                             background:rgba(34,197,94,0.15);border-radius:8px;">
-                    <i class="bi bi-graph-up-arrow" style="color:#22c55e;font-size:.85rem;"></i>
-                </span>
-                Crop Yield Progress
-            </span>
-            <span style="font-size:.72rem;color:#475569;background:rgba(71,85,105,0.15);padding:.25rem .75rem;
-                         border-radius:20px;border:1px solid rgba(71,85,105,0.2);">
-                <i class="bi bi-clock me-1"></i>Actual harvest yield (kg) per crop over time
-            </span>
+    <!-- ── Chart Row: Bar + Doughnut ── -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-7">
+            <div class="fm-card h-100">
+                <div class="fm-card-header">
+                    <span class="ch-title">
+                        <i class="bi bi-bar-chart-fill" style="color:#2563eb;"></i>
+                        Yield by Crop
+                    </span>
+                    <span style="font-size:.72rem;color:var(--fm-muted);">Total harvested (kg) per crop</span>
+                </div>
+                <div class="fm-card-body" style="padding:1.25rem;">
+                    <canvas id="barChart" height="260"></canvas>
+                </div>
+            </div>
         </div>
-        <div style="background:linear-gradient(180deg, #0f1f30 0%, #0d1b2a 100%);padding:1.75rem 1.5rem 1.25rem;">
-            <canvas id="yieldChart" height="90"></canvas>
+        <div class="col-lg-5">
+            <div class="fm-card h-100">
+                <div class="fm-card-header">
+                    <span class="ch-title">
+                        <i class="bi bi-pie-chart-fill" style="color:#7c3aed;"></i>
+                        Crop Share
+                    </span>
+                    <span style="font-size:.72rem;color:var(--fm-muted);">Percentage of total yield</span>
+                </div>
+                <div class="fm-card-body d-flex align-items-center justify-content-center" style="padding:1.25rem;">
+                    <canvas id="doughnutChart" height="260"></canvas>
+                </div>
+            </div>
         </div>
     </div>
-}
 
-<div class="fm-card">
+    }
+
+    <div class="fm-card">
     <div class="fm-card-header">
         <span class="ch-title">
             <i class="bi bi-table" style="color:#16a34a;"></i>
@@ -149,9 +160,7 @@
 
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-    <script src="~/js/yieldChart.js"></script>
     <script>
-        // Pass server data to the TypeScript-compiled chart function
         const harvestRecords = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
             Model.Records
                 .OrderBy(r => r.HarvestedDate)
@@ -162,6 +171,100 @@
                     yield = r.ActualYieldKg
                 })
         ));
-        renderYieldChart('yieldChart', harvestRecords);
-    </script>
-}
+
+        if (harvestRecords.length > 0) {
+            const colors = ['#2563eb','#16a34a','#f59e0b','#7c3aed','#dc2626','#0284c7','#ea580c','#34d399'];
+            const bgColors = ['rgba(37,99,235,.7)','rgba(22,163,106,.7)','rgba(245,158,11,.7)','rgba(124,58,250,.7)','rgba(220,38,38,.7)','rgba(2,132,199,.7)','rgba(234,88,12,.7)','rgba(52,211,153,.7)'];
+            const bgLight  = ['rgba(37,99,235,.12)','rgba(22,163,106,.12)','rgba(245,158,11,.12)','rgba(124,58,250,.12)','rgba(220,38,38,.12)','rgba(2,132,199,.12)','rgba(234,88,12,.12)','rgba(52,211,153,.12)'];
+
+            // ── Aggregate by crop ──
+            const cropMap = {};
+            harvestRecords.forEach(r => { cropMap[r.crop] = (cropMap[r.crop] || 0) + r.yield; });
+            const cropNames = Object.keys(cropMap);
+            const cropTotals = Object.values(cropMap);
+
+            // ═══  BAR CHART  ═══
+            new Chart(document.getElementById('barChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: cropNames,
+                    datasets: [{
+                        label: 'Total Yield (kg)',
+                        data: cropTotals,
+                        backgroundColor: bgColors.slice(0, cropNames.length),
+                        borderColor: colors.slice(0, cropNames.length),
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b', titleColor: '#94a3b8', bodyColor: '#e2e8f0',
+                            borderColor: '#334155', borderWidth: 1, cornerRadius: 8, padding: 12,
+                            callbacks: { label: ctx => '  ' + ctx.parsed.y.toLocaleString() + ' kg' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,.06)' },
+                            ticks: { callback: v => v.toLocaleString(), color: '#64748b', font: { size: 11 } },
+                            border: { display: false }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b', font: { size: 11, weight: '600' } },
+                            border: { display: false }
+                        }
+                    },
+                    animation: { duration: 1000, easing: 'easeOutQuart' }
+                }
+            });
+
+            // ═══  DOUGHNUT CHART  ═══
+            new Chart(document.getElementById('doughnutChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: cropNames,
+                    datasets: [{
+                        data: cropTotals,
+                        backgroundColor: bgColors.slice(0, cropNames.length),
+                        borderColor: '#fff',
+                        borderWidth: 3,
+                        hoverOffset: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '62%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#475569', font: { size: 12, weight: '500' },
+                                usePointStyle: true, pointStyle: 'circle', padding: 16
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e293b', titleColor: '#94a3b8', bodyColor: '#e2e8f0',
+                            borderColor: '#334155', borderWidth: 1, cornerRadius: 8, padding: 12,
+                            callbacks: {
+                                label: ctx => {
+                                    const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
+                                    const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                                    return '  ' + ctx.label + ': ' + ctx.parsed.toLocaleString() + ' kg (' + pct + '%)';
+                                }
+                            }
+                        }
+                    },
+                    animation: { animateRotate: true, duration: 1200 }
+                }
+            });
+
+                    }
+                </script>
+            }

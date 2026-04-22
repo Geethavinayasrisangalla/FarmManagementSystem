@@ -82,6 +82,16 @@
                             <span asp-validation-for="ConfirmPassword" class="text-danger" style="font-size:.78rem;"></span>
                         </div>
 
+                        <div class="col-12">
+                            <label asp-for="PasswordHint" class="form-label">Password Hint</label>
+                            <input asp-for="PasswordHint" class="form-control"
+                                   placeholder="e.g. My pet's name + birth year" />
+                            <span asp-validation-for="PasswordHint" class="text-danger" style="font-size:.78rem;"></span>
+                            <small style="color:var(--fm-muted);font-size:.75rem;">
+                                <i class="bi bi-info-circle me-1"></i>This hint helps the user reset their password.
+                            </small>
+                        </div>
+
                         <div class="col-12 pt-1">
                             <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:.85rem 1rem;font-size:.82rem;color:#15803d;">
                                 <i class="bi bi-info-circle me-1"></i>
@@ -109,11 +119,11 @@
                 <div class="row g-2">
                     @{
                         var roles = new[] {
-                            new { Name="Admin",            Color="#dc2626", Bg="#fef2f2", Desc="Full access — users, all farm data, reports, system settings." },
-                            new { Name="Farmer",           Color="#2563eb", Bg="#eff6ff", Desc="Crop & field management, performance analysis." },
-                            new { Name="Field Supervisor", Color="#7c3aed", Bg="#f5f3ff", Desc="Schedules, field assignments, pest and soil monitoring." },
-                            new { Name="Storekeeper",      Color="#ea580c", Bg="#fff7ed", Desc="Resource inventory, allocation, stock management." },
-                            new { Name="Agronomist",       Color="#475569", Bg="#f8fafc", Desc="Pest monitoring, yield analytics, farm reports." },
+                            new { Name="Admin",            Color="#dc2626", Bg="#fef2f2", Desc="Full system access — user management, all farm data, reports, and system settings." },
+                            new { Name="Farmer",           Color="#2563eb", Bg="#eff6ff", Desc="Crop & field management — register crops, assign fields, track growth and status." },
+                            new { Name="Field Supervisor", Color="#7c3aed", Bg="#f5f3ff", Desc="Planning & oversight — create schedules, assign fields, monitor pest and soil data." },
+                            new { Name="Storekeeper",      Color="#ea580c", Bg="#fff7ed", Desc="Resource & inventory — manage stock levels, allocate seeds, fertilizers and equipment." },
+                            new { Name="Agronomist",       Color="#475569", Bg="#f8fafc", Desc="Pest monitoring & analytics — track incidents, view yield reports and farm performance." },
                         };
                     }
                     @foreach (var r in roles)

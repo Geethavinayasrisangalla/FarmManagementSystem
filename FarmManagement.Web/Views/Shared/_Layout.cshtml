@@ -191,7 +191,7 @@
                         <div class="fm-user-avatar"><i class="bi bi-person-fill"></i></div>
                         <div class="fm-user-info">
                             <span class="fm-user-name">@User.Identity.Name</span>
-                            <span class="urole @roleCss" style="font-size:.6rem;padding:.05rem .38rem;">@userRole</span>
+                            <span class="urole @roleCss" style="font-size:.6rem;padding:.05rem .38rem;">@(userRole == "FieldSupervisor" ? "Field Supervisor" : userRole)</span>
                         </div>
                         <i class="bi bi-chevron-down fm-caret" style="font-size:.6rem;color:rgba(255,255,255,.4);"></i>
                     </button>

@@ -30,9 +30,16 @@ public class ScheduleController : Controller
     private string CurrentUserName => User.FindFirstValue(ClaimTypes.Name) ?? "Unknown";
     private string CurrentUserRole => User.FindFirstValue(ClaimTypes.Role) ?? "Unknown";
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? search)
     {
         var schedules = await _scheduleService.GetAllAsync();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            schedules = schedules.Where(s => (s.Crop?.CropName ?? "").Contains(search, StringComparison.OrdinalIgnoreCase)
+                                          || (s.Field?.FieldName ?? "").Contains(search, StringComparison.OrdinalIgnoreCase)
+                                          || s.Status.Contains(search, StringComparison.OrdinalIgnoreCase));
+        }
+        ViewBag.Search = search;
         return View(schedules);
     }
 

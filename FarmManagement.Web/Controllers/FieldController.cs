@@ -102,13 +102,21 @@ public class FieldController : Controller
         var field = await _fieldService.GetByIdAsync(id);
         if (field == null) return NotFound();
 
-        await _fieldService.DeleteAsync(id);
+        try
+        {
+            await _fieldService.DeleteAsync(id);
 
-        // Observer Pattern
-        await _dispatcher.DispatchAsync(new FieldDeletedEvent(
-            CurrentUserId, CurrentUserName, CurrentUserRole, field.FieldName));
+            // Observer Pattern
+            await _dispatcher.DispatchAsync(new FieldDeletedEvent(
+                CurrentUserId, CurrentUserName, CurrentUserRole, field.FieldName));
 
-        TempData["Success"] = $"Field '{field.FieldName}' deleted.";
+            TempData["Success"] = $"Field '{field.FieldName}' deleted.";
+        }
+        catch (Exception)
+        {
+            TempData["Error"] = $"Could not delete '{field.FieldName}'. Please try again.";
+        }
+
         return RedirectToAction(nameof(Index));
     }
 }
