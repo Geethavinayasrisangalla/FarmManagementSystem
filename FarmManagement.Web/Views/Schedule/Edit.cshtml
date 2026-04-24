@@ -1,0 +1,80 @@
+@model FarmManagement.Web.Models.ViewModels.ScheduleViewModel
+
+@{
+    ViewData["Title"] = "Edit Schedule";
+}
+
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>
+            <span class="ph-icon" style="background:#dbeafe;color:#2563eb;">
+                <i class="bi bi-pencil-square"></i>
+            </span>
+            Edit Schedule
+        </h1>
+        <p>Update the planting schedule details below.</p>
+    </div>
+    <a asp-action="Index" class="btn-fm btn-outline-fm">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+</div>
+
+<div class="fm-card" style="max-width:720px;">
+    <div class="fm-card-header">
+        <span class="ch-title"><i class="bi bi-calendar3" style="color:#2563eb;"></i> Schedule Details</span>
+    </div>
+    <div class="fm-card-body fm-form">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ScheduleId" />
+            <div asp-validation-summary="ModelOnly" class="fm-alert fm-alert-danger mb-3"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="CropId" class="form-label"></label>
+                    <select asp-for="CropId" class="form-select" asp-items="Model.Crops">
+                        <option value="">-- Select Crop --</option>
+                    </select>
+                    <span asp-validation-for="CropId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="FieldId" class="form-label"></label>
+                    <select asp-for="FieldId" class="form-select" asp-items="Model.Fields">
+                        <option value="">-- Select Field --</option>
+                    </select>
+                    <span asp-validation-for="FieldId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ScheduledDate" class="form-label"></label>
+                    <input asp-for="ScheduledDate" class="form-control" type="date" />
+                    <span asp-validation-for="ScheduledDate" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ExpectedYieldKg" class="form-label"></label>
+                    <div class="input-group">
+                        <input asp-for="ExpectedYieldKg" class="form-control" placeholder="e.g. 3500" />
+                        <span class="input-group-text">kg</span>
+                    </div>
+                    <span asp-validation-for="ExpectedYieldKg" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Notes" class="form-label"></label>
+                    <textarea asp-for="Notes" class="form-control" rows="3"
+                              placeholder="Optional notes about this schedule..."></textarea>
+                    <span asp-validation-for="Notes" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn-fm btn-primary-fm">
+                    <i class="bi bi-check-circle"></i> Update Schedule
+                </button>
+                <a asp-action="Index" class="btn-fm btn-ghost-fm">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

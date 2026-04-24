@@ -121,10 +121,16 @@
 
             function onTypeChange() {
                 var isPesticide = (typeSelect.value === '1');
+                var isEquipment = (typeSelect.value === '4');
                 pesticideFields.style.display = isPesticide ? '' : 'none';
                 nameField.style.display = isPesticide ? 'none' : '';
                 quantityField.style.display = isPesticide ? 'none' : '';
-                unitField.style.display = isPesticide ? 'none' : '';
+                unitField.style.display = (isPesticide || isEquipment) ? 'none' : '';
+                if (isEquipment) {
+                    document.getElementById('Unit').value = 'units';
+                } else if (!isPesticide) {
+                    document.getElementById('Unit').value = '';
+                }
             }
 
             typeSelect.addEventListener('change', onTypeChange);

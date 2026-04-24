@@ -170,10 +170,6 @@
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                     }
-                                    <a asp-action="Allocate" asp-route-id="@item.ResourceId"
-                                       class="btn-fm btn-primary-fm btn-sm-fm">
-                                        <i class="bi bi-arrow-right-circle"></i> Allocate
-                                    </a>
                                     @if (User.IsInRole("Admin") || User.IsInRole("Farmer"))
                                     {
                                         <form asp-action="Delete" asp-route-id="@item.ResourceId"

@@ -16,14 +16,17 @@ public class ScheduleController : Controller
     private readonly IScheduleService  _scheduleService;
     private readonly IEventDispatcher  _dispatcher;
     private readonly IFarmFacade       _facade;
+    private readonly IResourceService  _resourceService;
 
     public ScheduleController(IScheduleService scheduleService,
                                IEventDispatcher dispatcher,
-                               IFarmFacade facade)
+                               IFarmFacade facade,
+                               IResourceService resourceService)
     {
         _scheduleService = scheduleService;
         _dispatcher      = dispatcher;
         _facade          = facade;
+        _resourceService = resourceService;
     }
 
     private int    CurrentUserId   => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
@@ -60,6 +63,7 @@ public class ScheduleController : Controller
     public async Task<IActionResult> Create()
     {
         var vm = await _scheduleService.PrepareViewModelAsync();
+        ViewBag.Resources = await _resourceService.GetAllAsync();
         return View(vm);
     }
 
@@ -71,6 +75,7 @@ public class ScheduleController : Controller
         if (!ModelState.IsValid)
         {
             var prepared = await _scheduleService.PrepareViewModelAsync(vm);
+            ViewBag.Resources = await _resourceService.GetAllAsync();
             return View(prepared);
         }
 
@@ -82,6 +87,41 @@ public class ScheduleController : Controller
             vm.ScheduledDate, vm.ExpectedYieldKg));
 
         TempData["Success"] = "Harvest scheduled successfully.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [Authorize(Roles = "Admin,FieldSupervisor")]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var schedule = await _scheduleService.GetByIdAsync(id);
+        if (schedule == null) return NotFound();
+
+        var vm = await _scheduleService.PrepareViewModelAsync(new ScheduleViewModel
+        {
+            ScheduleId = schedule.ScheduleId,
+            CropId = schedule.CropId,
+            FieldId = schedule.FieldId,
+            ScheduledDate = schedule.ScheduledDate,
+            ExpectedYieldKg = schedule.ExpectedYieldKg,
+            Notes = schedule.Notes,
+            Status = schedule.Status
+        });
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,FieldSupervisor")]
+    public async Task<IActionResult> Edit(ScheduleViewModel vm)
+    {
+        if (!ModelState.IsValid)
+        {
+            var prepared = await _scheduleService.PrepareViewModelAsync(vm);
+            return View(prepared);
+        }
+
+        await _scheduleService.UpdateAsync(vm);
+        TempData["Success"] = "Schedule updated successfully.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -131,5 +171,53 @@ public class ScheduleController : Controller
 
         TempData["Success"] = "Schedule deleted.";
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,FieldSupervisor")]
+    public async Task<IActionResult> AddResourceAjax(string name, string type, decimal quantity, string unit)
+    {
+        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(unit) || quantity <= 0)
+            return BadRequest("All fields are required.");
+
+        if (!Enum.TryParse<FarmManagement.Web.Models.Enums.ResourceType>(type, out var resType))
+            return BadRequest("Invalid resource type.");
+
+        var vm = new FarmManagement.Web.Models.ViewModels.InventoryViewModel
+        {
+            Name = name,
+            Type = resType,
+            Quantity = quantity,
+            Unit = unit
+        };
+        await _resourceService.CreateAsync(vm);
+
+        var resources = await _resourceService.GetAllAsync();
+        var list = resources.Select(r => new
+        {
+            r.Name,
+            Type = r.Type.ToString(),
+            r.Quantity,
+            r.Unit,
+            LastUpdated = r.LastUpdated.ToString("dd MMM yyyy")
+        });
+        return Json(list);
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Admin,FieldSupervisor")]
+    public async Task<IActionResult> GetResourcesJson()
+    {
+        var resources = await _resourceService.GetAllAsync();
+        var list = resources.Select(r => new
+        {
+            r.Name,
+            Type = r.Type.ToString(),
+            r.Quantity,
+            r.Unit,
+            LastUpdated = r.LastUpdated.ToString("dd MMM yyyy")
+        });
+        return Json(list);
     }
 }

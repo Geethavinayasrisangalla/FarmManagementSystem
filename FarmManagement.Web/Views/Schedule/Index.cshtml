@@ -105,6 +105,13 @@
                                        class="btn-fm btn-info-fm btn-sm-fm">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                    @if (item.Status == "Scheduled" && (User.IsInRole("Admin") || User.IsInRole("FieldSupervisor")))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.ScheduleId"
+                                           class="btn-fm btn-warn-fm btn-sm-fm">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    }
                                     @if (item.Status == "Scheduled")
                                     {
                                         <a asp-action="RecordHarvest" asp-route-id="@item.ScheduleId"
@@ -115,10 +122,10 @@
                                     @if (User.IsInRole("Admin") || User.IsInRole("FieldSupervisor"))
                                     {
                                         <form asp-action="Delete" asp-route-id="@item.ScheduleId"
-                                              method="post" class="d-inline"
-                                              onsubmit="return confirm('Delete this schedule?')">
+                                              method="post" class="d-inline delete-form">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn-fm btn-danger-fm btn-sm-fm">
+                                            <button type="button" class="btn-fm btn-danger-fm btn-sm-fm btn-delete-schedule"
+                                                    data-name="@(item.Crop?.CropName ?? "this schedule")">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -132,3 +139,16 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.btn-delete-schedule').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var name = this.getAttribute('data-name');
+                if (confirm('Are you sure you want to delete the schedule for "' + name + '"?')) {
+                    this.closest('form').submit();
+                }
+            });
+        });
+    </script>
+}

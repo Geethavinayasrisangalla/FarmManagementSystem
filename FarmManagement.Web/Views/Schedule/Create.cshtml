@@ -19,61 +19,271 @@
     </a>
 </div>
 
-<div class="fm-card" style="max-width:720px;">
-    <div class="fm-card-header">
-        <span class="ch-title"><i class="bi bi-calendar3" style="color:#2563eb;"></i> Schedule Details</span>
-    </div>
-    <div class="fm-card-body fm-form">
-        <form asp-action="Create" method="post">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="fm-alert fm-alert-danger mb-3"></div>
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="fm-card">
+            <div class="fm-card-header">
+                <span class="ch-title"><i class="bi bi-calendar3" style="color:#2563eb;"></i> Schedule Details</span>
+            </div>
+            <div class="fm-card-body fm-form">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="fm-alert fm-alert-danger mb-3"></div>
 
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label asp-for="CropId" class="form-label"></label>
-                    <select asp-for="CropId" class="form-select" asp-items="Model.Crops">
-                        <option value="">-- Select Crop --</option>
-                    </select>
-                    <span asp-validation-for="CropId" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="FieldId" class="form-label"></label>
-                    <select asp-for="FieldId" class="form-select" asp-items="Model.Fields">
-                        <option value="">-- Select Field --</option>
-                    </select>
-                    <span asp-validation-for="FieldId" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="ScheduledDate" class="form-label"></label>
-                    <input asp-for="ScheduledDate" class="form-control" type="date" />
-                    <span asp-validation-for="ScheduledDate" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="ExpectedYieldKg" class="form-label"></label>
-                    <div class="input-group">
-                        <input asp-for="ExpectedYieldKg" class="form-control" placeholder="e.g. 3500" />
-                        <span class="input-group-text">kg</span>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="CropId" class="form-label"></label>
+                            <select asp-for="CropId" class="form-select" asp-items="Model.Crops">
+                                <option value="">-- Select Crop --</option>
+                            </select>
+                            <span asp-validation-for="CropId" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="FieldId" class="form-label"></label>
+                            <select asp-for="FieldId" class="form-select" asp-items="Model.Fields">
+                                <option value="">-- Select Field --</option>
+                            </select>
+                            <span asp-validation-for="FieldId" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ScheduledDate" class="form-label"></label>
+                            <input asp-for="ScheduledDate" class="form-control" type="date" />
+                            <span asp-validation-for="ScheduledDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ExpectedYieldKg" class="form-label"></label>
+                            <div class="input-group">
+                                <input asp-for="ExpectedYieldKg" class="form-control" placeholder="e.g. 3500" />
+                                <span class="input-group-text">kg</span>
+                            </div>
+                            <span asp-validation-for="ExpectedYieldKg" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"
+                                      placeholder="Optional notes about this schedule..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger small"></span>
+                        </div>
                     </div>
-                    <span asp-validation-for="ExpectedYieldKg" class="text-danger small"></span>
-                </div>
-                <div class="col-12">
-                    <label asp-for="Notes" class="form-label"></label>
-                    <textarea asp-for="Notes" class="form-control" rows="3"
-                              placeholder="Optional notes about this schedule..."></textarea>
-                    <span asp-validation-for="Notes" class="text-danger small"></span>
-                </div>
-            </div>
 
-            <div class="mt-4 d-flex gap-2">
-                <button type="submit" class="btn-fm btn-primary-fm">
-                    <i class="bi bi-check-circle"></i> Save Schedule
-                </button>
-                <a asp-action="Index" class="btn-fm btn-ghost-fm">Cancel</a>
+                    <div class="mt-4 d-flex gap-2 flex-wrap">
+                        <button type="button" class="btn-fm btn-outline-fm" id="btnToggleResources">
+                            <i class="bi bi-plus-circle"></i> Add Resource
+                        </button>
+                        <button type="submit" class="btn-fm btn-primary-fm">
+                            <i class="bi bi-check-circle"></i> Save Schedule
+                        </button>
+                        <a asp-action="Index" class="btn-fm btn-ghost-fm">Cancel</a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
+    </div>
+
+    <div class="col-lg-6" id="resourceSection" style="display:none;">
+        <div class="fm-card">
+            <div class="fm-card-header">
+                <span class="ch-title"><i class="bi bi-box-seam" style="color:#ea580c;"></i> Add New Resource</span>
+            </div>
+            <div class="fm-card-body fm-form">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Resource Name</label>
+                        <select id="resName" class="form-select">
+                            <option value="">-- Select Resource Name --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Type</label>
+                        <select id="resType" class="form-select">
+                            <option value="">-- Select Type --</option>
+                            <option value="Fertilizer">Fertilizer</option>
+                            <option value="Pesticide">Pesticide</option>
+                            <option value="Seeds">Seeds</option>
+                            <option value="Water">Water</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" id="resQty" class="form-control" placeholder="e.g. 100" />
+                    </div>
+                    <div class="col-md-6" id="resUnitField">
+                        <label class="form-label">Unit</label>
+                        <input type="text" id="resUnit" class="form-control" placeholder="e.g. kg, L, units" />
+                    </div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <button type="button" id="btnSaveResource" class="btn-fm btn-primary-fm">
+                        <i class="bi bi-plus-circle"></i> Save Resource
+                    </button>
+                    <span id="resMessage" class="text-success small align-self-center" style="display:none;"></span>
+                    <span id="resError" class="text-danger small align-self-center" style="display:none;"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="fm-card mt-3">
+            <div class="fm-card-header">
+                <span class="ch-title"><i class="bi bi-table" style="color:#ea580c;"></i> Resource Inventory</span>
+                <span id="resCount" style="font-size:.78rem;color:var(--fm-muted);"></span>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="fm-table">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Resource Name</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Stock Status</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        (function () {
+            var section = document.getElementById('resourceSection');
+            var toggleBtn = document.getElementById('btnToggleResources');
+            var tbody = document.getElementById('resTableBody');
+            var countSpan = document.getElementById('resCount');
+            var msg = document.getElementById('resMessage');
+            var err = document.getElementById('resError');
+
+            function stockBadge(qty) {
+                if (qty <= 10) return '<span class="badge-pill badge-red"><i class="bi bi-exclamation-triangle"></i> Low</span>';
+                if (qty <= 50) return '<span class="badge-pill badge-yellow"><i class="bi bi-dash-circle"></i> Medium</span>';
+                return '<span class="badge-pill badge-green"><i class="bi bi-check-circle"></i> In Stock</span>';
+            }
+
+            var resNameSelect = document.getElementById('resName');
+
+            function populateNameDropdown(data) {
+                var names = [];
+                var seen = {};
+                for (var i = 0; i < data.length; i++) {
+                    if (!seen[data[i].name]) {
+                        seen[data[i].name] = true;
+                        names.push(data[i].name);
+                    }
+                }
+                names.sort();
+                resNameSelect.innerHTML = '<option value="">-- Select Resource Name --</option>';
+                for (var j = 0; j < names.length; j++) {
+                    var opt = document.createElement('option');
+                    opt.value = names[j];
+                    opt.textContent = names[j];
+                    resNameSelect.appendChild(opt);
+                }
+            }
+
+            function renderTable(data) {
+                var html = '';
+                for (var i = 0; i < data.length; i++) {
+                    var r = data[i];
+                    var color = r.quantity <= 10 ? '#dc2626' : '#16a34a';
+                    html += '<tr>'
+                        + '<td style="color:var(--fm-muted);font-size:.8rem;">' + (i + 1) + '</td>'
+                        + '<td style="font-weight:600;">' + r.name + '</td>'
+                        + '<td><span class="badge-pill badge-gray">' + r.type + '</span></td>'
+                        + '<td style="font-weight:700;color:' + color + ';">' + r.quantity + '</td>'
+                        + '<td>' + r.unit + '</td>'
+                        + '<td>' + stockBadge(r.quantity) + '</td>'
+                        + '<td>' + r.lastUpdated + '</td>'
+                        + '</tr>';
+                }
+                tbody.innerHTML = html;
+                countSpan.textContent = data.length + ' records';
+                populateNameDropdown(data);
+            }
+
+            function loadResources() {
+                fetch('@Url.Action("GetResourcesJson")')
+                    .then(function (r) { return r.json(); })
+                    .then(renderTable);
+            }
+
+            var resTypeSelect = document.getElementById('resType');
+            var resUnitField = document.getElementById('resUnitField');
+            var resUnitInput = document.getElementById('resUnit');
+
+            resTypeSelect.addEventListener('change', function () {
+                if (this.value === 'Equipment') {
+                    resUnitField.style.display = 'none';
+                    resUnitInput.value = 'units';
+                } else {
+                    resUnitField.style.display = '';
+                    resUnitInput.value = '';
+                }
+            });
+
+            toggleBtn.addEventListener('click', function () {
+                if (section.style.display === 'none') {
+                    section.style.display = 'block';
+                    this.innerHTML = '<i class="bi bi-x-circle"></i> Hide Resource';
+                    loadResources();
+                } else {
+                    section.style.display = 'none';
+                    this.innerHTML = '<i class="bi bi-plus-circle"></i> Add Resource';
+                }
+            });
+
+            document.getElementById('btnSaveResource').addEventListener('click', function () {
+                msg.style.display = 'none';
+                err.style.display = 'none';
+                var name = document.getElementById('resName').value;
+                var type = document.getElementById('resType').value;
+                var qty = document.getElementById('resQty').value;
+                var unit = document.getElementById('resUnit').value;
+
+                if (!name || !type || !qty || (type !== 'Equipment' && !unit)) {
+                    err.textContent = 'All fields are required.';
+                    err.style.display = 'inline';
+                    return;
+                }
+                if (type === 'Equipment') unit = 'units';
+
+                var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                var formData = new FormData();
+                formData.append('name', name);
+                formData.append('type', type);
+                formData.append('quantity', qty);
+                formData.append('unit', unit);
+
+                fetch('@Url.Action("AddResourceAjax")', {
+                    method: 'POST',
+                    headers: { 'RequestVerificationToken': token },
+                    body: formData
+                })
+                .then(function (r) {
+                    if (!r.ok) throw new Error('Failed to add resource.');
+                    return r.json();
+                })
+                .then(function (data) {
+                    renderTable(data);
+                    msg.textContent = 'Resource added successfully!';
+                    msg.style.display = 'inline';
+                    document.getElementById('resName').value = '';
+                    document.getElementById('resType').value = '';
+                    document.getElementById('resQty').value = '';
+                    document.getElementById('resUnit').value = '';
+                })
+                .catch(function (e) {
+                    err.textContent = e.message;
+                    err.style.display = 'inline';
+                });
+            });
+        })();
+    </script>
 }
