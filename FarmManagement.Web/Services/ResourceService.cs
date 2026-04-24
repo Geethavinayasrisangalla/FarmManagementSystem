@@ -43,6 +43,20 @@ public class ResourceService : IResourceService
         await _db.SaveChangesAsync();
     }
 
+    public async Task CreateAsync(InventoryViewModel vm, int pestIncidentId)
+    {
+        _db.Resources.Add(new Resource
+        {
+            Name           = vm.Name,
+            Type           = vm.Type,
+            Quantity       = vm.Quantity,
+            Unit           = vm.Unit,
+            LastUpdated    = DateTime.Now,
+            PestIncidentId = pestIncidentId
+        });
+        await _db.SaveChangesAsync();
+    }
+
     public async Task UpdateAsync(InventoryViewModel vm)
     {
         var resource = await _db.Resources.FindAsync(vm.ResourceId)

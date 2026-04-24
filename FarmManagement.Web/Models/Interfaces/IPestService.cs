@@ -8,6 +8,7 @@ public interface IPestService
     Task<PestIncident?> GetByIdAsync(int id);
     Task<IEnumerable<PestIncident>> GetActivesAsync();
     Task CreateAsync(PestIncident incident);
-    Task UpdateStatusAsync(int id, string status, string? treatmentNotes);
+    Task UpdateStatusAsync(int id, string status);
+    Task UpdateAsync(PestIncident incident);
     Task DeleteAsync(int id);
 }

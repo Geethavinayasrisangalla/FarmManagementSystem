@@ -8,4 +8,5 @@ public class ResourceReportViewModel
     public int LowStockCount { get; set; }
     public int TotalAllocations { get; set; }
     public IEnumerable<Resource> Resources { get; set; } = new List<Resource>();
+    public List<TypeCount> TypeBreakdown { get; set; } = new();
 }

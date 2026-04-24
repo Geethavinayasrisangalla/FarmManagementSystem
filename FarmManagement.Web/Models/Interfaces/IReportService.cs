@@ -12,4 +12,5 @@ public interface IReportService
     Task<PestSummaryViewModel> GetPestSummaryAsync();
     Task<ResourceReportViewModel> GetResourceReportAsync();
     Task<FarmAnalyticsViewModel> GetFarmAnalyticsAsync();
+    Task<ReportDashboardViewModel> GetReportDashboardAsync();
 }

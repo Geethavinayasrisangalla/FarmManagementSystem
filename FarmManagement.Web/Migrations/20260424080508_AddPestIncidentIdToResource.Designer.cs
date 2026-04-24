@@ -4,6 +4,7 @@ using FarmManagement.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FarmManagement.Web.Migrations
 {
     [DbContext(typeof(FarmDbContext))]
-    partial class FarmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260424080508_AddPestIncidentIdToResource")]
+    partial class AddPestIncidentIdToResource
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -234,10 +237,6 @@ namespace FarmManagement.Web.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("DiseaseName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
                     b.Property<string>("PestName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -248,6 +247,10 @@ namespace FarmManagement.Web.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("TreatmentNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("PestIncidentId");
 

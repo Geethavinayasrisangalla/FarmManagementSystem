@@ -9,7 +9,7 @@ public class PestIncidentDto
     public string? Description { get; set; }
     public DateTime ReportedDate { get; set; }
     public IncidentStatus Status { get; set; }
-    public string? TreatmentNotes { get; set; }
+    public string? DiseaseName { get; set; }
 
     // Related crop info (flattened — no navigation property)
     public int CropId { get; set; }

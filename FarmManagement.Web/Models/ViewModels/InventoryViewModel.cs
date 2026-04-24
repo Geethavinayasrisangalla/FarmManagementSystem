@@ -24,4 +24,18 @@ public class InventoryViewModel
     [Required(ErrorMessage = "Unit is required.")]
     [Display(Name = "Unit (kg / L / units)")]
     public string Unit { get; set; } = string.Empty;
+
+    // ── Pest Incident fields (used only when Type == Pesticide) ──
+
+    [Display(Name = "Pest Name")]
+    public string? PestName { get; set; }
+
+    [Display(Name = "Disease Name")]
+    public string? DiseaseName { get; set; }
+
+    [Display(Name = "Description")]
+    public string? PestDescription { get; set; }
+
+    [Display(Name = "Affected Crop")]
+    public int? CropId { get; set; }
 }

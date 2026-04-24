@@ -22,8 +22,11 @@ public class ScheduleService : IScheduleService
     public async Task<PlantingSchedule?> GetByIdAsync(int id) =>
         await _db.PlantingSchedules.AsNoTracking()
                  .Include(ps => ps.Crop)
+                     .ThenInclude(c => c.PestIncidents)
                  .Include(ps => ps.Field)
                  .Include(ps => ps.Harvests)
+                 .Include(ps => ps.ResourceUsages)
+                     .ThenInclude(ru => ru.Resource)
                  .FirstOrDefaultAsync(ps => ps.ScheduleId == id);
 
     public async Task CreateAsync(ScheduleViewModel vm)

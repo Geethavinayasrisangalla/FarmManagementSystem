@@ -172,5 +172,55 @@
                 </table>
             }
         </div>
+
+        <!-- Pest Incidents for this Crop -->
+        <div class="fm-card mt-4">
+            <div class="fm-card-header">
+                <span class="ch-title">
+                    <i class="bi bi-bug" style="color:#dc2626;"></i>
+                    Pest Incidents
+                </span>
+            </div>
+            @if (Model.Crop?.PestIncidents == null || !Model.Crop.PestIncidents.Any())
+            {
+                <div class="empty-state" style="padding:2rem;">
+                    <i class="bi bi-shield-check" style="font-size:2rem;opacity:.3;display:block;margin-bottom:.5rem;"></i>
+                    <p>No pest incidents reported for this crop.</p>
+                </div>
+            }
+            else
+            {
+                <table class="fm-table">
+                    <thead>
+                        <tr>
+                            <th>Pest Name</th>
+                            <th>Disease Name</th>
+                            <th>Status</th>
+                            <th>Reported</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Crop.PestIncidents)
+                        {
+                            var pestBadge = p.Status switch {
+                                FarmManagement.Web.Models.Enums.IncidentStatus.Active     => "badge-red",
+                                FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring => "badge-yellow",
+                                _                                                          => "badge-green"
+                            };
+                            <tr>
+                                <td style="font-weight:600;">@p.PestName</td>
+                                <td>@(p.DiseaseName ?? "—")</td>
+                                <td><span class="badge-pill @pestBadge">@p.Status</span></td>
+                                <td>@p.ReportedDate.ToString("dd MMM yyyy")</td>
+                                <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                    @(p.Description ?? "—")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
     </div>
 </div>

@@ -28,50 +28,74 @@
             <div asp-validation-summary="ModelOnly" class="fm-alert fm-alert-danger mb-3"></div>
 
             <div class="row g-3">
-                <div class="col-md-6">
-                    <label asp-for="Name" class="form-label"></label>
-                    <select asp-for="Name" class="form-select">
-                        <option value="">-- Select Resource Name --</option>
-                        <option value="Tractor">Tractor</option>
-                        <option value="Harvester">Harvester</option>
-                        <option value="Plough">Plough</option>
-                        <option value="Seed Drill">Seed Drill</option>
-                        <option value="Rotavator">Rotavator</option>
-                        <option value="Cultivator">Cultivator</option>
-                        <option value="Harrow">Harrow</option>
-                        <option value="Bullock Cart">Bullock Cart</option>
-                        <option value="Trailer">Trailer</option>
-                        <option value="Farm Wagon">Farm Wagon</option>
-                        <option value="Sprayer">Sprayer</option>
-                        <option value="Combine Harvester">Combine Harvester</option>
-                        <option value="Thresher">Thresher</option>
-                        <option value="Paddy Transplanter">Paddy Transplanter</option>
-                        <option value="Power Tiller">Power Tiller</option>
-                        <option value="Water Tanker Truck">Water Tanker Truck</option>
-                        <option value="Pickup Truck">Pickup Truck</option>
-                        <option value="Mini Truck">Mini Truck</option>
-                        <option value="ATV">ATV</option>
-                        <option value="Irrigation Pump">Irrigation Pump</option>
-                    </select>
-                    <span asp-validation-for="Name" class="text-danger small"></span>
-                </div>
+                <!-- Type comes FIRST -->
                 <div class="col-md-6">
                     <label asp-for="Type" class="form-label"></label>
-                    <select asp-for="Type" class="form-select"
+                    <select asp-for="Type" class="form-select" id="typeSelect"
                             asp-items="Html.GetEnumSelectList<FarmManagement.Web.Models.Enums.ResourceType>()">
                         <option value="">-- Select Type --</option>
                     </select>
                     <span asp-validation-for="Type" class="text-danger small"></span>
                 </div>
-                <div class="col-md-6">
+
+                <!-- Resource Name (hidden when Pesticide) -->
+                <div class="col-md-6" id="nameField">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter resource name" />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6" id="quantityField">
                     <label asp-for="Quantity" class="form-label"></label>
                     <input asp-for="Quantity" class="form-control" placeholder="e.g. 100" />
                     <span asp-validation-for="Quantity" class="text-danger small"></span>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6" id="unitField">
                     <label asp-for="Unit" class="form-label"></label>
                     <input asp-for="Unit" class="form-control" placeholder="e.g. kg, L, units" />
                     <span asp-validation-for="Unit" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- Pest Incident fields (shown only when Type == Pesticide) -->
+            <div id="pesticideFields" style="display:none;" class="mt-4">
+                <hr />
+                <h6 class="mb-3"><i class="bi bi-bug" style="color:#dc2626;"></i> Pest Incident Details</h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="PestName" class="form-label"></label>
+                        <input asp-for="PestName" class="form-control" placeholder="e.g. Aphids, Brown Plant Hopper" />
+                        <span asp-validation-for="PestName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="DiseaseName" class="form-label"></label>
+                        <input asp-for="DiseaseName" class="form-control" placeholder="e.g. Blight, Leaf Curl" />
+                        <span asp-validation-for="DiseaseName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="CropId" class="form-label"></label>
+                        <select asp-for="CropId" class="form-select">
+                            <option value="">-- Select Crop --</option>
+                            @if (ViewBag.Crops != null)
+                            {
+                                foreach (var crop in ViewBag.Crops)
+                                {
+                                    <option value="@crop.CropId">@crop.CropName</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="CropId" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="PestDescription" class="form-label"></label>
+                        <textarea asp-for="PestDescription" class="form-control" rows="3"
+                                  placeholder="Describe the pest incident in detail..."></textarea>
+                        <span asp-validation-for="PestDescription" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="fm-alert fm-alert-warning mt-3">
+                    <i class="bi bi-info-circle"></i>
+                    <span>A pest incident will be auto-created and this pesticide resource will be linked to it.</span>
                 </div>
             </div>
 
@@ -87,4 +111,24 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (function () {
+            var typeSelect = document.getElementById('typeSelect');
+            var pesticideFields = document.getElementById('pesticideFields');
+            var nameField = document.getElementById('nameField');
+            var quantityField = document.getElementById('quantityField');
+            var unitField = document.getElementById('unitField');
+
+            function onTypeChange() {
+                var isPesticide = (typeSelect.value === '1');
+                pesticideFields.style.display = isPesticide ? '' : 'none';
+                nameField.style.display = isPesticide ? 'none' : '';
+                quantityField.style.display = isPesticide ? 'none' : '';
+                unitField.style.display = isPesticide ? 'none' : '';
+            }
+
+            typeSelect.addEventListener('change', onTypeChange);
+            onTypeChange();
+        })();
+    </script>
 }

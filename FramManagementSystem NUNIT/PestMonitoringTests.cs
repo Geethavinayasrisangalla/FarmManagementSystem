@@ -58,19 +58,19 @@ public class PestMonitoringTests
         Assert.That(_incident.Status, Is.EqualTo(IncidentStatus.Resolved));
     }
 
-    // ── Test 4: Treatment notes should be updatable ──
+    // ── Test 4: Disease name should be updatable ──
     [Test]
-    public void PestIncident_TreatmentNotes_ShouldBeUpdatable()
+    public void PestIncident_DiseaseName_ShouldBeUpdatable()
     {
-        // Arrange — initially no treatment
-        Assert.That(_incident.TreatmentNotes, Is.Null);
+        // Arrange — initially no disease name
+        Assert.That(_incident.DiseaseName, Is.Null);
 
-        // Act — log treatment
-        _incident.TreatmentNotes = "Applied neem oil spray on 15 Jun 2025";
+        // Act — set disease name
+        _incident.DiseaseName = "Leaf Blight";
 
         // Assert
-        Assert.That(_incident.TreatmentNotes, Is.Not.Null);
-        Assert.That(_incident.TreatmentNotes, Does.Contain("neem oil"));
+        Assert.That(_incident.DiseaseName, Is.Not.Null);
+        Assert.That(_incident.DiseaseName, Does.Contain("Blight"));
     }
 
     // ── Test 5: Incident should belong to a Crop (via CropId) ──

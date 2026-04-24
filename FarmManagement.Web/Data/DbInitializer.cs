@@ -42,15 +42,18 @@ public static class DbInitializer
         {
             var fields = await context.Fields.ToListAsync();
 
-            var crops = new List<Crop>
+            if (fields.Count >= 3)
             {
-                new Crop { CropName = "Wheat",  CropType = "Grain",     Season = SeasonType.Rabi,   PlantingDate = new DateTime(2025, 11, 1), ExpectedHarvestDate = new DateTime(2026, 4, 15), FieldId = fields[0].FieldId, Status = "Growing" },
-                new Crop { CropName = "Rice",   CropType = "Grain",     Season = SeasonType.Kharif, PlantingDate = new DateTime(2025, 6, 1),  ExpectedHarvestDate = new DateTime(2025, 10, 1), FieldId = fields[1].FieldId, Status = "Growing" },
-                new Crop { CropName = "Tomato", CropType = "Vegetable", Season = SeasonType.Zaid,   PlantingDate = new DateTime(2026, 3, 1),  ExpectedHarvestDate = new DateTime(2026, 7, 1),  FieldId = fields[2].FieldId, Status = "Harvested" }
-            };
+                var crops = new List<Crop>
+                {
+                    new Crop { CropName = "Wheat",  CropType = "Grain",     Season = SeasonType.Rabi,   PlantingDate = new DateTime(2025, 11, 1), ExpectedHarvestDate = new DateTime(2026, 4, 15), FieldId = fields[0].FieldId, Status = "Growing" },
+                    new Crop { CropName = "Rice",   CropType = "Grain",     Season = SeasonType.Kharif, PlantingDate = new DateTime(2025, 6, 1),  ExpectedHarvestDate = new DateTime(2025, 10, 1), FieldId = fields[1].FieldId, Status = "Growing" },
+                    new Crop { CropName = "Tomato", CropType = "Vegetable", Season = SeasonType.Zaid,   PlantingDate = new DateTime(2026, 3, 1),  ExpectedHarvestDate = new DateTime(2026, 7, 1),  FieldId = fields[2].FieldId, Status = "Harvested" }
+                };
 
-            await context.Crops.AddRangeAsync(crops);
-            await context.SaveChangesAsync();
+                await context.Crops.AddRangeAsync(crops);
+                await context.SaveChangesAsync();
+            }
         }
 
         if (!await context.PlantingSchedules.AnyAsync())
@@ -58,15 +61,18 @@ public static class DbInitializer
             var crops = await context.Crops.ToListAsync();
             var fields = await context.Fields.ToListAsync();
 
-            var schedules = new List<PlantingSchedule>
+            if (crops.Count >= 3 && fields.Count >= 3)
             {
-                new PlantingSchedule { CropId = crops[0].CropId, FieldId = fields[0].FieldId, ScheduledDate = new DateTime(2026, 4, 15), ExpectedYieldKg = 4500.00m, Status = "Scheduled",  Notes = "First wheat harvest of the Rabi season" },
-                new PlantingSchedule { CropId = crops[1].CropId, FieldId = fields[1].FieldId, ScheduledDate = new DateTime(2025, 10, 1), ExpectedYieldKg = 3800.00m, Status = "Scheduled",  Notes = "Main Kharif rice harvest" },
-                new PlantingSchedule { CropId = crops[2].CropId, FieldId = fields[2].FieldId, ScheduledDate = new DateTime(2026, 7, 1),  ExpectedYieldKg = 3000.00m, Status = "Completed", Notes = "Zaid tomato harvest completed" }
-            };
+                var schedules = new List<PlantingSchedule>
+                {
+                    new PlantingSchedule { CropId = crops[0].CropId, FieldId = fields[0].FieldId, ScheduledDate = new DateTime(2026, 4, 15), ExpectedYieldKg = 4500.00m, Status = "Scheduled",  Notes = "First wheat harvest of the Rabi season" },
+                    new PlantingSchedule { CropId = crops[1].CropId, FieldId = fields[1].FieldId, ScheduledDate = new DateTime(2025, 10, 1), ExpectedYieldKg = 3800.00m, Status = "Scheduled",  Notes = "Main Kharif rice harvest" },
+                    new PlantingSchedule { CropId = crops[2].CropId, FieldId = fields[2].FieldId, ScheduledDate = new DateTime(2026, 7, 1),  ExpectedYieldKg = 3000.00m, Status = "Completed", Notes = "Zaid tomato harvest completed" }
+                };
 
-            await context.PlantingSchedules.AddRangeAsync(schedules);
-            await context.SaveChangesAsync();
+                await context.PlantingSchedules.AddRangeAsync(schedules);
+                await context.SaveChangesAsync();
+            }
         }
 
         if (!await context.Harvests.AnyAsync())
@@ -93,9 +99,9 @@ public static class DbInitializer
 
             var incidents = new List<PestIncident>
             {
-                new PestIncident { CropId = crops[0].CropId, PestName = "Aphids",            Description = "Heavy aphid infestation on wheat leaves",    ReportedDate = DateTime.Now.AddDays(-5),  Status = IncidentStatus.Active,     TreatmentNotes = null },
-                new PestIncident { CropId = crops[1].CropId, PestName = "Brown Plant Hopper", Description = "Early signs of BPH detected in rice field",   ReportedDate = DateTime.Now.AddDays(-10), Status = IncidentStatus.Monitoring, TreatmentNotes = "Applied neem-based spray, monitoring weekly" },
-                new PestIncident { CropId = crops[2].CropId, PestName = "Whitefly",           Description = "Whitefly attack resolved after treatment",    ReportedDate = DateTime.Now.AddDays(-20), Status = IncidentStatus.Resolved,   TreatmentNotes = "Sprayed insecticide, issue resolved" }
+                new PestIncident { CropId = crops[0].CropId, PestName = "Aphids",            Description = "Heavy aphid infestation on wheat leaves",    ReportedDate = DateTime.Now.AddDays(-5),  Status = IncidentStatus.Active,     DiseaseName = null },
+                new PestIncident { CropId = crops[1].CropId, PestName = "Brown Plant Hopper", Description = "Early signs of BPH detected in rice field",   ReportedDate = DateTime.Now.AddDays(-10), Status = IncidentStatus.Monitoring, DiseaseName = "Hopper Burn" },
+                new PestIncident { CropId = crops[2].CropId, PestName = "Whitefly",           Description = "Whitefly attack resolved after treatment",    ReportedDate = DateTime.Now.AddDays(-20), Status = IncidentStatus.Resolved,   DiseaseName = "Leaf Curl" }
             };
 
             await context.PestIncidents.AddRangeAsync(incidents);
@@ -140,15 +146,18 @@ public static class DbInitializer
         {
             var crops = await context.Crops.ToListAsync();
 
-            var yieldReports = new List<YieldReport>
+            if (crops.Count >= 3)
             {
-                new YieldReport { CropId = crops[0].CropId, TotalYieldKg = 4500.00m, Season = SeasonType.Rabi,   Year = 2026, GeneratedAt = DateTime.Now },
-                new YieldReport { CropId = crops[1].CropId, TotalYieldKg = 3800.00m, Season = SeasonType.Kharif, Year = 2025, GeneratedAt = DateTime.Now },
-                new YieldReport { CropId = crops[2].CropId, TotalYieldKg = 3200.00m, Season = SeasonType.Zaid,   Year = 2026, GeneratedAt = DateTime.Now }
-            };
+                var yieldReports = new List<YieldReport>
+                {
+                    new YieldReport { CropId = crops[0].CropId, TotalYieldKg = 4500.00m, Season = SeasonType.Rabi,   Year = 2026, GeneratedAt = DateTime.Now },
+                    new YieldReport { CropId = crops[1].CropId, TotalYieldKg = 3800.00m, Season = SeasonType.Kharif, Year = 2025, GeneratedAt = DateTime.Now },
+                    new YieldReport { CropId = crops[2].CropId, TotalYieldKg = 3200.00m, Season = SeasonType.Zaid,   Year = 2026, GeneratedAt = DateTime.Now }
+                };
 
-            await context.YieldReports.AddRangeAsync(yieldReports);
-            await context.SaveChangesAsync();
+                await context.YieldReports.AddRangeAsync(yieldReports);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

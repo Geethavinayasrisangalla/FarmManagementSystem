@@ -1,5 +1,7 @@
 using FarmManagement.Web.Events;
 using FarmManagement.Web.Factories;
+using FarmManagement.Web.Models.Entities;
+using FarmManagement.Web.Models.Enums;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -17,18 +19,24 @@ public class ResourceController : Controller
 {
     private readonly IResourceService _resourceService;
     private readonly IScheduleService _scheduleService;
+    private readonly IPestService     _pestService;
+    private readonly ICropService     _cropService;
     private readonly IResourceFactory _resourceFactory;
     private readonly IEventDispatcher _dispatcher;
     private readonly IFarmFacade      _facade;
 
     public ResourceController(IResourceService resourceService,
                                IScheduleService scheduleService,
+                               IPestService pestService,
+                               ICropService cropService,
                                IResourceFactory resourceFactory,
                                IEventDispatcher dispatcher,
                                IFarmFacade facade)
     {
         _resourceService = resourceService;
         _scheduleService = scheduleService;
+        _pestService     = pestService;
+        _cropService     = cropService;
         _resourceFactory = resourceFactory;
         _dispatcher      = dispatcher;
         _facade          = facade;
@@ -41,6 +49,8 @@ public class ResourceController : Controller
     public async Task<IActionResult> Index(string? search)
     {
         var resources = await _resourceService.GetAllAsync();
+        // Pesticide resources are shown in Pest Incidents, not here
+        resources = resources.Where(r => r.Type != ResourceType.Pesticide);
         if (!string.IsNullOrWhiteSpace(search))
         {
             resources = resources.Where(r => r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
@@ -58,14 +68,57 @@ public class ResourceController : Controller
     }
 
     [Authorize(Roles = "Admin,Farmer")]
-    public IActionResult Create() => View(new InventoryViewModel());
+    public async Task<IActionResult> Create()
+    {
+        ViewBag.Crops = await _cropService.GetAllAsync();
+        return View(new InventoryViewModel());
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Admin,Farmer")]
     public async Task<IActionResult> Create(InventoryViewModel vm)
     {
-        if (!ModelState.IsValid) return View(vm);
+        // For Pesticide type, pest fields are required but Name/Quantity/Unit are not
+        if (vm.Type == ResourceType.Pesticide)
+        {
+            ModelState.Remove("Name");
+            ModelState.Remove("Quantity");
+            ModelState.Remove("Unit");
+
+            if (string.IsNullOrWhiteSpace(vm.PestName))
+                ModelState.AddModelError("PestName", "Pest name is required for Pesticide type.");
+            if (!vm.CropId.HasValue || vm.CropId == 0)
+                ModelState.AddModelError("CropId", "Affected crop is required for Pesticide type.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Crops = await _cropService.GetAllAsync();
+            return View(vm);
+        }
+
+        if (vm.Type == ResourceType.Pesticide)
+        {
+            // Create a PestIncident only (no resource row needed)
+            var pest = new PestIncident
+            {
+                PestName     = vm.PestName!,
+                DiseaseName  = vm.DiseaseName,
+                Description  = vm.PestDescription ?? string.Empty,
+                Status       = IncidentStatus.Active,
+                ReportedDate = DateTime.Now,
+                CropId       = vm.CropId!.Value
+            };
+            await _pestService.CreateAsync(pest);
+
+            // Observer Pattern
+            await _dispatcher.DispatchAsync(new PestReportedEvent(
+                CurrentUserId, CurrentUserName, CurrentUserRole, vm.PestName!));
+
+            TempData["Success"] = $"Pest incident '{vm.PestName}' created successfully.";
+            return RedirectToAction("Index", "Pest");
+        }
 
         await _resourceService.CreateAsync(vm);
 

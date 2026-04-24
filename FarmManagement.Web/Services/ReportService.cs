@@ -111,13 +111,26 @@ public class ReportService : IReportService
             .Include(p => p.Crop)
             .ToListAsync();
 
+        var cropBreakdown = incidents
+            .GroupBy(p => p.Crop?.CropName ?? "Unknown")
+            .Select(g => new CropPestCount
+            {
+                CropName   = g.Key,
+                Active     = g.Count(p => p.Status == IncidentStatus.Active),
+                Monitoring = g.Count(p => p.Status == IncidentStatus.Monitoring),
+                Resolved   = g.Count(p => p.Status == IncidentStatus.Resolved)
+            })
+            .OrderByDescending(c => c.Total)
+            .ToList();
+
         return new PestSummaryViewModel
         {
-            TotalIncidents = incidents.Count,
-            ActiveCount = incidents.Count(p => p.Status == IncidentStatus.Active),
-            MonitoringCount = incidents.Count(p => p.Status == IncidentStatus.Monitoring),
-            ResolvedCount = incidents.Count(p => p.Status == IncidentStatus.Resolved),
-            Incidents = incidents.OrderByDescending(p => p.ReportedDate)
+            TotalIncidents    = incidents.Count,
+            ActiveCount       = incidents.Count(p => p.Status == IncidentStatus.Active),
+            MonitoringCount   = incidents.Count(p => p.Status == IncidentStatus.Monitoring),
+            ResolvedCount     = incidents.Count(p => p.Status == IncidentStatus.Resolved),
+            Incidents         = incidents.OrderByDescending(p => p.ReportedDate),
+            CropWiseBreakdown = cropBreakdown
         };
     }
 
@@ -125,39 +138,145 @@ public class ReportService : IReportService
     {
         var resources = await _db.Resources.AsNoTracking()
             .Include(r => r.ResourceUsages)
+            .Where(r => r.Type != Models.Enums.ResourceType.Pesticide)
             .OrderBy(r => r.Name)
             .ToListAsync();
 
+        var typeBreakdown = resources
+            .GroupBy(r => r.Type)
+            .Select(g => new TypeCount
+            {
+                Type     = g.Key.ToString(),
+                Count    = g.Count(),
+                TotalQty = g.Sum(r => r.Quantity)
+            })
+            .OrderByDescending(t => t.Count)
+            .ToList();
+
         return new ResourceReportViewModel
         {
-            TotalResources = resources.Count,
-            LowStockCount = resources.Count(r => r.Quantity <= 10),
+            TotalResources   = resources.Count,
+            LowStockCount    = resources.Count(r => r.Quantity <= 10),
             TotalAllocations = resources.Sum(r => r.ResourceUsages.Count),
-            Resources = resources
+            Resources        = resources,
+            TypeBreakdown    = typeBreakdown
         };
     }
 
     public async Task<FarmAnalyticsViewModel> GetFarmAnalyticsAsync()
     {
+        var pestIncidents = await _db.PestIncidents.AsNoTracking()
+            .Include(p => p.Crop)
+            .ToListAsync();
+
+        var pestsByCrop = pestIncidents
+            .GroupBy(p => p.Crop?.CropName ?? "Unknown")
+            .Select(g => new CropPestCount
+            {
+                CropName   = g.Key,
+                Active     = g.Count(p => p.Status == IncidentStatus.Active),
+                Monitoring = g.Count(p => p.Status == IncidentStatus.Monitoring),
+                Resolved   = g.Count(p => p.Status == IncidentStatus.Resolved)
+            })
+            .OrderByDescending(c => c.Total)
+            .ToList();
+
         return new FarmAnalyticsViewModel
         {
             TotalFields = await _db.Fields.CountAsync(),
             TotalCrops = await _db.Crops.CountAsync(),
-            TotalResources = await _db.Resources.CountAsync(),
+            TotalResources = await _db.Resources.CountAsync(r => r.Type != Models.Enums.ResourceType.Pesticide),
             TotalHarvests = await _db.Harvests.CountAsync(),
-            TotalPestIncidents = await _db.PestIncidents.CountAsync(),
-            ActivePests = await _db.PestIncidents.CountAsync(p => p.Status == IncidentStatus.Active),
-            LowStockItems = await _db.Resources.CountAsync(r => r.Quantity <= 10),
+            TotalPestIncidents = pestIncidents.Count,
+            ActivePests = pestIncidents.Count(p => p.Status == IncidentStatus.Active),
+            LowStockItems = await _db.Resources.CountAsync(r => r.Quantity <= 10 && r.Type != Models.Enums.ResourceType.Pesticide),
             TotalYieldKg = await _db.Harvests.SumAsync(h => (decimal?)h.ActualYieldKg) ?? 0,
             TotalFieldArea = await _db.Fields.SumAsync(f => (decimal?)f.AreaHectares) ?? 0,
+            TotalSchedules = await _db.PlantingSchedules.CountAsync(),
+            ScheduledCount = await _db.PlantingSchedules.CountAsync(s => s.Status == "Scheduled"),
+            CompletedCount = await _db.PlantingSchedules.CountAsync(s => s.Status == "Completed"),
             CropsByStatus = await _db.Crops.AsNoTracking()
                 .GroupBy(c => c.Status)
                 .Select(g => new StatusCount { Status = g.Key, Count = g.Count() })
                 .ToListAsync(),
             ResourcesByType = await _db.Resources.AsNoTracking()
+                .Where(r => r.Type != Models.Enums.ResourceType.Pesticide)
                 .GroupBy(r => r.Type)
                 .Select(g => new TypeCount { Type = g.Key.ToString(), Count = g.Count(), TotalQty = g.Sum(r => r.Quantity) })
-                .ToListAsync()
+                .ToListAsync(),
+            PestsByCrop = pestsByCrop
+        };
+    }
+
+    public async Task<ReportDashboardViewModel> GetReportDashboardAsync()
+    {
+        var pestIncidents = await _db.PestIncidents.AsNoTracking()
+            .Include(p => p.Crop)
+            .OrderByDescending(p => p.ReportedDate)
+            .ToListAsync();
+
+        var resources = await _db.Resources.AsNoTracking()
+            .Include(r => r.ResourceUsages)
+            .Where(r => r.Type != Models.Enums.ResourceType.Pesticide)
+            .OrderBy(r => r.Name)
+            .ToListAsync();
+
+        var harvests = await _db.Harvests.AsNoTracking()
+            .Include(h => h.PlantingSchedule).ThenInclude(ps => ps.Crop)
+            .Include(h => h.PlantingSchedule).ThenInclude(ps => ps.Field)
+            .OrderByDescending(h => h.HarvestedDate)
+            .ToListAsync();
+
+        var schedules = await _db.PlantingSchedules.AsNoTracking()
+            .Include(ps => ps.Crop)
+            .Include(ps => ps.Field)
+            .OrderByDescending(ps => ps.ScheduledDate)
+            .ToListAsync();
+
+        var pestsByCrop = pestIncidents
+            .GroupBy(p => p.Crop?.CropName ?? "Unknown")
+            .Select(g => new CropPestCount
+            {
+                CropName   = g.Key,
+                Active     = g.Count(p => p.Status == IncidentStatus.Active),
+                Monitoring = g.Count(p => p.Status == IncidentStatus.Monitoring),
+                Resolved   = g.Count(p => p.Status == IncidentStatus.Resolved)
+            }).OrderByDescending(c => c.Total).ToList();
+
+        var resourcesByType = resources
+            .GroupBy(r => r.Type)
+            .Select(g => new TypeCount { Type = g.Key.ToString(), Count = g.Count(), TotalQty = g.Sum(r => r.Quantity) })
+            .OrderByDescending(t => t.Count).ToList();
+
+        var cropsByStatus = await _db.Crops.AsNoTracking()
+            .GroupBy(c => c.Status)
+            .Select(g => new StatusCount { Status = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        return new ReportDashboardViewModel
+        {
+            TotalFields        = await _db.Fields.CountAsync(),
+            TotalFieldArea     = await _db.Fields.SumAsync(f => (decimal?)f.AreaHectares) ?? 0,
+            TotalCrops         = await _db.Crops.CountAsync(),
+            TotalResources     = resources.Count,
+            LowStockCount      = resources.Count(r => r.Quantity <= 10),
+            TotalSchedules     = schedules.Count,
+            ScheduledCount     = schedules.Count(s => s.Status == "Scheduled"),
+            CompletedCount     = schedules.Count(s => s.Status == "Completed"),
+            TotalHarvests      = harvests.Count,
+            TotalYieldKg       = harvests.Sum(h => h.ActualYieldKg),
+            AverageYieldKg     = harvests.Count > 0 ? harvests.Average(h => h.ActualYieldKg) : 0,
+            TotalPestIncidents = pestIncidents.Count,
+            ActivePests        = pestIncidents.Count(p => p.Status == IncidentStatus.Active),
+            MonitoringPests    = pestIncidents.Count(p => p.Status == IncidentStatus.Monitoring),
+            ResolvedPests      = pestIncidents.Count(p => p.Status == IncidentStatus.Resolved),
+            PestHistory        = pestIncidents,
+            ResourceHistory    = resources,
+            HarvestHistory     = harvests,
+            ScheduleHistory    = schedules,
+            PestsByCrop        = pestsByCrop,
+            ResourcesByType    = resourcesByType,
+            CropsByStatus      = cropsByStatus
         };
     }
 }

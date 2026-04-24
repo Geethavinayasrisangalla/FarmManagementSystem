@@ -23,6 +23,7 @@ public class PestService : IPestService
     public async Task<PestIncident?> GetByIdAsync(int id) =>
         await _db.PestIncidents.AsNoTracking()
                                .Include(p => p.Crop)
+                               .Include(p => p.Resources)
                                .FirstOrDefaultAsync(p => p.PestIncidentId == id);
 
     public async Task<IEnumerable<PestIncident>> GetActivesAsync() =>
@@ -38,7 +39,7 @@ public class PestService : IPestService
     }
 
     // State Pattern — PestStateMachine enforces valid transitions and throws on invalid ones
-    public async Task UpdateStatusAsync(int id, string status, string? treatmentNotes)
+    public async Task UpdateStatusAsync(int id, string status)
     {
         var pest = await _db.PestIncidents.FindAsync(id)
                    ?? throw new KeyNotFoundException("Incident not found.");
@@ -46,8 +47,18 @@ public class PestService : IPestService
         // Delegates transition logic to the State Machine
         PestStateMachine.Transition(pest, status);
 
-        if (!string.IsNullOrWhiteSpace(treatmentNotes))
-            pest.TreatmentNotes = treatmentNotes;
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(PestIncident incident)
+    {
+        var pest = await _db.PestIncidents.FindAsync(incident.PestIncidentId)
+                   ?? throw new KeyNotFoundException("Incident not found.");
+
+        pest.PestName    = incident.PestName;
+        pest.DiseaseName = incident.DiseaseName;
+        pest.Description = incident.Description;
+        pest.CropId      = incident.CropId;
 
         await _db.SaveChangesAsync();
     }

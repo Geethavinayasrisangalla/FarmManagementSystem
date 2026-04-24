@@ -14,9 +14,10 @@ public class ReportController : Controller
         _reportService = reportService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var vm = await _reportService.GetReportDashboardAsync();
+        return View(vm);
     }
 
     public async Task<IActionResult> YieldAnalytics()

@@ -11,8 +11,12 @@ public class FarmAnalyticsViewModel
     public int LowStockItems { get; set; }
     public decimal TotalYieldKg { get; set; }
     public decimal TotalFieldArea { get; set; }
+    public int TotalSchedules { get; set; }
+    public int ScheduledCount { get; set; }
+    public int CompletedCount { get; set; }
     public List<StatusCount> CropsByStatus { get; set; } = new();
     public List<TypeCount> ResourcesByType { get; set; } = new();
+    public List<CropPestCount> PestsByCrop { get; set; } = new();
 }
 
 public class StatusCount

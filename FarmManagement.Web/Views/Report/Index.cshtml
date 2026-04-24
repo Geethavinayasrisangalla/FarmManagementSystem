@@ -1,3 +1,4 @@
+@model FarmManagement.Web.Models.ViewModels.ReportDashboardViewModel
 @{
     ViewData["Title"] = "Reports";
 }
@@ -8,186 +9,299 @@
             <span class="ph-icon" style="background:#dcfce7;color:#16a34a;">
                 <i class="bi bi-bar-chart-line"></i>
             </span>
-            Reports
+            Farm Reports
         </h1>
-        <p>Access farm analytics, pest summaries and inventory reports.</p>
+        <p>Complete overview of farm performance, pest history, resource usage and harvest records.</p>
     </div>
 </div>
 
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="fm-card h-100" style="display:flex;flex-direction:column;">
-            <div class="fm-card-header">
-                <span class="ch-title">
-                    <i class="bi bi-graph-up-arrow" style="color:#16a34a;"></i>
-                    Yield Analytics
-                </span>
-            </div>
-            <div class="fm-card-body" style="flex:1;">
-                <p style="font-size:.875rem;color:var(--fm-muted);margin:0;">
-                    View harvest yield records across all crops and seasons.
-                    Includes total yield, average yield and crop-wise breakdown.
-                </p>
-            </div>
-            <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
-                <a asp-action="YieldAnalytics" class="btn-fm btn-primary-fm" style="width:100%;justify-content:center;">
-                    <i class="bi bi-bar-chart"></i> View Yield Analytics
-                </a>
-            </div>
+<!-- ══════════════ SUMMARY STATS ══════════════ -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-grid-3x3-gap"></i></div>
+            <div><div class="stat-value">@Model.TotalFields</div><div class="stat-label">Fields (@Model.TotalFieldArea.ToString("N1") ha)</div></div>
         </div>
     </div>
-
-    <div class="col-md-4">
-        <div class="fm-card h-100" style="display:flex;flex-direction:column;">
-            <div class="fm-card-header">
-                <span class="ch-title">
-                    <i class="bi bi-bug" style="color:#dc2626;"></i>
-                    Pest Incident Summary
-                </span>
-            </div>
-            <div class="fm-card-body" style="flex:1;">
-                <p style="font-size:.875rem;color:var(--fm-muted);margin:0;">
-                    Overview of all pest incidents reported across crops.
-                    Filter by status — Active, Monitoring or Resolved.
-                </p>
-            </div>
-            <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
-                <a asp-action="PestSummary" class="btn-fm btn-danger-fm" style="width:100%;justify-content:center;">
-                    <i class="bi bi-bug"></i> View Pest Summary
-                </a>
-            </div>
+    <div class="col-sm-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#dbeafe;color:#2563eb;"><i class="bi bi-flower1"></i></div>
+            <div><div class="stat-value">@Model.TotalCrops</div><div class="stat-label">Crops</div></div>
         </div>
     </div>
-
-    <div class="col-md-4">
-        <div class="fm-card h-100" style="display:flex;flex-direction:column;">
-            <div class="fm-card-header">
-                <span class="ch-title">
-                    <i class="bi bi-box-seam" style="color:#ea580c;"></i>
-                    Resource Inventory
-                </span>
-            </div>
-            <div class="fm-card-body" style="flex:1;">
-                <p style="font-size:.875rem;color:var(--fm-muted);margin:0;">
-                    Check current stock levels for all resources.
-                    Highlights low stock items that need restocking.
-                </p>
-            </div>
-            <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
-                <a asp-action="ResourceReport" class="btn-fm btn-warn-fm" style="width:100%;justify-content:center;">
-                    <i class="bi bi-box-seam"></i> View Resource Report
-                </a>
-            </div>
+    <div class="col-sm-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#ffedd5;color:#ea580c;"><i class="bi bi-box-seam"></i></div>
+            <div><div class="stat-value">@Model.TotalResources</div><div class="stat-label">Resources (@Model.LowStockCount low)</div></div>
         </div>
     </div>
-
-    <div class="col-md-4">
-        <div class="fm-card h-100" style="display:flex;flex-direction:column;">
-            <div class="fm-card-header">
-                <span class="ch-title">
-                    <i class="bi bi-calendar3" style="color:#2563eb;"></i>
-                    Schedule Overview
-                </span>
-            </div>
-            <div class="fm-card-body" style="flex:1;">
-                <p style="font-size:.875rem;color:var(--fm-muted);margin:0;">
-                    View all planting schedules including upcoming harvests
-                    within the next 30 days.
-                </p>
-            </div>
-            <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
-                <a asp-controller="Schedule" asp-action="HarvestList" class="btn-fm btn-info-fm" style="width:100%;justify-content:center;">
-                    <i class="bi bi-calendar-check"></i> View Upcoming Harvests
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="fm-card h-100" style="display:flex;flex-direction:column;">
-            <div class="fm-card-header">
-                <span class="ch-title">
-                    <i class="bi bi-flower1" style="color:#2563eb;"></i>
-                    Crop Overview
-                </span>
-            </div>
-            <div class="fm-card-body" style="flex:1;">
-                <p style="font-size:.875rem;color:var(--fm-muted);margin:0;">
-                    View all crops currently growing across all fields
-                    with season and status information.
-                </p>
-            </div>
-            <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
-                <a asp-controller="Crop" asp-action="Index" class="btn-fm btn-outline-fm" style="width:100%;justify-content:center;">
-                    <i class="bi bi-flower1"></i> View Crops
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="fm-card h-100" style="display:flex;flex-direction:column;">
-            <div class="fm-card-header">
-                <span class="ch-title">
-                    <i class="bi bi-grid-3x3-gap" style="color:#16a34a;"></i>
-                    Field Overview
-                </span>
-            </div>
-            <div class="fm-card-body" style="flex:1;">
-                <p style="font-size:.875rem;color:var(--fm-muted);margin:0;">
-                    View all registered fields with area, soil type,
-                    location and number of assigned crops.
-                </p>
-            </div>
-            <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
-                <a asp-controller="Field" asp-action="Index" class="btn-fm btn-outline-fm" style="width:100%;justify-content:center;">
-                    <i class="bi bi-grid-3x3-gap"></i> View Fields
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="fm-card h-100" style="display:flex;flex-direction:column;">
-            <div class="fm-card-header">
-                <span class="ch-title">
-                    <i class="bi bi-clipboard-data" style="color:#7c3aed;"></i>
-                    Yield Reports
-                </span>
-            </div>
-            <div class="fm-card-body" style="flex:1;">
-                <p style="font-size:.875rem;color:var(--fm-muted);margin:0;">
-                    Generate and view saved yield reports with
-                    average yield per acre calculations.
-                </p>
-            </div>
-            <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
-                <a asp-action="YieldReports" class="btn-fm btn-primary-fm" style="width:100%;justify-content:center;">
-                    <i class="bi bi-clipboard-data"></i> View Yield Reports
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="fm-card h-100" style="display:flex;flex-direction:column;">
-            <div class="fm-card-header">
-                <span class="ch-title">
-                    <i class="bi bi-pie-chart" style="color:#0284c7;"></i>
-                    Farm Analytics
-                </span>
-            </div>
-            <div class="fm-card-body" style="flex:1;">
-                <p style="font-size:.875rem;color:var(--fm-muted);margin:0;">
-                    Combined farm-wide analytics with crop status,
-                    resource breakdown, and overall performance metrics.
-                </p>
-            </div>
-            <div style="padding:.85rem 1.25rem;border-top:1px solid var(--fm-border);">
-                <a asp-action="FarmAnalytics" class="btn-fm btn-info-fm" style="width:100%;justify-content:center;">
-                    <i class="bi bi-pie-chart"></i> View Farm Analytics
-                </a>
-            </div>
+    <div class="col-sm-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-graph-up"></i></div>
+            <div><div class="stat-value">@Model.TotalYieldKg.ToString("N0") kg</div><div class="stat-label">Total Yield (@Model.TotalHarvests harvests)</div></div>
         </div>
     </div>
 </div>
+<div class="row g-3 mb-4">
+    <div class="col-sm-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#dbeafe;color:#2563eb;"><i class="bi bi-calendar3"></i></div>
+            <div><div class="stat-value">@Model.TotalSchedules</div><div class="stat-label">Schedules</div></div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#fef9c3;color:#ca8a04;"><i class="bi bi-clock"></i></div>
+            <div><div class="stat-value" style="color:#ca8a04;">@Model.ScheduledCount</div><div class="stat-label">Scheduled</div></div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-check-circle"></i></div>
+            <div><div class="stat-value" style="color:#16a34a;">@Model.CompletedCount</div><div class="stat-label">Completed</div></div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#fee2e2;color:#dc2626;"><i class="bi bi-bug"></i></div>
+            <div><div class="stat-value" style="color:#dc2626;">@Model.ActivePests</div><div class="stat-label">Active Pests (of @Model.TotalPestIncidents)</div></div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════ PEST INCIDENT HISTORY ══════════════ -->
+<div class="fm-card mb-4">
+    <div class="fm-card-header">
+        <span class="ch-title"><i class="bi bi-bug" style="color:#dc2626;"></i> Pest Incident History</span>
+        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalPestIncidents records</span>
+    </div>
+    @if (!Model.PestHistory.Any())
+    {
+        <div class="empty-state"><i class="bi bi-shield-check"></i><p>No pest incidents recorded.</p></div>
+    }
+    else
+    {
+        <div style="overflow-x:auto;">
+            <table class="fm-table">
+                <thead>
+                    <tr><th>#</th><th>Pest Name</th><th>Disease Name</th><th>Crop</th><th>Reported</th><th>Description</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.PestHistory)
+                    {
+                        var badge = p.Status switch {
+                            FarmManagement.Web.Models.Enums.IncidentStatus.Active => "badge-red",
+                            FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring => "badge-yellow",
+                            _ => "badge-green"
+                        };
+                        <tr>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@p.PestIncidentId</td>
+                            <td style="font-weight:600;">@p.PestName</td>
+                            <td>@(p.DiseaseName ?? "—")</td>
+                            <td>@(p.Crop?.CropName ?? "—")</td>
+                            <td>@p.ReportedDate.ToString("dd MMM yyyy")</td>
+                            <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@(p.Description ?? "—")</td>
+                            <td><span class="badge-pill @badge">@p.Status</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- ══════════════ PEST BY CROP BREAKDOWN ══════════════ -->
+@if (Model.PestsByCrop.Any())
+{
+    <div class="fm-card mb-4">
+        <div class="fm-card-header">
+            <span class="ch-title"><i class="bi bi-bar-chart" style="color:#dc2626;"></i> Pest Incidents by Crop</span>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="fm-table">
+                <thead><tr><th>Crop</th><th>Active</th><th>Monitoring</th><th>Resolved</th><th>Total</th></tr></thead>
+                <tbody>
+                    @foreach (var c in Model.PestsByCrop)
+                    {
+                        <tr>
+                            <td style="font-weight:600;">@c.CropName</td>
+                            <td><span class="badge-pill badge-red">@c.Active</span></td>
+                            <td><span class="badge-pill badge-yellow">@c.Monitoring</span></td>
+                            <td><span class="badge-pill badge-green">@c.Resolved</span></td>
+                            <td style="font-weight:700;">@c.Total</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<!-- ══════════════ RESOURCE INVENTORY HISTORY ══════════════ -->
+<div class="fm-card mb-4">
+    <div class="fm-card-header">
+        <span class="ch-title"><i class="bi bi-box-seam" style="color:#ea580c;"></i> Resource Inventory</span>
+        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalResources resources</span>
+    </div>
+    @if (!Model.ResourceHistory.Any())
+    {
+        <div class="empty-state"><i class="bi bi-box-seam"></i><p>No resources found.</p></div>
+    }
+    else
+    {
+        <div style="overflow-x:auto;">
+            <table class="fm-table">
+                <thead>
+                    <tr><th>Name</th><th>Type</th><th>Quantity</th><th>Unit</th><th>Allocations</th><th>Stock Status</th><th>Last Updated</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.ResourceHistory)
+                    {
+                        <tr>
+                            <td style="font-weight:600;">@r.Name</td>
+                            <td><span class="badge-pill badge-gray">@r.Type</span></td>
+                            <td style="font-weight:700;color:@(r.Quantity <= 10 ? "#dc2626" : "#16a34a");">@r.Quantity</td>
+                            <td>@r.Unit</td>
+                            <td>@r.ResourceUsages.Count</td>
+                            <td>
+                                @if (r.Quantity <= 10)
+                                { <span class="badge-pill badge-red">Low</span> }
+                                else if (r.Quantity <= 50)
+                                { <span class="badge-pill badge-yellow">Medium</span> }
+                                else
+                                { <span class="badge-pill badge-green">In Stock</span> }
+                            </td>
+                            <td>@r.LastUpdated.ToString("dd MMM yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- ══════════════ RESOURCE TYPE BREAKDOWN ══════════════ -->
+@if (Model.ResourcesByType.Any())
+{
+    <div class="fm-card mb-4">
+        <div class="fm-card-header">
+            <span class="ch-title"><i class="bi bi-bar-chart" style="color:#ea580c;"></i> Resources by Type</span>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="fm-table">
+                <thead><tr><th>Type</th><th>Count</th><th>Total Quantity</th></tr></thead>
+                <tbody>
+                    @foreach (var t in Model.ResourcesByType)
+                    {
+                        <tr>
+                            <td style="font-weight:600;">@t.Type</td>
+                            <td>@t.Count</td>
+                            <td style="font-weight:700;">@t.TotalQty.ToString("N0")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<!-- ══════════════ HARVEST HISTORY ══════════════ -->
+<div class="fm-card mb-4">
+    <div class="fm-card-header">
+        <span class="ch-title"><i class="bi bi-basket" style="color:#16a34a;"></i> Harvest History</span>
+        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalHarvests records | Avg: @Model.AverageYieldKg.ToString("N1") kg</span>
+    </div>
+    @if (!Model.HarvestHistory.Any())
+    {
+        <div class="empty-state"><i class="bi bi-basket"></i><p>No harvest records found.</p></div>
+    }
+    else
+    {
+        <div style="overflow-x:auto;">
+            <table class="fm-table">
+                <thead>
+                    <tr><th>#</th><th>Crop</th><th>Field</th><th>Harvested Date</th><th>Actual Yield</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var h in Model.HarvestHistory)
+                    {
+                        <tr>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@h.HarvestId</td>
+                            <td style="font-weight:600;">@(h.PlantingSchedule?.Crop?.CropName ?? "—")</td>
+                            <td>@(h.PlantingSchedule?.Field?.FieldName ?? "—")</td>
+                            <td>@h.HarvestedDate.ToString("dd MMM yyyy")</td>
+                            <td style="font-weight:700;color:#16a34a;">@h.ActualYieldKg kg</td>
+                            <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@(h.Notes ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- ══════════════ SCHEDULE HISTORY ══════════════ -->
+<div class="fm-card mb-4">
+    <div class="fm-card-header">
+        <span class="ch-title"><i class="bi bi-calendar3" style="color:#2563eb;"></i> Schedule History</span>
+        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalSchedules records</span>
+    </div>
+    @if (!Model.ScheduleHistory.Any())
+    {
+        <div class="empty-state"><i class="bi bi-calendar3"></i><p>No schedules found.</p></div>
+    }
+    else
+    {
+        <div style="overflow-x:auto;">
+            <table class="fm-table">
+                <thead>
+                    <tr><th>#</th><th>Crop</th><th>Field</th><th>Scheduled Date</th><th>Expected Yield</th><th>Status</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model.ScheduleHistory)
+                    {
+                        var schBadge = s.Status switch {
+                            "Completed" => "badge-green",
+                            "Cancelled" => "badge-gray",
+                            "Scheduled" => "badge-blue",
+                            _ => "badge-yellow"
+                        };
+                        <tr>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@s.ScheduleId</td>
+                            <td style="font-weight:600;">@(s.Crop?.CropName ?? "—")</td>
+                            <td>@(s.Field?.FieldName ?? "—")</td>
+                            <td>@s.ScheduledDate.ToString("dd MMM yyyy")</td>
+                            <td style="font-weight:700;color:#2563eb;">@s.ExpectedYieldKg kg</td>
+                            <td><span class="badge-pill @schBadge">@s.Status</span></td>
+                            <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@(s.Notes ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- ══════════════ CROPS BY STATUS ══════════════ -->
+@if (Model.CropsByStatus.Any())
+{
+    <div class="fm-card mb-4">
+        <div class="fm-card-header">
+            <span class="ch-title"><i class="bi bi-flower1" style="color:#2563eb;"></i> Crops by Status</span>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="fm-table">
+                <thead><tr><th>Status</th><th>Count</th></tr></thead>
+                <tbody>
+                    @foreach (var s in Model.CropsByStatus)
+                    {
+                        <tr>
+                            <td><span class="badge-pill badge-gray">@s.Status</span></td>
+                            <td style="font-weight:700;">@s.Count</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

@@ -74,7 +74,7 @@ public class FarmDbContext : DbContext
             entity.HasKey(p => p.PestIncidentId);
             entity.Property(p => p.PestName).IsRequired().HasMaxLength(100);
             entity.Property(p => p.Description).HasMaxLength(500);
-            entity.Property(p => p.TreatmentNotes).HasMaxLength(500);
+            entity.Property(p => p.DiseaseName).HasMaxLength(200);
 
             entity.HasOne(p => p.Crop)
                   .WithMany(c => c.PestIncidents)
@@ -88,6 +88,11 @@ public class FarmDbContext : DbContext
             entity.Property(r => r.Name).IsRequired().HasMaxLength(100);
             entity.Property(r => r.Unit).HasMaxLength(50);
             entity.Property(r => r.Quantity).HasColumnType("decimal(10,2)");
+
+            entity.HasOne(r => r.PestIncident)
+                  .WithMany(p => p.Resources)
+                  .HasForeignKey(r => r.PestIncidentId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<ResourceUsage>(entity =>
