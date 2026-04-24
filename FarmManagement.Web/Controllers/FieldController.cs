@@ -11,7 +11,7 @@ namespace FarmManagement.Web.Controllers;
 // Patterns used:
 //   Factory  — IFieldFactory maps entity ↔ ViewModel (no manual mapping in controller)
 //   Observer — IEventDispatcher replaces direct IActivityService calls
-[Authorize(Roles = "Admin,Farmer,FieldSupervisor,Agronomist")]
+[Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper,Agronomist")]
 public class FieldController : Controller
 {
     private readonly IFieldService     _fieldService;

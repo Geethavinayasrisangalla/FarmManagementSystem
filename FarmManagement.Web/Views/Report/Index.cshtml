@@ -11,7 +11,7 @@
             </span>
             Farm Reports
         </h1>
-        <p>Complete overview of farm performance, pest history, resource usage and harvest records.</p>
+        <p>Complete overview of farm performance — fields, crops, schedules, harvests, resources and pest incidents.</p>
     </div>
 </div>
 
@@ -69,39 +69,34 @@
     </div>
 </div>
 
-<!-- ══════════════ PEST INCIDENT HISTORY ══════════════ -->
+<!-- ══════════════ 1. FIELD RECORDS ══════════════ -->
 <div class="fm-card mb-4">
     <div class="fm-card-header">
-        <span class="ch-title"><i class="bi bi-bug" style="color:#dc2626;"></i> Pest Incident History</span>
-        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalPestIncidents records</span>
+        <span class="ch-title"><i class="bi bi-grid-3x3-gap" style="color:#16a34a;"></i> Field Records</span>
+        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalFields records</span>
     </div>
-    @if (!Model.PestHistory.Any())
+    @if (!Model.FieldHistory.Any())
     {
-        <div class="empty-state"><i class="bi bi-shield-check"></i><p>No pest incidents recorded.</p></div>
+        <div class="empty-state"><i class="bi bi-grid-3x3-gap"></i><p>No fields found.</p></div>
     }
     else
     {
         <div style="overflow-x:auto;">
             <table class="fm-table">
                 <thead>
-                    <tr><th>#</th><th>Pest Name</th><th>Disease Name</th><th>Crop</th><th>Reported</th><th>Description</th><th>Status</th></tr>
+                    <tr><th>S.No</th><th>Field Name</th><th>Area (ha)</th><th>Soil Type</th><th>Location</th><th>Crops</th></tr>
                 </thead>
                 <tbody>
-                    @foreach (var p in Model.PestHistory)
+                    @{ var fSno = 1; }
+                    @foreach (var f in Model.FieldHistory)
                     {
-                        var badge = p.Status switch {
-                            FarmManagement.Web.Models.Enums.IncidentStatus.Active => "badge-red",
-                            FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring => "badge-yellow",
-                            _ => "badge-green"
-                        };
                         <tr>
-                            <td style="color:var(--fm-muted);font-size:.8rem;">@p.PestIncidentId</td>
-                            <td style="font-weight:600;">@p.PestName</td>
-                            <td>@(p.DiseaseName ?? "—")</td>
-                            <td>@(p.Crop?.CropName ?? "—")</td>
-                            <td>@p.ReportedDate.ToString("dd MMM yyyy")</td>
-                            <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@(p.Description ?? "—")</td>
-                            <td><span class="badge-pill @badge">@p.Status</span></td>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@(fSno++)</td>
+                            <td style="font-weight:600;">@f.FieldName</td>
+                            <td>@f.AreaHectares.ToString("N2")</td>
+                            <td>@f.SoilType</td>
+                            <td>@f.Location</td>
+                            <td><span class="badge-pill badge-blue">@f.Crops.Count</span></td>
                         </tr>
                     }
                 </tbody>
@@ -110,34 +105,120 @@
     }
 </div>
 
-<!-- ══════════════ PEST BY CROP BREAKDOWN ══════════════ -->
-@if (Model.PestsByCrop.Any())
-{
-    <div class="fm-card mb-4">
-        <div class="fm-card-header">
-            <span class="ch-title"><i class="bi bi-bar-chart" style="color:#dc2626;"></i> Pest Incidents by Crop</span>
-        </div>
+<!-- ══════════════ 2. CROP RECORDS ══════════════ -->
+<div class="fm-card mb-4">
+    <div class="fm-card-header">
+        <span class="ch-title"><i class="bi bi-flower1" style="color:#2563eb;"></i> Crop Records</span>
+        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalCrops records</span>
+    </div>
+    @if (!Model.CropHistory.Any())
+    {
+        <div class="empty-state"><i class="bi bi-flower1"></i><p>No crops found.</p></div>
+    }
+    else
+    {
         <div style="overflow-x:auto;">
             <table class="fm-table">
-                <thead><tr><th>Crop</th><th>Active</th><th>Monitoring</th><th>Resolved</th><th>Total</th></tr></thead>
+                <thead>
+                    <tr><th>S.No</th><th>Crop Name</th><th>Type</th><th>Season</th><th>Field</th><th>Planting Date</th><th>Expected Harvest</th><th>Status</th></tr>
+                </thead>
                 <tbody>
-                    @foreach (var c in Model.PestsByCrop)
+                    @{ var cSno = 1; }
+                    @foreach (var c in Model.CropHistory)
                     {
+                        var cBadge = c.Status switch { "Growing" => "badge-green", "Harvested" => "badge-blue", _ => "badge-gray" };
                         <tr>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@(cSno++)</td>
                             <td style="font-weight:600;">@c.CropName</td>
-                            <td><span class="badge-pill badge-red">@c.Active</span></td>
-                            <td><span class="badge-pill badge-yellow">@c.Monitoring</span></td>
-                            <td><span class="badge-pill badge-green">@c.Resolved</span></td>
-                            <td style="font-weight:700;">@c.Total</td>
+                            <td>@c.CropType</td>
+                            <td><span class="badge-pill badge-gray">@c.Season</span></td>
+                            <td>@(c.Field?.FieldName ?? "—")</td>
+                            <td>@c.PlantingDate.ToString("dd MMM yyyy")</td>
+                            <td>@c.ExpectedHarvestDate.ToString("dd MMM yyyy")</td>
+                            <td><span class="badge-pill @cBadge">@c.Status</span></td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
-    </div>
-}
+    }
+</div>
 
-<!-- ══════════════ RESOURCE INVENTORY HISTORY ══════════════ -->
+<!-- ══════════════ 3. SCHEDULE HISTORY ══════════════ -->
+<div class="fm-card mb-4">
+    <div class="fm-card-header">
+        <span class="ch-title"><i class="bi bi-calendar3" style="color:#2563eb;"></i> Schedule History</span>
+        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalSchedules records</span>
+    </div>
+    @if (!Model.ScheduleHistory.Any())
+    {
+        <div class="empty-state"><i class="bi bi-calendar3"></i><p>No schedules found.</p></div>
+    }
+    else
+    {
+        <div style="overflow-x:auto;">
+            <table class="fm-table">
+                <thead>
+                    <tr><th>S.No</th><th>Crop</th><th>Field</th><th>Scheduled Date</th><th>Expected Yield</th><th>Status</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    @{ var sSno = 1; }
+                    @foreach (var s in Model.ScheduleHistory)
+                    {
+                        var schBadge = s.Status switch { "Completed" => "badge-green", "Cancelled" => "badge-gray", "Scheduled" => "badge-blue", _ => "badge-yellow" };
+                        <tr>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@(sSno++)</td>
+                            <td style="font-weight:600;">@(s.Crop?.CropName ?? "—")</td>
+                            <td>@(s.Field?.FieldName ?? "—")</td>
+                            <td>@s.ScheduledDate.ToString("dd MMM yyyy")</td>
+                            <td style="font-weight:700;color:#2563eb;">@s.ExpectedYieldKg kg</td>
+                            <td><span class="badge-pill @schBadge">@s.Status</span></td>
+                            <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@(s.Notes ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- ══════════════ 4. HARVEST HISTORY ══════════════ -->
+<div class="fm-card mb-4">
+    <div class="fm-card-header">
+        <span class="ch-title"><i class="bi bi-basket" style="color:#16a34a;"></i> Harvest History</span>
+        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalHarvests records | Avg: @Model.AverageYieldKg.ToString("N1") kg</span>
+    </div>
+    @if (!Model.HarvestHistory.Any())
+    {
+        <div class="empty-state"><i class="bi bi-basket"></i><p>No harvest records found.</p></div>
+    }
+    else
+    {
+        <div style="overflow-x:auto;">
+            <table class="fm-table">
+                <thead>
+                    <tr><th>S.No</th><th>Crop</th><th>Field</th><th>Harvested Date</th><th>Actual Yield</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    @{ var hSno = 1; }
+                    @foreach (var h in Model.HarvestHistory)
+                    {
+                        <tr>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@(hSno++)</td>
+                            <td style="font-weight:600;">@(h.PlantingSchedule?.Crop?.CropName ?? "—")</td>
+                            <td>@(h.PlantingSchedule?.Field?.FieldName ?? "—")</td>
+                            <td>@h.HarvestedDate.ToString("dd MMM yyyy")</td>
+                            <td style="font-weight:700;color:#16a34a;">@h.ActualYieldKg kg</td>
+                            <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@(h.Notes ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- ══════════════ 5. RESOURCE INVENTORY ══════════════ -->
 <div class="fm-card mb-4">
     <div class="fm-card-header">
         <span class="ch-title"><i class="bi bi-box-seam" style="color:#ea580c;"></i> Resource Inventory</span>
@@ -152,12 +233,14 @@
         <div style="overflow-x:auto;">
             <table class="fm-table">
                 <thead>
-                    <tr><th>Name</th><th>Type</th><th>Quantity</th><th>Unit</th><th>Allocations</th><th>Stock Status</th><th>Last Updated</th></tr>
+                    <tr><th>S.No</th><th>Name</th><th>Type</th><th>Quantity</th><th>Unit</th><th>Allocations</th><th>Stock Status</th><th>Last Updated</th></tr>
                 </thead>
                 <tbody>
+                    @{ var rSno = 1; }
                     @foreach (var r in Model.ResourceHistory)
                     {
                         <tr>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@(rSno++)</td>
                             <td style="font-weight:600;">@r.Name</td>
                             <td><span class="badge-pill badge-gray">@r.Type</span></td>
                             <td style="font-weight:700;color:@(r.Quantity <= 10 ? "#dc2626" : "#16a34a");">@r.Quantity</td>
@@ -180,100 +263,40 @@
     }
 </div>
 
-<!-- ══════════════ RESOURCE TYPE BREAKDOWN ══════════════ -->
-@if (Model.ResourcesByType.Any())
-{
-    <div class="fm-card mb-4">
-        <div class="fm-card-header">
-            <span class="ch-title"><i class="bi bi-bar-chart" style="color:#ea580c;"></i> Resources by Type</span>
-        </div>
-        <div style="overflow-x:auto;">
-            <table class="fm-table">
-                <thead><tr><th>Type</th><th>Count</th><th>Total Quantity</th></tr></thead>
-                <tbody>
-                    @foreach (var t in Model.ResourcesByType)
-                    {
-                        <tr>
-                            <td style="font-weight:600;">@t.Type</td>
-                            <td>@t.Count</td>
-                            <td style="font-weight:700;">@t.TotalQty.ToString("N0")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-}
-
-<!-- ══════════════ HARVEST HISTORY ══════════════ -->
+<!-- ══════════════ 6. PEST INCIDENT HISTORY ══════════════ -->
 <div class="fm-card mb-4">
     <div class="fm-card-header">
-        <span class="ch-title"><i class="bi bi-basket" style="color:#16a34a;"></i> Harvest History</span>
-        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalHarvests records | Avg: @Model.AverageYieldKg.ToString("N1") kg</span>
+        <span class="ch-title"><i class="bi bi-bug" style="color:#dc2626;"></i> Pest Incident History</span>
+        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalPestIncidents records</span>
     </div>
-    @if (!Model.HarvestHistory.Any())
+    @if (!Model.PestHistory.Any())
     {
-        <div class="empty-state"><i class="bi bi-basket"></i><p>No harvest records found.</p></div>
+        <div class="empty-state"><i class="bi bi-shield-check"></i><p>No pest incidents recorded.</p></div>
     }
     else
     {
         <div style="overflow-x:auto;">
             <table class="fm-table">
                 <thead>
-                    <tr><th>#</th><th>Crop</th><th>Field</th><th>Harvested Date</th><th>Actual Yield</th><th>Notes</th></tr>
+                    <tr><th>S.No</th><th>Pest Name</th><th>Disease Name</th><th>Crop</th><th>Reported</th><th>Description</th><th>Status</th></tr>
                 </thead>
                 <tbody>
-                    @foreach (var h in Model.HarvestHistory)
+                    @{ var pSno = 1; }
+                    @foreach (var p in Model.PestHistory)
                     {
-                        <tr>
-                            <td style="color:var(--fm-muted);font-size:.8rem;">@h.HarvestId</td>
-                            <td style="font-weight:600;">@(h.PlantingSchedule?.Crop?.CropName ?? "—")</td>
-                            <td>@(h.PlantingSchedule?.Field?.FieldName ?? "—")</td>
-                            <td>@h.HarvestedDate.ToString("dd MMM yyyy")</td>
-                            <td style="font-weight:700;color:#16a34a;">@h.ActualYieldKg kg</td>
-                            <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@(h.Notes ?? "—")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-</div>
-
-<!-- ══════════════ SCHEDULE HISTORY ══════════════ -->
-<div class="fm-card mb-4">
-    <div class="fm-card-header">
-        <span class="ch-title"><i class="bi bi-calendar3" style="color:#2563eb;"></i> Schedule History</span>
-        <span style="font-size:.78rem;color:var(--fm-muted);">@Model.TotalSchedules records</span>
-    </div>
-    @if (!Model.ScheduleHistory.Any())
-    {
-        <div class="empty-state"><i class="bi bi-calendar3"></i><p>No schedules found.</p></div>
-    }
-    else
-    {
-        <div style="overflow-x:auto;">
-            <table class="fm-table">
-                <thead>
-                    <tr><th>#</th><th>Crop</th><th>Field</th><th>Scheduled Date</th><th>Expected Yield</th><th>Status</th><th>Notes</th></tr>
-                </thead>
-                <tbody>
-                    @foreach (var s in Model.ScheduleHistory)
-                    {
-                        var schBadge = s.Status switch {
-                            "Completed" => "badge-green",
-                            "Cancelled" => "badge-gray",
-                            "Scheduled" => "badge-blue",
-                            _ => "badge-yellow"
+                        var badge = p.Status switch {
+                            FarmManagement.Web.Models.Enums.IncidentStatus.Active => "badge-red",
+                            FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring => "badge-yellow",
+                            _ => "badge-green"
                         };
                         <tr>
-                            <td style="color:var(--fm-muted);font-size:.8rem;">@s.ScheduleId</td>
-                            <td style="font-weight:600;">@(s.Crop?.CropName ?? "—")</td>
-                            <td>@(s.Field?.FieldName ?? "—")</td>
-                            <td>@s.ScheduledDate.ToString("dd MMM yyyy")</td>
-                            <td style="font-weight:700;color:#2563eb;">@s.ExpectedYieldKg kg</td>
-                            <td><span class="badge-pill @schBadge">@s.Status</span></td>
-                            <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@(s.Notes ?? "—")</td>
+                            <td style="color:var(--fm-muted);font-size:.8rem;">@(pSno++)</td>
+                            <td style="font-weight:600;">@p.PestName</td>
+                            <td>@(p.DiseaseName ?? "—")</td>
+                            <td>@(p.Crop?.CropName ?? "—")</td>
+                            <td>@p.ReportedDate.ToString("dd MMM yyyy")</td>
+                            <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@(p.Description ?? "—")</td>
+                            <td><span class="badge-pill @badge">@p.Status</span></td>
                         </tr>
                     }
                 </tbody>
@@ -282,26 +305,90 @@
     }
 </div>
 
-<!-- ══════════════ CROPS BY STATUS ══════════════ -->
-@if (Model.CropsByStatus.Any())
-{
-    <div class="fm-card mb-4">
-        <div class="fm-card-header">
-            <span class="ch-title"><i class="bi bi-flower1" style="color:#2563eb;"></i> Crops by Status</span>
+<!-- ══════════════ BREAKDOWN TABLES ══════════════ -->
+<div class="row g-4 mb-4">
+    @if (Model.PestsByCrop.Any())
+    {
+        <div class="col-md-4">
+            <div class="fm-card h-100">
+                <div class="fm-card-header">
+                    <span class="ch-title"><i class="bi bi-bar-chart" style="color:#dc2626;"></i> Pests by Crop</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="fm-table">
+                        <thead><tr><th>S.No</th><th>Crop</th><th>Active</th><th>Monitoring</th><th>Resolved</th><th>Total</th></tr></thead>
+                        <tbody>
+                            @{ var pcSno = 1; }
+                            @foreach (var c in Model.PestsByCrop)
+                            {
+                                <tr>
+                                    <td style="color:var(--fm-muted);font-size:.8rem;">@(pcSno++)</td>
+                                    <td style="font-weight:600;">@c.CropName</td>
+                                    <td><span class="badge-pill badge-red">@c.Active</span></td>
+                                    <td><span class="badge-pill badge-yellow">@c.Monitoring</span></td>
+                                    <td><span class="badge-pill badge-green">@c.Resolved</span></td>
+                                    <td style="font-weight:700;">@c.Total</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div style="overflow-x:auto;">
-            <table class="fm-table">
-                <thead><tr><th>Status</th><th>Count</th></tr></thead>
-                <tbody>
-                    @foreach (var s in Model.CropsByStatus)
-                    {
-                        <tr>
-                            <td><span class="badge-pill badge-gray">@s.Status</span></td>
-                            <td style="font-weight:700;">@s.Count</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    }
+
+    @if (Model.ResourcesByType.Any())
+    {
+        <div class="col-md-4">
+            <div class="fm-card h-100">
+                <div class="fm-card-header">
+                    <span class="ch-title"><i class="bi bi-bar-chart" style="color:#ea580c;"></i> Resources by Type</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="fm-table">
+                        <thead><tr><th>S.No</th><th>Type</th><th>Count</th><th>Total Qty</th></tr></thead>
+                        <tbody>
+                            @{ var rtSno = 1; }
+                            @foreach (var t in Model.ResourcesByType)
+                            {
+                                <tr>
+                                    <td style="color:var(--fm-muted);font-size:.8rem;">@(rtSno++)</td>
+                                    <td style="font-weight:600;">@t.Type</td>
+                                    <td>@t.Count</td>
+                                    <td style="font-weight:700;">@t.TotalQty.ToString("N0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>
-}
+    }
+
+    @if (Model.CropsByStatus.Any())
+    {
+        <div class="col-md-4">
+            <div class="fm-card h-100">
+                <div class="fm-card-header">
+                    <span class="ch-title"><i class="bi bi-flower1" style="color:#2563eb;"></i> Crops by Status</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="fm-table">
+                        <thead><tr><th>S.No</th><th>Status</th><th>Count</th></tr></thead>
+                        <tbody>
+                            @{ var csSno = 1; }
+                            @foreach (var s in Model.CropsByStatus)
+                            {
+                                <tr>
+                                    <td style="color:var(--fm-muted);font-size:.8rem;">@(csSno++)</td>
+                                    <td><span class="badge-pill badge-gray">@s.Status</span></td>
+                                    <td style="font-weight:700;">@s.Count</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

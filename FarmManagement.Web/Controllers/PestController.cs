@@ -14,7 +14,7 @@ namespace FarmManagement.Web.Controllers;
 //   State    — PestStateMachine enforces valid status transitions (Active→Monitoring→Resolved)
 //   Observer — IEventDispatcher replaces direct IActivityService calls
 //   Facade   — IFarmFacade handles Delete (service + event in one call)
-[Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper")]
+[Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper,Agronomist")]
 public class PestController : Controller
 {
     private readonly IPestService      _pestService;
@@ -88,7 +88,7 @@ public class PestController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    [Authorize(Roles = "Admin,Farmer")]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Agronomist")]
     public async Task<IActionResult> Edit(int id)
     {
         var incident = await _pestService.GetByIdAsync(id);
@@ -100,7 +100,7 @@ public class PestController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Farmer")]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Agronomist")]
     public async Task<IActionResult> Edit(int id, PestIncident pest)
     {
         if (id != pest.PestIncidentId) return BadRequest();
@@ -150,7 +150,7 @@ public class PestController : Controller
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Farmer")]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var incident = await _pestService.GetByIdAsync(id);

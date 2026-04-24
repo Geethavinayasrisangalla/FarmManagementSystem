@@ -114,14 +114,14 @@
                                        class="btn-fm btn-info-fm btn-sm-fm">
                                         <i class="bi bi-eye"></i> View
                                     </a>
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Farmer"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Farmer") || User.IsInRole("FieldSupervisor") || User.IsInRole("Agronomist"))
                                     {
                                         <a asp-action="Edit" asp-route-id="@item.PestIncidentId"
                                            class="btn-fm btn-warn-fm btn-sm-fm">
                                             <i class="bi bi-pencil"></i> Update
                                         </a>
                                     }
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Farmer"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Farmer") || User.IsInRole("FieldSupervisor"))
                                     {
                                         <form asp-action="Delete"
                                               asp-route-id="@item.PestIncidentId"

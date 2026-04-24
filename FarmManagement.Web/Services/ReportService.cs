@@ -210,6 +210,16 @@ public class ReportService : IReportService
 
     public async Task<ReportDashboardViewModel> GetReportDashboardAsync()
     {
+        var fields = await _db.Fields.AsNoTracking()
+            .Include(f => f.Crops)
+            .OrderBy(f => f.FieldName)
+            .ToListAsync();
+
+        var crops = await _db.Crops.AsNoTracking()
+            .Include(c => c.Field)
+            .OrderBy(c => c.CropName)
+            .ToListAsync();
+
         var pestIncidents = await _db.PestIncidents.AsNoTracking()
             .Include(p => p.Crop)
             .OrderByDescending(p => p.ReportedDate)
@@ -255,9 +265,9 @@ public class ReportService : IReportService
 
         return new ReportDashboardViewModel
         {
-            TotalFields        = await _db.Fields.CountAsync(),
-            TotalFieldArea     = await _db.Fields.SumAsync(f => (decimal?)f.AreaHectares) ?? 0,
-            TotalCrops         = await _db.Crops.CountAsync(),
+            TotalFields        = fields.Count,
+            TotalFieldArea     = fields.Sum(f => f.AreaHectares),
+            TotalCrops         = crops.Count,
             TotalResources     = resources.Count,
             LowStockCount      = resources.Count(r => r.Quantity <= 10),
             TotalSchedules     = schedules.Count,
@@ -270,6 +280,8 @@ public class ReportService : IReportService
             ActivePests        = pestIncidents.Count(p => p.Status == IncidentStatus.Active),
             MonitoringPests    = pestIncidents.Count(p => p.Status == IncidentStatus.Monitoring),
             ResolvedPests      = pestIncidents.Count(p => p.Status == IncidentStatus.Resolved),
+            FieldHistory       = fields,
+            CropHistory        = crops,
             PestHistory        = pestIncidents,
             ResourceHistory    = resources,
             HarvestHistory     = harvests,

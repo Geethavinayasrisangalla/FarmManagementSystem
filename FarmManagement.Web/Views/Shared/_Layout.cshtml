@@ -20,11 +20,11 @@
     var isWorker     = User.IsInRole("Storekeeper");
     var isViewer     = User.IsInRole("Agronomist");
 
-    var canViewCrops     = isAdmin || isManager || isSupervisor || isViewer;
+    var canViewCrops     = isAdmin || isManager || isSupervisor || isWorker || isViewer;
     var canViewSchedules = isAdmin || isManager || isSupervisor || isWorker || isViewer;
-    var canViewPest      = isAdmin || isManager || isSupervisor || isWorker;
-    var canViewResources = isAdmin || isWorker;
-    var canViewReports   = isAdmin || isManager || isSupervisor || isViewer;
+    var canViewPest      = isAdmin || isManager || isSupervisor || isWorker || isViewer;
+    var canViewResources = isAdmin || isManager || isSupervisor || isWorker || isViewer;
+    var canViewReports   = isAdmin || isManager || isSupervisor || isWorker || isViewer;
     var canManageUsers   = isAdmin;
 
     var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";

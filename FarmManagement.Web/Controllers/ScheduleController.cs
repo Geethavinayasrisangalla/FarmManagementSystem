@@ -59,7 +59,7 @@ public class ScheduleController : Controller
         return View(schedule);
     }
 
-    [Authorize(Roles = "Admin,FieldSupervisor")]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> Create()
     {
         var vm = await _scheduleService.PrepareViewModelAsync();
@@ -68,7 +68,7 @@ public class ScheduleController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,FieldSupervisor")]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> Create(ScheduleViewModel vm)
     {
         if (!ModelState.IsValid)
@@ -88,7 +88,7 @@ public class ScheduleController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    [Authorize(Roles = "Admin,FieldSupervisor")]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> Edit(int id)
     {
         var schedule = await _scheduleService.GetByIdAsync(id);
@@ -124,7 +124,7 @@ public class ScheduleController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,FieldSupervisor")]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> Edit(ScheduleViewModel vm)
     {
         if (!ModelState.IsValid)
@@ -176,7 +176,7 @@ public class ScheduleController : Controller
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,FieldSupervisor")]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         // Facade Pattern — single call coordinates ScheduleService + event dispatch
@@ -188,7 +188,7 @@ public class ScheduleController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin,FieldSupervisor")]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> GetResourcesJson()
     {
         var resources = await _resourceService.GetAllAsync();

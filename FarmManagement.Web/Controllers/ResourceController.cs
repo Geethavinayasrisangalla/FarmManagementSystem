@@ -14,7 +14,7 @@ namespace FarmManagement.Web.Controllers;
 //   Factory  — IResourceFactory maps entity ↔ ViewModel
 //   Observer — IEventDispatcher replaces direct IActivityService calls
 //   Facade   — IFarmFacade coordinates Allocate & Delete (multi-service ops)
-[Authorize(Roles = "Admin,Storekeeper")]
+[Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper,Agronomist")]
 public class ResourceController : Controller
 {
     private readonly IResourceService _resourceService;
@@ -67,7 +67,7 @@ public class ResourceController : Controller
         return View(resource);
     }
 
-    [Authorize(Roles = "Admin,Farmer")]
+    [Authorize(Roles = "Admin,Farmer,Storekeeper")]
     public async Task<IActionResult> Create()
     {
         ViewBag.Crops = await _cropService.GetAllAsync();
@@ -76,7 +76,7 @@ public class ResourceController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Farmer")]
+    [Authorize(Roles = "Admin,Farmer,Storekeeper")]
     public async Task<IActionResult> Create(InventoryViewModel vm)
     {
         // For Pesticide type, pest fields are required but Name/Quantity/Unit are not
@@ -131,7 +131,7 @@ public class ResourceController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    [Authorize(Roles = "Admin,Farmer")]
+    [Authorize(Roles = "Admin,Farmer,Storekeeper")]
     public async Task<IActionResult> Edit(int id)
     {
         var resource = await _resourceService.GetByIdAsync(id);
@@ -144,7 +144,7 @@ public class ResourceController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Farmer")]
+    [Authorize(Roles = "Admin,Farmer,Storekeeper")]
     public async Task<IActionResult> Edit(int id, InventoryViewModel vm)
     {
         if (id != vm.ResourceId) return BadRequest();
@@ -195,7 +195,7 @@ public class ResourceController : Controller
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Farmer")]
+    [Authorize(Roles = "Admin,Farmer,Storekeeper")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var resource = await _resourceService.GetByIdAsync(id);

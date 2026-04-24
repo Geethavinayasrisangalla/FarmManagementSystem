@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FarmManagement.Web.Controllers;
 
-[Authorize(Roles = "Admin,Farmer,FieldSupervisor,Agronomist")]
+[Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper,Agronomist")]
 public class ReportController : Controller
 {
     private readonly IReportService _reportService;
@@ -28,7 +28,7 @@ public class ReportController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Farmer")]
+    [Authorize(Roles = "Admin,Farmer,Agronomist")]
     public async Task<IActionResult> GenerateYieldReport()
     {
         await _reportService.GenerateYieldReportAsync();

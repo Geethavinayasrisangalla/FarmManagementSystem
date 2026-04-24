@@ -22,6 +22,8 @@ public class ReportDashboardViewModel
     public int ResolvedPests { get; set; }
 
     // ── History Tables ──
+    public IEnumerable<Field> FieldHistory { get; set; } = new List<Field>();
+    public IEnumerable<Crop> CropHistory { get; set; } = new List<Crop>();
     public IEnumerable<PestIncident> PestHistory { get; set; } = new List<PestIncident>();
     public IEnumerable<Resource> ResourceHistory { get; set; } = new List<Resource>();
     public IEnumerable<Harvest> HarvestHistory { get; set; } = new List<Harvest>();
