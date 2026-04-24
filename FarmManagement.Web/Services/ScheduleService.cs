@@ -31,7 +31,7 @@ public class ScheduleService : IScheduleService
 
     public async Task CreateAsync(ScheduleViewModel vm)
     {
-        _db.PlantingSchedules.Add(new PlantingSchedule
+        var schedule = new PlantingSchedule
         {
             CropId = vm.CropId,
             FieldId = vm.FieldId,
@@ -39,8 +39,35 @@ public class ScheduleService : IScheduleService
             ExpectedYieldKg = vm.ExpectedYieldKg,
             Notes = vm.Notes,
             Status = "Scheduled"
-        });
+        };
+        _db.PlantingSchedules.Add(schedule);
         await _db.SaveChangesAsync();
+
+        if (vm.ResourceUsages != null && vm.ResourceUsages.Count > 0)
+        {
+            foreach (var ru in vm.ResourceUsages)
+            {
+                if (ru.ResourceId > 0 && ru.QuantityUsed > 0)
+                {
+                    var resource = await _db.Resources.FindAsync(ru.ResourceId);
+                    if (resource != null)
+                    {
+                        resource.Quantity -= ru.QuantityUsed;
+                        resource.LastUpdated = DateTime.Now;
+                    }
+
+                    _db.ResourceUsages.Add(new ResourceUsage
+                    {
+                        ResourceId   = ru.ResourceId,
+                        ScheduleId   = schedule.ScheduleId,
+                        QuantityUsed = ru.QuantityUsed,
+                        Notes        = ru.Notes,
+                        UsedDate     = DateTime.Now
+                    });
+                }
+            }
+            await _db.SaveChangesAsync();
+        }
     }
 
     public async Task UpdateAsync(ScheduleViewModel vm)
@@ -52,6 +79,49 @@ public class ScheduleService : IScheduleService
         ps.ScheduledDate = vm.ScheduledDate;
         ps.ExpectedYieldKg = vm.ExpectedYieldKg;
         ps.Notes = vm.Notes;
+
+        // Remove old resource usages and restore quantities
+        var oldUsages = await _db.ResourceUsages
+            .Where(ru => ru.ScheduleId == vm.ScheduleId)
+            .ToListAsync();
+
+        foreach (var old in oldUsages)
+        {
+            var resource = await _db.Resources.FindAsync(old.ResourceId);
+            if (resource != null)
+            {
+                resource.Quantity += old.QuantityUsed;
+                resource.LastUpdated = DateTime.Now;
+            }
+        }
+        _db.ResourceUsages.RemoveRange(oldUsages);
+
+        // Add new resource usages and deduct quantities
+        if (vm.ResourceUsages != null && vm.ResourceUsages.Count > 0)
+        {
+            foreach (var ru in vm.ResourceUsages)
+            {
+                if (ru.ResourceId > 0 && ru.QuantityUsed > 0)
+                {
+                    var resource = await _db.Resources.FindAsync(ru.ResourceId);
+                    if (resource != null)
+                    {
+                        resource.Quantity -= ru.QuantityUsed;
+                        resource.LastUpdated = DateTime.Now;
+                    }
+
+                    _db.ResourceUsages.Add(new ResourceUsage
+                    {
+                        ResourceId   = ru.ResourceId,
+                        ScheduleId   = vm.ScheduleId,
+                        QuantityUsed = ru.QuantityUsed,
+                        Notes        = ru.Notes,
+                        UsedDate     = DateTime.Now
+                    });
+                }
+            }
+        }
+
         await _db.SaveChangesAsync();
     }
 

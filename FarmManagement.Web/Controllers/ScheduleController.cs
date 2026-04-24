@@ -63,7 +63,6 @@ public class ScheduleController : Controller
     public async Task<IActionResult> Create()
     {
         var vm = await _scheduleService.PrepareViewModelAsync();
-        ViewBag.Resources = await _resourceService.GetAllAsync();
         return View(vm);
     }
 
@@ -75,7 +74,6 @@ public class ScheduleController : Controller
         if (!ModelState.IsValid)
         {
             var prepared = await _scheduleService.PrepareViewModelAsync(vm);
-            ViewBag.Resources = await _resourceService.GetAllAsync();
             return View(prepared);
         }
 
@@ -104,8 +102,23 @@ public class ScheduleController : Controller
             ScheduledDate = schedule.ScheduledDate,
             ExpectedYieldKg = schedule.ExpectedYieldKg,
             Notes = schedule.Notes,
-            Status = schedule.Status
+            Status = schedule.Status,
+            ResourceUsages = schedule.ResourceUsages?.Select(ru => new FarmManagement.Web.Models.ViewModels.ResourceUsageItem
+            {
+                ResourceId   = ru.ResourceId,
+                QuantityUsed = ru.QuantityUsed,
+                Notes        = ru.Notes
+            }).ToList() ?? new()
         });
+        ViewBag.ExistingResources = schedule.ResourceUsages?.Select(ru => new
+        {
+            ru.ResourceId,
+            Name = ru.Resource?.Name ?? "Unknown",
+            Type = ru.Resource?.Type.ToString() ?? "",
+            Unit = ru.Resource?.Unit ?? "",
+            ru.QuantityUsed,
+            Notes = ru.Notes ?? ""
+        }).ToList();
         return View(vm);
     }
 
@@ -117,6 +130,7 @@ public class ScheduleController : Controller
         if (!ModelState.IsValid)
         {
             var prepared = await _scheduleService.PrepareViewModelAsync(vm);
+            ViewBag.ExistingResources = new List<object>();
             return View(prepared);
         }
 
@@ -173,51 +187,22 @@ public class ScheduleController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,FieldSupervisor")]
-    public async Task<IActionResult> AddResourceAjax(string name, string type, decimal quantity, string unit)
-    {
-        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(unit) || quantity <= 0)
-            return BadRequest("All fields are required.");
-
-        if (!Enum.TryParse<FarmManagement.Web.Models.Enums.ResourceType>(type, out var resType))
-            return BadRequest("Invalid resource type.");
-
-        var vm = new FarmManagement.Web.Models.ViewModels.InventoryViewModel
-        {
-            Name = name,
-            Type = resType,
-            Quantity = quantity,
-            Unit = unit
-        };
-        await _resourceService.CreateAsync(vm);
-
-        var resources = await _resourceService.GetAllAsync();
-        var list = resources.Select(r => new
-        {
-            r.Name,
-            Type = r.Type.ToString(),
-            r.Quantity,
-            r.Unit,
-            LastUpdated = r.LastUpdated.ToString("dd MMM yyyy")
-        });
-        return Json(list);
-    }
-
     [HttpGet]
     [Authorize(Roles = "Admin,FieldSupervisor")]
     public async Task<IActionResult> GetResourcesJson()
     {
         var resources = await _resourceService.GetAllAsync();
-        var list = resources.Select(r => new
-        {
-            r.Name,
-            Type = r.Type.ToString(),
-            r.Quantity,
-            r.Unit,
-            LastUpdated = r.LastUpdated.ToString("dd MMM yyyy")
-        });
+        var list = resources
+            .Where(r => r.Type != FarmManagement.Web.Models.Enums.ResourceType.Pesticide)
+            .Select(r => new
+            {
+                r.ResourceId,
+                r.Name,
+                Type = r.Type.ToString(),
+                r.Quantity,
+                r.Unit,
+                LastUpdated = r.LastUpdated.ToString("dd MMM yyyy")
+            });
         return Json(list);
     }
 }

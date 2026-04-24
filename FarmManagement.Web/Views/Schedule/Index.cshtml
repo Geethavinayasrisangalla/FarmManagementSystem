@@ -102,21 +102,21 @@
                             <td>
                                 <div style="display:flex;gap:.3rem;flex-wrap:wrap;">
                                     <a asp-action="Details" asp-route-id="@item.ScheduleId"
-                                       class="btn-fm btn-info-fm btn-sm-fm">
+                                       class="btn-fm btn-info-fm btn-sm-fm" title="View Details">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                     @if (item.Status == "Scheduled" && (User.IsInRole("Admin") || User.IsInRole("FieldSupervisor")))
                                     {
                                         <a asp-action="Edit" asp-route-id="@item.ScheduleId"
-                                           class="btn-fm btn-warn-fm btn-sm-fm">
+                                           class="btn-fm btn-warn-fm btn-sm-fm" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                     }
                                     @if (item.Status == "Scheduled")
                                     {
                                         <a asp-action="RecordHarvest" asp-route-id="@item.ScheduleId"
-                                           class="btn-fm btn-primary-fm btn-sm-fm">
-                                            <i class="bi bi-basket"></i> Harvest
+                                           class="btn-fm btn-primary-fm btn-sm-fm" title="Record Harvest">
+                                            <i class="bi bi-basket"></i>
                                         </a>
                                     }
                                     @if (User.IsInRole("Admin") || User.IsInRole("FieldSupervisor"))
@@ -125,7 +125,7 @@
                                               method="post" class="d-inline delete-form">
                                             @Html.AntiForgeryToken()
                                             <button type="button" class="btn-fm btn-danger-fm btn-sm-fm btn-delete-schedule"
-                                                    data-name="@(item.Crop?.CropName ?? "this schedule")">
+                                                    data-name="@(item.Crop?.CropName ?? "this schedule")" title="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>

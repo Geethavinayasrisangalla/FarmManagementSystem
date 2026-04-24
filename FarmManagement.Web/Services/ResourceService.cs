@@ -28,6 +28,7 @@ public class ResourceService : IResourceService
         await _db.Resources
                  .Include(r => r.ResourceUsages)
                      .ThenInclude(ru => ru.PlantingSchedule)
+                         .ThenInclude(ps => ps.Crop)
                  .FirstOrDefaultAsync(r => r.ResourceId == id);
 
     public async Task CreateAsync(InventoryViewModel vm)

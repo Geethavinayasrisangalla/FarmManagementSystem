@@ -35,4 +35,13 @@ public class ScheduleViewModel
 
     public IEnumerable<SelectListItem> Crops { get; set; } = new List<SelectListItem>();
     public IEnumerable<SelectListItem> Fields { get; set; } = new List<SelectListItem>();
+
+    public List<ResourceUsageItem> ResourceUsages { get; set; } = new();
+}
+
+public class ResourceUsageItem
+{
+    public int ResourceId { get; set; }
+    public decimal QuantityUsed { get; set; }
+    public string? Notes { get; set; }
 }

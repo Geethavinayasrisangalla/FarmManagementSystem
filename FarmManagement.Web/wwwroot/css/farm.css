@@ -360,7 +360,7 @@ body {
     border: 1px solid var(--fm-border);
     border-radius: var(--fm-radius);
     box-shadow: var(--fm-shadow);
-    overflow: hidden;
+    overflow: visible;
 }
 
 .fm-card-header {
