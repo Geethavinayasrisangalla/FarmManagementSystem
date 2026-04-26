@@ -85,24 +85,10 @@
 
             @if (canViewSchedules)
             {
-                <div class="fm-dropdown @(ctrl=="Schedule" ? "fm-dd-active" : "")">
-                    <button class="fm-nav-link fm-dd-toggle">
-                        <i class="bi bi-calendar3"></i><span>Planning</span><i class="bi bi-chevron-down fm-caret"></i>
-                    </button>
-                    <div class="fm-dd-menu">
-                        <div class="fm-dd-label">Planning &amp; Scheduling</div>
-                        <a class="fm-dd-item @(ctrl=="Schedule"&&action!="HarvestList"?"fm-dd-item-active":"")"
-                           asp-controller="Schedule" asp-action="Index">
-                            <span class="fm-dd-icon" style="background:#fef9c3;color:#ca8a04;"><i class="bi bi-calendar3"></i></span>
-                            <div><div class="fm-dd-title">Schedules</div><div class="fm-dd-sub">Planting &amp; harvest schedules</div></div>
-                        </a>
-                        <a class="fm-dd-item @(ctrl=="Schedule"&&action=="HarvestList"?"fm-dd-item-active":"")"
-                           asp-controller="Schedule" asp-action="HarvestList">
-                            <span class="fm-dd-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-basket"></i></span>
-                            <div><div class="fm-dd-title">Harvests</div><div class="fm-dd-sub">Upcoming &amp; recorded harvests</div></div>
-                        </a>
-                    </div>
-                </div>
+                <a class="fm-nav-link @(ctrl=="Schedule" ? "fm-nav-active" : "")"
+                   asp-controller="Schedule" asp-action="Index">
+                    <i class="bi bi-calendar3"></i><span>Planting Schedule</span>
+                </a>
             }
 
             @if (canViewPest || canViewResources)

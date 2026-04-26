@@ -88,6 +88,8 @@
     </div>
 
     <div class="col-md-7">
+        @if (Model.Status != "Scheduled")
+        {
         <div class="fm-card mb-4">
             <div class="fm-card-header">
                 <span class="ch-title">
@@ -100,13 +102,6 @@
                 <div class="empty-state" style="padding:2rem;">
                     <i class="bi bi-basket" style="font-size:2rem;opacity:.3;display:block;margin-bottom:.5rem;"></i>
                     <p>No harvest recorded yet.</p>
-                    @if (Model.Status == "Scheduled")
-                    {
-                        <a asp-action="RecordHarvest" asp-route-id="@Model.ScheduleId"
-                           class="btn-fm btn-primary-fm btn-sm-fm mt-2">
-                            <i class="bi bi-plus-circle"></i> Record Harvest
-                        </a>
-                    }
                 </div>
             }
             else
@@ -132,6 +127,7 @@
                 </table>
             }
         </div>
+        }
 
         <div class="fm-card">
             <div class="fm-card-header">

@@ -11,19 +11,22 @@ namespace FarmManagement.Web.Controllers;
 // Patterns used:
 //   Factory  — ICropFactory maps entity ↔ ViewModel (no manual mapping in controller)
 //   Observer — IEventDispatcher replaces direct IActivityService calls
+//   Facade   — IFarmFacade handles Delete (service + event in one call)
 [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper,Agronomist")]
 public class CropController : Controller
 {
     private readonly ICropService     _cropService;
     private readonly ICropFactory     _cropFactory;
     private readonly IEventDispatcher _dispatcher;
+    private readonly IFarmFacade      _facade;
 
     public CropController(ICropService cropService, ICropFactory cropFactory,
-                          IEventDispatcher dispatcher)
+                          IEventDispatcher dispatcher, IFarmFacade facade)
     {
         _cropService = cropService;
         _cropFactory = cropFactory;
         _dispatcher  = dispatcher;
+        _facade      = facade;
     }
 
     private int    CurrentUserId   => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
@@ -124,11 +127,10 @@ public class CropController : Controller
         var crop = await _cropService.GetByIdAsync(id);
         if (crop == null) return NotFound();
 
-        await _cropService.DeleteAsync(id);
-
-        // Observer Pattern
-        await _dispatcher.DispatchAsync(new CropDeletedEvent(
-            CurrentUserId, CurrentUserName, CurrentUserRole, crop.CropName));
+        // Facade Pattern — single call coordinates CropService + event dispatch
+        await _facade.DeleteCropAsync(
+            id, crop.CropName,
+            CurrentUserId, CurrentUserName, CurrentUserRole);
 
         TempData["Success"] = $"Crop '{crop.CropName}' deleted.";
         return RedirectToAction(nameof(Index));

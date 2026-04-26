@@ -11,19 +11,22 @@ namespace FarmManagement.Web.Controllers;
 // Patterns used:
 //   Factory  — IFieldFactory maps entity ↔ ViewModel (no manual mapping in controller)
 //   Observer — IEventDispatcher replaces direct IActivityService calls
+//   Facade   — IFarmFacade handles Delete (service + event in one call)
 [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper,Agronomist")]
 public class FieldController : Controller
 {
     private readonly IFieldService     _fieldService;
     private readonly IFieldFactory     _fieldFactory;
     private readonly IEventDispatcher  _dispatcher;
+    private readonly IFarmFacade       _facade;
 
     public FieldController(IFieldService fieldService, IFieldFactory fieldFactory,
-                           IEventDispatcher dispatcher)
+                           IEventDispatcher dispatcher, IFarmFacade facade)
     {
         _fieldService = fieldService;
         _fieldFactory = fieldFactory;
         _dispatcher   = dispatcher;
+        _facade       = facade;
     }
 
     private int    CurrentUserId   => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
@@ -104,11 +107,10 @@ public class FieldController : Controller
 
         try
         {
-            await _fieldService.DeleteAsync(id);
-
-            // Observer Pattern
-            await _dispatcher.DispatchAsync(new FieldDeletedEvent(
-                CurrentUserId, CurrentUserName, CurrentUserRole, field.FieldName));
+            // Facade Pattern — single call coordinates FieldService + event dispatch
+            await _facade.DeleteFieldAsync(
+                id, field.FieldName,
+                CurrentUserId, CurrentUserName, CurrentUserRole);
 
             TempData["Success"] = $"Field '{field.FieldName}' deleted.";
         }

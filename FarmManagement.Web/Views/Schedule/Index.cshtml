@@ -112,7 +112,7 @@
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                     }
-                                    @if (item.Status == "Scheduled")
+                                    @if (item.Status == "Scheduled" && (User.IsInRole("Admin") || User.IsInRole("Farmer") || User.IsInRole("FieldSupervisor") || User.IsInRole("Storekeeper")))
                                     {
                                         <a asp-action="RecordHarvest" asp-route-id="@item.ScheduleId"
                                            class="btn-fm btn-primary-fm btn-sm-fm" title="Record Harvest">

@@ -14,6 +14,12 @@
         </h1>
         <p>Track and manage pest and disease incidents across crops.</p>
     </div>
+    @if (User.IsInRole("Admin") || User.IsInRole("Farmer") || User.IsInRole("FieldSupervisor"))
+    {
+        <a asp-action="Create" class="btn-fm btn-danger-fm">
+            <i class="bi bi-plus-circle"></i> Report Incident
+        </a>
+    }
 </div>
 
 @if (TempData["Success"] != null)
@@ -90,23 +96,30 @@
                             </td>
                             <td>@item.ReportedDate.ToString("dd MMM yyyy")</td>
                             <td>
-                                <form asp-action="UpdateStatus" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@item.PestIncidentId" />
-                                    <select name="status" class="form-select form-select-sm"
-                                            style="width:auto;display:inline-block;min-width:130px;font-size:.8rem;"
-                                            onchange="this.form.submit()">
-                                        <option value="Active" selected="@(item.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Active ? "selected" : null)">
-                                            🔴 Active
-                                        </option>
-                                        <option value="Monitoring" selected="@(item.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring ? "selected" : null)">
-                                            🟡 Monitoring
-                                        </option>
-                                        <option value="Resolved" selected="@(item.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Resolved ? "selected" : null)">
-                                            🟢 Resolved
-                                        </option>
-                                    </select>
-                                </form>
+                                @if (User.IsInRole("Admin") || User.IsInRole("Farmer") || User.IsInRole("FieldSupervisor") || User.IsInRole("Agronomist"))
+                                {
+                                    <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.PestIncidentId" />
+                                        <select name="status" class="form-select form-select-sm"
+                                                style="width:auto;display:inline-block;min-width:130px;font-size:.8rem;"
+                                                onchange="this.form.submit()">
+                                            <option value="Active" selected="@(item.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Active ? "selected" : null)">
+                                                🔴 Active
+                                            </option>
+                                            <option value="Monitoring" selected="@(item.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Monitoring ? "selected" : null)">
+                                                🟡 Monitoring
+                                            </option>
+                                            <option value="Resolved" selected="@(item.Status == FarmManagement.Web.Models.Enums.IncidentStatus.Resolved ? "selected" : null)">
+                                                🟢 Resolved
+                                            </option>
+                                        </select>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="badge-pill @pestBadge">@item.Status</span>
+                                }
                             </td>
                             <td>
                                 <div style="display:flex;gap:.3rem;flex-wrap:wrap;">
@@ -114,7 +127,7 @@
                                        class="btn-fm btn-info-fm btn-sm-fm">
                                         <i class="bi bi-eye"></i> View
                                     </a>
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Farmer") || User.IsInRole("FieldSupervisor") || User.IsInRole("Agronomist"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Farmer") || User.IsInRole("FieldSupervisor"))
                                     {
                                         <a asp-action="Edit" asp-route-id="@item.PestIncidentId"
                                            class="btn-fm btn-warn-fm btn-sm-fm">

@@ -57,6 +57,7 @@ public class PestController : Controller
         return View(incident);
     }
 
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> Create()
     {
         ViewBag.Crops = await _cropService.GetAllAsync();
@@ -65,6 +66,7 @@ public class PestController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> Create(PestIncident pest)
     {
         ModelState.Remove("Crop");
@@ -124,6 +126,7 @@ public class PestController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Agronomist")]
     public async Task<IActionResult> UpdateStatus(int id, string status)
     {
         var incident = await _pestService.GetByIdAsync(id);

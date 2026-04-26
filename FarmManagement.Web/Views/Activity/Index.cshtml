@@ -115,10 +115,10 @@
                     onfocus="this.style.borderColor='#16a34a'" onblur="this.style.borderColor='#d1d5db'">
                 <option value="">All Roles</option>
                 <option>Admin</option>
-                <option>Manager</option>
-                <option>Supervisor</option>
-                <option>Worker</option>
-                <option>Viewer</option>
+                <option>Farmer</option>
+                <option>FieldSupervisor</option>
+                <option>Storekeeper</option>
+                <option>Agronomist</option>
             </select>
 
             <span id="rowCount" style="font-size:.77rem;color:var(--fm-muted);margin-left:.2rem;"></span>
@@ -158,11 +158,11 @@
                             _                                 => "badge-gray"
                         };
                         var roleCss = log.UserRole.ToLower() switch {
-                            "admin"      => "role-admin",
-                            "manager"    => "role-manager",
-                            "supervisor" => "role-supervisor",
-                            "worker"     => "role-worker",
-                            _            => "role-viewer"
+                            "admin"           => "role-admin",
+                            "farmer"          => "role-manager",
+                            "fieldsupervisor" => "role-supervisor",
+                            "storekeeper"     => "role-worker",
+                            _                 => "role-viewer"
                         };
                         <tr data-entity="@log.EntityType"
                             data-role="@log.UserRole"

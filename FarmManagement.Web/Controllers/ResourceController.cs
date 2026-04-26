@@ -161,6 +161,7 @@ public class ResourceController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper")]
     public async Task<IActionResult> Allocate(int id)
     {
         var resource = await _resourceService.GetByIdAsync(id);
@@ -173,6 +174,7 @@ public class ResourceController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper")]
     public async Task<IActionResult> Allocate(int resourceId, int scheduleId,
                                                decimal qty, string? notes)
     {
