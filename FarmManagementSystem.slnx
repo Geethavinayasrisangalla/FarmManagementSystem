@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="FarmManagement.Core/FarmManagement.Core.csproj" />
   <Project Path="FarmManagement.Web/FarmManagement.Web.csproj" />
   <Project Path="FramManagementSystem NUNIT/FarmManagementSystem NUNIT.csproj" Id="71870d37-87dc-45e9-bc97-36bbe6314940" />
   <Project Path="FarmManagement.CropFieldService/FarmManagement.CropFieldService.csproj" />

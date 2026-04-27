@@ -25,4 +25,8 @@
     <Folder Include="wwwroot\Images\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FarmManagement.Core\FarmManagement.Core.csproj" />
+  </ItemGroup>
+
 </Project>

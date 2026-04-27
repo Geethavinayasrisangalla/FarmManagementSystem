@@ -3,7 +3,6 @@ using FarmManagement.Web.Models.Enums;
 
 namespace FarmManagement.Web.States;
 
-// State Pattern — Active state: can only move to Monitoring
 public class ActivePestState : IPestIncidentState
 {
     public string StatusName => "Active";
@@ -15,7 +14,6 @@ public class ActivePestState : IPestIncidentState
             incident.Status = IncidentStatus.Monitoring;
             return incident;
         }
-
         throw new InvalidOperationException(
             $"Cannot transition from Active to '{targetStatus}'. Only 'Monitoring' is allowed next.");
     }
