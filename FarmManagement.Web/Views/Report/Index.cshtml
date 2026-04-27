@@ -69,91 +69,189 @@
     </div>
 </div>
 
-<!-- ══════════════ ANALYTICS CHARTS ══════════════ -->
+<!-- ══════════════ ANALYTICS BREAKDOWNS ══════════════ -->
 <div class="row g-4 mb-4">
-    <!-- Pest Status Doughnut -->
+
+    <!-- Pest Status Breakdown -->
     <div class="col-lg-3 col-md-6">
         <div class="fm-card h-100">
             <div class="fm-card-header">
                 <span class="ch-title"><i class="bi bi-bug" style="color:#dc2626;"></i> Pest Status</span>
+                <span class="badge-pill badge-gray">@Model.TotalPestIncidents total</span>
             </div>
-            <div style="padding:1rem 1.25rem 1.25rem;display:flex;flex-direction:column;align-items:center;">
-                <canvas id="pestDonut" height="200"></canvas>
-                <div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-top:.9rem;">
-                    <span style="font-size:.72rem;display:flex;align-items:center;gap:.3rem;"><span style="width:10px;height:10px;border-radius:50%;background:#dc2626;display:inline-block;"></span>Active (@Model.ActivePests)</span>
-                    <span style="font-size:.72rem;display:flex;align-items:center;gap:.3rem;"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>Monitoring (@Model.MonitoringPests)</span>
-                    <span style="font-size:.72rem;display:flex;align-items:center;gap:.3rem;"><span style="width:10px;height:10px;border-radius:50%;background:#16a34a;display:inline-block;"></span>Resolved (@Model.ResolvedPests)</span>
+            <div style="padding:1rem 1.2rem 1.25rem;">
+                @{
+                    var pestTotal = Model.TotalPestIncidents > 0 ? Model.TotalPestIncidents : 1;
+                    var activePct    = (double)Model.ActivePests    / pestTotal * 100;
+                    var monitorPct   = (double)Model.MonitoringPests / pestTotal * 100;
+                    var resolvedPct  = (double)Model.ResolvedPests  / pestTotal * 100;
+                }
+                <div class="metric-row">
+                    <span class="metric-row-label"><span class="badge-pill badge-red">Active</span></span>
+                    <div class="metric-row-bar"><div class="fm-progress"><div class="fm-progress-bar fm-progress-bar-red" style="width:@activePct.ToString("F0")%"></div></div></div>
+                    <span class="metric-row-value" style="color:#dc2626;">@Model.ActivePests</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-row-label"><span class="badge-pill badge-yellow">Monitoring</span></span>
+                    <div class="metric-row-bar"><div class="fm-progress"><div class="fm-progress-bar fm-progress-bar-yellow" style="width:@monitorPct.ToString("F0")%"></div></div></div>
+                    <span class="metric-row-value" style="color:#d97706;">@Model.MonitoringPests</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-row-label"><span class="badge-pill badge-green">Resolved</span></span>
+                    <div class="metric-row-bar"><div class="fm-progress"><div class="fm-progress-bar" style="width:@resolvedPct.ToString("F0")%"></div></div></div>
+                    <span class="metric-row-value" style="color:#16a34a;">@Model.ResolvedPests</span>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Schedule Status Doughnut -->
+
+    <!-- Schedule Status Breakdown -->
     <div class="col-lg-3 col-md-6">
         <div class="fm-card h-100">
             <div class="fm-card-header">
-                <span class="ch-title"><i class="bi bi-calendar3" style="color:#2563eb;"></i> Schedule Status</span>
+                <span class="ch-title"><i class="bi bi-calendar3" style="color:#2563eb;"></i> Schedules</span>
+                <span class="badge-pill badge-gray">@Model.TotalSchedules total</span>
             </div>
-            <div style="padding:1rem 1.25rem 1.25rem;display:flex;flex-direction:column;align-items:center;">
-                <canvas id="schedDonut" height="200"></canvas>
-                <div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-top:.9rem;">
-                    <span style="font-size:.72rem;display:flex;align-items:center;gap:.3rem;"><span style="width:10px;height:10px;border-radius:50%;background:#2563eb;display:inline-block;"></span>Scheduled (@Model.ScheduledCount)</span>
-                    <span style="font-size:.72rem;display:flex;align-items:center;gap:.3rem;"><span style="width:10px;height:10px;border-radius:50%;background:#16a34a;display:inline-block;"></span>Completed (@Model.CompletedCount)</span>
-                    <span style="font-size:.72rem;display:flex;align-items:center;gap:.3rem;"><span style="width:10px;height:10px;border-radius:50%;background:#94a3b8;display:inline-block;"></span>Other (@(Model.TotalSchedules - Model.ScheduledCount - Model.CompletedCount))</span>
+            <div style="padding:1rem 1.2rem 1.25rem;">
+                @{
+                    var schedTotal   = Model.TotalSchedules > 0 ? Model.TotalSchedules : 1;
+                    var schedPct     = (double)Model.ScheduledCount / schedTotal * 100;
+                    var compPct      = (double)Model.CompletedCount / schedTotal * 100;
+                    var otherCount   = Model.TotalSchedules - Model.ScheduledCount - Model.CompletedCount;
+                    var otherPct     = (double)(otherCount < 0 ? 0 : otherCount) / schedTotal * 100;
+                }
+                <div class="metric-row">
+                    <span class="metric-row-label"><span class="badge-pill badge-blue">Scheduled</span></span>
+                    <div class="metric-row-bar"><div class="fm-progress"><div class="fm-progress-bar fm-progress-bar-blue" style="width:@schedPct.ToString("F0")%"></div></div></div>
+                    <span class="metric-row-value" style="color:#2563eb;">@Model.ScheduledCount</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-row-label"><span class="badge-pill badge-green">Completed</span></span>
+                    <div class="metric-row-bar"><div class="fm-progress"><div class="fm-progress-bar" style="width:@compPct.ToString("F0")%"></div></div></div>
+                    <span class="metric-row-value" style="color:#16a34a;">@Model.CompletedCount</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-row-label"><span class="badge-pill badge-gray">Other</span></span>
+                    <div class="metric-row-bar"><div class="fm-progress"><div class="fm-progress-bar" style="width:@otherPct.ToString("F0")%;background:#94a3b8;"></div></div></div>
+                    <span class="metric-row-value" style="color:#64748b;">@(otherCount < 0 ? 0 : otherCount)</span>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Crop Status Doughnut -->
+
+    <!-- Crop Status Breakdown -->
     <div class="col-lg-3 col-md-6">
         <div class="fm-card h-100">
             <div class="fm-card-header">
                 <span class="ch-title"><i class="bi bi-flower1" style="color:#16a34a;"></i> Crop Status</span>
+                <span class="badge-pill badge-gray">@Model.TotalCrops total</span>
             </div>
-            <div style="padding:1rem 1.25rem 1.25rem;display:flex;flex-direction:column;align-items:center;">
-                <canvas id="cropDonut" height="200"></canvas>
-                <div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-top:.9rem;" id="cropLegend"></div>
+            <div style="padding:1rem 1.2rem 1.25rem;">
+                @{
+                    var cropTotal = Model.TotalCrops > 0 ? Model.TotalCrops : 1;
+                    var cropBarColors = new[] { "", "fm-progress-bar-blue", "fm-progress-bar-yellow", "fm-progress-bar-purple", "fm-progress-bar-orange" };
+                    var cropBadges    = new[] { "badge-green", "badge-blue", "badge-yellow", "badge-purple", "badge-orange" };
+                }
+                @foreach (var (s, idx) in Model.CropsByStatus.Select((s,i)=>(s,i)))
+                {
+                    var pct = (double)s.Count / cropTotal * 100;
+                    <div class="metric-row">
+                        <span class="metric-row-label"><span class="badge-pill @cropBadges[idx % cropBadges.Length]">@s.Status</span></span>
+                        <div class="metric-row-bar"><div class="fm-progress"><div class="fm-progress-bar @cropBarColors[idx % cropBarColors.Length]" style="width:@pct.ToString("F0")%"></div></div></div>
+                        <span class="metric-row-value">@s.Count</span>
+                    </div>
+                }
             </div>
         </div>
     </div>
-    <!-- Resource Types Doughnut -->
+
+    <!-- Resource Types Breakdown -->
     <div class="col-lg-3 col-md-6">
         <div class="fm-card h-100">
             <div class="fm-card-header">
                 <span class="ch-title"><i class="bi bi-box-seam" style="color:#ea580c;"></i> Resource Types</span>
+                <span class="badge-pill badge-gray">@Model.TotalResources total</span>
             </div>
-            <div style="padding:1rem 1.25rem 1.25rem;display:flex;flex-direction:column;align-items:center;">
-                <canvas id="resDonut" height="200"></canvas>
-                <div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-top:.9rem;" id="resLegend"></div>
+            <div style="padding:1rem 1.2rem 1.25rem;">
+                @{
+                    var resTotal     = Model.ResourcesByType.Sum(r => r.Count);
+                    var resBarColors = new[] { "fm-progress-bar-orange", "fm-progress-bar-blue", "", "fm-progress-bar-yellow", "fm-progress-bar-purple" };
+                    var resBadges    = new[] { "badge-orange", "badge-blue", "badge-green", "badge-yellow", "badge-purple" };
+                }
+                @foreach (var (r, idx) in Model.ResourcesByType.Select((r,i)=>(r,i)))
+                {
+                    var pct = resTotal > 0 ? (double)r.Count / resTotal * 100 : 0;
+                    <div class="metric-row">
+                        <span class="metric-row-label"><span class="badge-pill @resBadges[idx % resBadges.Length]">@r.Type</span></span>
+                        <div class="metric-row-bar"><div class="fm-progress"><div class="fm-progress-bar @resBarColors[idx % resBarColors.Length]" style="width:@pct.ToString("F0")%"></div></div></div>
+                        <span class="metric-row-value">@r.Count</span>
+                    </div>
+                }
             </div>
         </div>
     </div>
+
 </div>
 
+<!-- Resource Stock & Pest-by-Crop tables -->
 <div class="row g-4 mb-4">
-    <!-- Resource Quantity by Type — Horizontal Bar -->
+
+    <!-- Resource Stock by Type -->
     <div class="col-lg-7">
         <div class="fm-card h-100">
             <div class="fm-card-header">
-                <span class="ch-title"><i class="bi bi-bar-chart-fill" style="color:#ea580c;"></i> Resource Quantity by Type</span>
-                <span style="font-size:.72rem;color:var(--fm-muted);">Total stock per category</span>
+                <span class="ch-title"><i class="bi bi-archive" style="color:#ea580c;"></i> Resource Stock by Type</span>
+                <span style="font-size:.72rem;color:var(--muted);">Total quantity in stock</span>
             </div>
-            <div style="padding:1rem 1.25rem 1.25rem;">
-                <canvas id="resBarChart" height="220"></canvas>
+            <div style="padding:1rem 1.2rem 1.25rem;">
+                @{
+                    var maxQty = Model.ResourcesByType.Any() ? Model.ResourcesByType.Max(r => r.TotalQty) : 1;
+                }
+                @foreach (var (r, idx) in Model.ResourcesByType.Select((r,i)=>(r,i)))
+                {
+                    var pct = maxQty > 0 ? (double)r.TotalQty / (double)maxQty * 100 : 0;
+                    <div class="metric-row">
+                        <span class="metric-row-label" style="min-width:120px;"><span class="badge-pill @resBadges[idx % resBadges.Length]">@r.Type</span></span>
+                        <div class="metric-row-bar"><div class="fm-progress"><div class="fm-progress-bar @resBarColors[idx % resBarColors.Length]" style="width:@pct.ToString("F0")%"></div></div></div>
+                        <span class="metric-row-value" style="min-width:100px;text-align:right;color:#ea580c;font-size:.85rem;">@r.TotalQty.ToString("N0") units</span>
+                    </div>
+                }
             </div>
         </div>
     </div>
-    <!-- Pests by Crop — Stacked Bar -->
+
+    <!-- Pest Incidents by Crop -->
     <div class="col-lg-5">
         <div class="fm-card h-100">
             <div class="fm-card-header">
-                <span class="ch-title"><i class="bi bi-bug" style="color:#dc2626;"></i> Pest Incidents by Crop</span>
-                <span style="font-size:.72rem;color:var(--fm-muted);">Active · Monitoring · Resolved</span>
+                <span class="ch-title"><i class="bi bi-bug" style="color:#dc2626;"></i> Pests by Crop</span>
+                <span style="font-size:.72rem;color:var(--muted);">Active · Monitoring · Resolved</span>
             </div>
-            <div style="padding:1rem 1.25rem 1.25rem;">
-                <canvas id="pestByCropChart" height="220"></canvas>
+            <div style="overflow-x:auto;">
+                <table class="fm-table">
+                    <thead>
+                        <tr><th>Crop</th><th style="color:#dc2626;">Active</th><th style="color:#d97706;">Monitor</th><th style="color:#16a34a;">Resolved</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.PestsByCrop)
+                        {
+                            <tr>
+                                <td style="font-weight:600;">@p.CropName</td>
+                                <td><span class="badge-pill badge-red">@p.Active</span></td>
+                                <td><span class="badge-pill badge-yellow">@p.Monitoring</span></td>
+                                <td><span class="badge-pill badge-green">@p.Resolved</span></td>
+                            </tr>
+                        }
+                        @if (!Model.PestsByCrop.Any())
+                        {
+                            <tr><td colspan="4" class="text-center" style="padding:1.5rem;color:var(--muted);">No incidents recorded.</td></tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+
 </div>
 
 <!-- ══════════════ 1. FIELD RECORDS ══════════════ -->
@@ -391,131 +489,3 @@
         </div>
     }
 </div>
-
-
-@section Scripts {
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script>
-(function () {
-    const tooltipDefaults = {
-        backgroundColor: '#1e293b', titleColor: '#94a3b8', bodyColor: '#e2e8f0',
-        borderColor: '#334155', borderWidth: 1, cornerRadius: 8, padding: 12
-    };
-
-    function doughnut(id, labels, data, colors) {
-        const ctx = document.getElementById(id);
-        if (!ctx) return;
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#fff', borderWidth: 3, hoverOffset: 10 }] },
-            options: {
-                responsive: true, cutout: '65%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { ...tooltipDefaults, callbacks: { label: c => '  ' + c.label + ': ' + c.parsed } }
-                },
-                animation: { animateRotate: true, duration: 900 }
-            }
-        });
-    }
-
-    // ── Pest Status ──
-    doughnut('pestDonut',
-        ['Active', 'Monitoring', 'Resolved'],
-        [@Model.ActivePests, @Model.MonitoringPests, @Model.ResolvedPests],
-        ['rgba(220,38,38,.8)', 'rgba(245,158,11,.8)', 'rgba(22,163,74,.8)']);
-
-    // ── Schedule Status ──
-    const otherSched = @Model.TotalSchedules - @Model.ScheduledCount - @Model.CompletedCount;
-    doughnut('schedDonut',
-        ['Scheduled', 'Completed', 'Other'],
-        [@Model.ScheduledCount, @Model.CompletedCount, otherSched < 0 ? 0 : otherSched],
-        ['rgba(37,99,235,.8)', 'rgba(22,163,74,.8)', 'rgba(148,163,184,.8)']);
-
-    // ── Crops by Status ──
-    const cropLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CropsByStatus.Select(s => s.Status).ToList()));
-    const cropCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CropsByStatus.Select(s => s.Count).ToList()));
-    const cropPalette = ['rgba(22,163,74,.8)', 'rgba(37,99,235,.8)', 'rgba(245,158,11,.8)', 'rgba(148,163,184,.8)', 'rgba(124,58,237,.8)'];
-    doughnut('cropDonut', cropLabels, cropCounts, cropPalette.slice(0, cropLabels.length));
-    const cropLeg = document.getElementById('cropLegend');
-    if (cropLeg) cropLabels.forEach((l, i) => {
-        cropLeg.innerHTML += `<span style="font-size:.72rem;display:flex;align-items:center;gap:.3rem;">
-            <span style="width:10px;height:10px;border-radius:50%;background:${cropPalette[i]};display:inline-block;"></span>${l} (${cropCounts[i]})</span>`;
-    });
-
-    // ── Resources by Type Doughnut ──
-    const resLabels  = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ResourcesByType.Select(r => r.Type).ToList()));
-    const resCounts  = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ResourcesByType.Select(r => r.Count).ToList()));
-    const resTotals  = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ResourcesByType.Select(r => r.TotalQty).ToList()));
-    const resPalette = ['rgba(234,88,12,.8)', 'rgba(37,99,235,.8)', 'rgba(22,163,74,.8)', 'rgba(245,158,11,.8)', 'rgba(124,58,237,.8)', 'rgba(148,163,184,.8)'];
-    doughnut('resDonut', resLabels, resCounts, resPalette.slice(0, resLabels.length));
-    const resLeg = document.getElementById('resLegend');
-    if (resLeg) resLabels.forEach((l, i) => {
-        resLeg.innerHTML += `<span style="font-size:.72rem;display:flex;align-items:center;gap:.3rem;">
-            <span style="width:10px;height:10px;border-radius:50%;background:${resPalette[i]};display:inline-block;"></span>${l} (${resCounts[i]})</span>`;
-    });
-
-    // ── Resource Quantity Horizontal Bar ──
-    const resBarCtx = document.getElementById('resBarChart');
-    if (resBarCtx && resLabels.length) {
-        new Chart(resBarCtx, {
-            type: 'bar',
-            data: {
-                labels: resLabels,
-                datasets: [{
-                    label: 'Total Quantity',
-                    data: resTotals,
-                    backgroundColor: resPalette.slice(0, resLabels.length),
-                    borderColor: resPalette.map(c => c.replace('.8)', '1)')),
-                    borderWidth: 2, borderRadius: 7, borderSkipped: false
-                }]
-            },
-            options: {
-                indexAxis: 'y', responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { ...tooltipDefaults, callbacks: { label: c => '  ' + c.parsed.x.toLocaleString() + ' units' } }
-                },
-                scales: {
-                    x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.06)' }, ticks: { color: '#64748b', font: { size: 11 } }, border: { display: false } },
-                    y: { grid: { display: false }, ticks: { color: '#374151', font: { size: 12, weight: '600' } }, border: { display: false } }
-                },
-                animation: { duration: 900, easing: 'easeOutQuart' }
-            }
-        });
-    }
-
-    // ── Pests by Crop Stacked Bar ──
-    const pestCropLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PestsByCrop.Select(p => p.CropName).ToList()));
-    const pestActive     = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PestsByCrop.Select(p => p.Active).ToList()));
-    const pestMonitor    = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PestsByCrop.Select(p => p.Monitoring).ToList()));
-    const pestResolved   = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PestsByCrop.Select(p => p.Resolved).ToList()));
-    const pestCropCtx = document.getElementById('pestByCropChart');
-    if (pestCropCtx && pestCropLabels.length) {
-        new Chart(pestCropCtx, {
-            type: 'bar',
-            data: {
-                labels: pestCropLabels,
-                datasets: [
-                    { label: 'Active',     data: pestActive,   backgroundColor: 'rgba(220,38,38,.75)',  borderRadius: 4 },
-                    { label: 'Monitoring', data: pestMonitor,  backgroundColor: 'rgba(245,158,11,.75)', borderRadius: 4 },
-                    { label: 'Resolved',   data: pestResolved, backgroundColor: 'rgba(22,163,74,.75)',  borderRadius: 4 }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#475569', font: { size: 11 }, usePointStyle: true, pointStyle: 'circle', padding: 12 } },
-                    tooltip: { ...tooltipDefaults, mode: 'index', intersect: false }
-                },
-                scales: {
-                    x: { stacked: true, grid: { display: false }, ticks: { color: '#374151', font: { size: 11, weight: '600' } }, border: { display: false } },
-                    y: { stacked: true, beginAtZero: true, grid: { color: 'rgba(0,0,0,.06)' }, ticks: { stepSize: 1, color: '#64748b', font: { size: 11 } }, border: { display: false } }
-                },
-                animation: { duration: 900, easing: 'easeOutQuart' }
-            }
-        });
-    }
-})();
-</script>
-}
