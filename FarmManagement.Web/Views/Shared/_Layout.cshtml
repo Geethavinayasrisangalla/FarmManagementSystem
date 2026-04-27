@@ -42,10 +42,12 @@
 
         <!-- Brand -->
         <a class="tn-brand" asp-controller="Home" asp-action="Index">
-            <div class="tn-brand-icon"><i class="bi bi-tree-fill"></i></div>
+            <div class="tn-brand-icon">
+                <i class="bi bi-tree-fill" style="position:relative;z-index:1;"></i>
+            </div>
             <div class="tn-brand-text">
                 <span class="tn-brand-name">AgroManage</span>
-                <span class="tn-brand-sub">Farm System</span>
+                <span class="tn-brand-sub">Farm Management</span>
             </div>
         </a>
 
@@ -60,17 +62,17 @@
             <!-- Farm dropdown -->
             <div class="tn-drop @(ctrl=="Crop"||ctrl=="Field" ? "tn-drop-active" : "")">
                 <button class="tn-link tn-drop-btn">
-                    <i class="bi bi-flower1"></i> Farm <i class="bi bi-chevron-down tn-caret"></i>
+                    <i class="bi bi-tree"></i> Farm <i class="bi bi-chevron-down tn-caret"></i>
                 </button>
                 <div class="tn-drop-menu">
                     <a class="tn-drop-item @(ctrl=="Crop"?"tn-drop-item-active":"")"
                        asp-controller="Crop" asp-action="Index">
-                        <i class="bi bi-flower1"></i>
+                        <i class="bi bi-flower1" style="color:#16a34a;"></i>
                         <div><div class="tn-drop-title">Crops</div><div class="tn-drop-sub">Manage crop records</div></div>
                     </a>
                     <a class="tn-drop-item @(ctrl=="Field"?"tn-drop-item-active":"")"
                        asp-controller="Field" asp-action="Index">
-                        <i class="bi bi-grid-3x3-gap"></i>
+                        <i class="bi bi-map" style="color:#0d9488;"></i>
                         <div><div class="tn-drop-title">Fields</div><div class="tn-drop-sub">Farm field management</div></div>
                     </a>
                 </div>
@@ -84,7 +86,7 @@
             <!-- Operations dropdown -->
             <div class="tn-drop @(ctrl=="Pest"||ctrl=="Resource" ? "tn-drop-active" : "")">
                 <button class="tn-link tn-drop-btn">
-                    <i class="bi bi-tools"></i> Operations <i class="bi bi-chevron-down tn-caret"></i>
+                    <i class="bi bi-gear"></i> Operations <i class="bi bi-chevron-down tn-caret"></i>
                 </button>
                 <div class="tn-drop-menu">
                     <a class="tn-drop-item @(ctrl=="Pest"?"tn-drop-item-active":"")"
@@ -94,7 +96,7 @@
                     </a>
                     <a class="tn-drop-item @(ctrl=="Resource"?"tn-drop-item-active":"")"
                        asp-controller="Resource" asp-action="Index">
-                        <i class="bi bi-box-seam" style="color:#ea580c;"></i>
+                        <i class="bi bi-boxes" style="color:#ea580c;"></i>
                         <div><div class="tn-drop-title">Resources</div><div class="tn-drop-sub">Inventory &amp; allocation</div></div>
                     </a>
                 </div>
@@ -108,7 +110,7 @@
                 <div class="tn-drop-menu">
                     <a class="tn-drop-item @(ctrl=="Report"&&action=="Index"?"tn-drop-item-active":"")"
                        asp-controller="Report" asp-action="Index">
-                        <i class="bi bi-bar-chart-line" style="color:#7c3aed;"></i>
+                        <i class="bi bi-clipboard-data" style="color:#7c3aed;"></i>
                         <div><div class="tn-drop-title">Reports</div><div class="tn-drop-sub">Farm-wide summary</div></div>
                     </a>
                     <a class="tn-drop-item @(ctrl=="Report"&&action=="YieldAnalytics"?"tn-drop-item-active":"")"
@@ -128,12 +130,12 @@
                     <div class="tn-drop-menu">
                         <a class="tn-drop-item @(ctrl=="UserManagement"?"tn-drop-item-active":"")"
                            asp-controller="UserManagement" asp-action="Index">
-                            <i class="bi bi-people" style="color:#dc2626;"></i>
+                            <i class="bi bi-people-fill" style="color:#dc2626;"></i>
                             <div><div class="tn-drop-title">User Management</div><div class="tn-drop-sub">Accounts &amp; roles</div></div>
                         </a>
                         <a class="tn-drop-item @(ctrl=="Activity"?"tn-drop-item-active":"")"
                            asp-controller="Activity" asp-action="Index">
-                            <i class="bi bi-journal-text" style="color:#16a34a;"></i>
+                            <i class="bi bi-activity" style="color:#16a34a;"></i>
                             <div><div class="tn-drop-title">Activity Log</div><div class="tn-drop-sub">System audit trail</div></div>
                         </a>
                     </div>
