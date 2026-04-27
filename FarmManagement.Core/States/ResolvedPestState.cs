@@ -2,7 +2,6 @@ using FarmManagement.Web.Models.Entities;
 
 namespace FarmManagement.Web.States;
 
-// State Pattern — Resolved state: terminal state, no further transitions allowed
 public class ResolvedPestState : IPestIncidentState
 {
     public string StatusName => "Resolved";

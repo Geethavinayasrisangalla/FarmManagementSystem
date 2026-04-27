@@ -3,7 +3,6 @@ using FarmManagement.Web.Models.Enums;
 
 namespace FarmManagement.Web.States;
 
-// State Pattern — Monitoring state: can move to Resolved or back to Active
 public class MonitoringPestState : IPestIncidentState
 {
     public string StatusName => "Monitoring";
@@ -15,11 +14,9 @@ public class MonitoringPestState : IPestIncidentState
             case "Resolved":
                 incident.Status = IncidentStatus.Resolved;
                 return incident;
-
             case "Active":
                 incident.Status = IncidentStatus.Active;
                 return incident;
-
             default:
                 throw new InvalidOperationException(
                     $"Cannot transition from Monitoring to '{targetStatus}'. Allowed: 'Active', 'Resolved'.");
