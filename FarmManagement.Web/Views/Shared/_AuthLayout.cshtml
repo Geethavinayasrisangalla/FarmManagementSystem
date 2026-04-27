@@ -10,124 +10,178 @@
 
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body {
-            height: 100%;
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            overflow-x: hidden;
-            background: #050e07;
+        html, body { height: 100%; font-family: 'Inter', 'Segoe UI', sans-serif; overflow: hidden; }
+
+        /* ════════════════════════════════════════
+           SPLIT LAYOUT
+        ════════════════════════════════════════ */
+        .auth-split {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
         }
 
-        /* ════════════════════════════════
-           CSS-ONLY PROFESSIONAL BACKGROUND
-        ════════════════════════════════ */
-
-        /* Base gradient */
-        .auth-bg {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            background:
-                radial-gradient(ellipse 80% 60% at 20%  10%, rgba(16,185,129,.13) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 80%  80%, rgba(5, 150,105,.11) 0%, transparent 55%),
-                radial-gradient(ellipse 50% 40% at 55%  40%, rgba(22,163, 74,.07) 0%, transparent 50%),
-                linear-gradient(160deg, #030c05 0%, #061408 35%, #071c0c 60%, #051008 100%);
-        }
-
-        /* Subtle dot-grid overlay */
-        .auth-bg::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(rgba(255,255,255,.055) 1px, transparent 1px);
-            background-size: 28px 28px;
-        }
-
-        /* Thin diagonal line texture */
-        .auth-bg::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: repeating-linear-gradient(
-                -45deg,
-                transparent,
-                transparent 38px,
-                rgba(255,255,255,.018) 38px,
-                rgba(255,255,255,.018) 39px
-            );
-        }
-
-        /* Aurora blobs — blurred color orbs */
-        .auth-blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(90px);
-            pointer-events: none;
-            z-index: 0;
-        }
-        .auth-blob-1 {
-            width: 560px; height: 560px;
-            top: -180px; left: -140px;
-            background: radial-gradient(circle, rgba(22,163,74,.22) 0%, transparent 65%);
-        }
-        .auth-blob-2 {
-            width: 480px; height: 480px;
-            bottom: -140px; right: -100px;
-            background: radial-gradient(circle, rgba(16,185,129,.18) 0%, transparent 65%);
-        }
-        .auth-blob-3 {
-            width: 340px; height: 340px;
-            top: 42%; left: 58%;
-            background: radial-gradient(circle, rgba(5,150,105,.12) 0%, transparent 65%);
-        }
-
-        /* ════════════════════════════════
-           PAGE LAYOUT
-        ════════════════════════════════ */
-        .auth-page {
+        /* ── LEFT: Photo panel ── */
+        .auth-photo {
+            flex: 0 0 52%;
             position: relative;
+            overflow: hidden;
+        }
+
+        /* The actual photo */
+        .auth-photo-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            filter: brightness(.92) saturate(1.08);
+            transition: transform 8s ease;
+        }
+        .auth-photo-img:hover { transform: scale(1.03); }
+
+        /* Gradient overlays for text legibility */
+        .auth-photo-grad-top {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 45%;
+            background: linear-gradient(to bottom, rgba(5,12,6,.72) 0%, transparent 100%);
             z-index: 1;
-            min-height: 100vh;
+        }
+        .auth-photo-grad-bot {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 55%;
+            background: linear-gradient(to top, rgba(5,15,7,.88) 0%, rgba(5,15,7,.55) 45%, transparent 100%);
+            z-index: 1;
+        }
+
+        /* Brand in top-left of photo */
+        .auth-photo-brand {
+            position: absolute;
+            top: 2rem; left: 2.2rem;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+        }
+        .auth-photo-logo {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, #15803d, #4ade80);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; color: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,.35);
+        }
+        .auth-photo-logo-name {
+            font-size: 1.05rem; font-weight: 900; color: #fff;
+            letter-spacing: -.02em;
+            text-shadow: 0 1px 8px rgba(0,0,0,.4);
+        }
+        .auth-photo-logo-sub {
+            font-size: .58rem; color: rgba(255,255,255,.55);
+            text-transform: uppercase; letter-spacing: .1em;
+            margin-top: 1px;
+        }
+
+        /* Caption at bottom of photo */
+        .auth-photo-caption {
+            position: absolute;
+            bottom: 2.5rem; left: 2.2rem; right: 2.2rem;
+            z-index: 2;
+        }
+        .auth-photo-tag {
+            display: inline-flex; align-items: center; gap: .35rem;
+            font-size: .65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .12em;
+            color: #4ade80;
+            margin-bottom: .6rem;
+        }
+        .auth-photo-tag::before {
+            content: '';
+            display: inline-block;
+            width: 22px; height: 2px;
+            background: #4ade80;
+            border-radius: 2px;
+        }
+        .auth-photo-title {
+            font-size: 1.95rem; font-weight: 900;
+            color: #fff; line-height: 1.18;
+            letter-spacing: -.035em;
+            margin-bottom: .9rem;
+            text-shadow: 0 2px 16px rgba(0,0,0,.4);
+        }
+        .auth-photo-title span {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Feature pills */
+        .auth-photo-pills {
+            display: flex; gap: .5rem; flex-wrap: wrap;
+        }
+        .auth-pill {
+            display: inline-flex; align-items: center; gap: .35rem;
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.2);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: .3rem .8rem;
+            font-size: .71rem; font-weight: 600;
+            color: rgba(255,255,255,.9);
+        }
+        .auth-pill i { font-size: .78rem; }
+
+        /* ── RIGHT: Form panel ── */
+        .auth-form-panel {
+            flex: 1;
+            background: #f8fafc;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 2rem;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        /* Subtle dot pattern on right panel */
+        .auth-form-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(#d0dae6 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: .5;
+            pointer-events: none;
+        }
+
+        .auth-form-inner {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Mobile brand (hidden on desktop) */
+        .auth-mobile-brand {
+            display: none;
             align-items: center;
             justify-content: center;
-            padding: 2.5rem 1rem;
+            gap: .65rem;
+            margin-bottom: 1.8rem;
+            text-align: center;
         }
 
-        /* Brand above card */
-        .auth-brand-top {
-            display: flex;
-            align-items: center;
-            gap: .8rem;
-            margin-bottom: 1.6rem;
-        }
-        .auth-brand-icon {
-            width: 46px; height: 46px;
-            background: linear-gradient(135deg, #15803d, #34d399);
-            border-radius: 13px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem; color: #fff;
-            box-shadow: 0 0 0 1px rgba(52,211,153,.25), 0 4px 22px rgba(52,211,153,.3);
-        }
-        .auth-brand-name {
-            font-size: 1.18rem; font-weight: 900; color: #f0fdf4; letter-spacing: -.025em;
-        }
-        .auth-brand-sub {
-            font-size: .6rem; color: rgba(255,255,255,.38);
-            text-transform: uppercase; letter-spacing: .12em; margin-top: 1px;
-        }
-
-        /* Form wrapper */
-        .auth-form-wrap { width: 100%; max-width: 420px; }
-
-        /* ── Card ── */
+        /* ── Form card ── */
         .auth-card {
-            background: rgba(255,255,255,.97);
+            background: #fff;
             border-radius: 20px;
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,.08),
-                0 8px 32px rgba(0,0,0,.28),
-                0 32px 72px rgba(0,0,0,.22);
+            box-shadow: 0 4px 24px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.05);
+            border: 1px solid #e2e8f0;
             overflow: hidden;
         }
         .auth-card-body   { padding: 2rem 2rem 1.5rem; }
@@ -169,7 +223,7 @@
         }
         .form-control:focus, .form-select:focus {
             border-color: #16a34a;
-            box-shadow: 0 0 0 3px rgba(22,163,74,.13);
+            box-shadow: 0 0 0 3px rgba(22,163,74,.12);
             outline: none;
             background: #fff;
         }
@@ -183,13 +237,13 @@
             color: #fff; font-weight: 700; font-size: .9rem;
             padding: .72rem; width: 100%;
             transition: transform .14s, box-shadow .14s;
-            box-shadow: 0 4px 14px rgba(22,163,74,.38);
+            box-shadow: 0 4px 14px rgba(22,163,74,.35);
             display: flex; align-items: center; justify-content: center; gap: .45rem;
             letter-spacing: .01em; cursor: pointer;
         }
         .btn-auth:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(22,163,74,.48);
+            box-shadow: 0 8px 22px rgba(22,163,74,.45);
             color: #fff;
         }
 
@@ -213,13 +267,21 @@
         }
         .pw-toggle:hover { color: #64748b; }
 
-        /* ── Page footer ── */
-        .auth-page-footer {
-            margin-top: 1.5rem;
-            font-size: .72rem;
-            color: rgba(255,255,255,.22);
-            text-align: center;
-            letter-spacing: .03em;
+        /* ════════════════════════════════════════
+           RESPONSIVE
+        ════════════════════════════════════════ */
+        @@media (max-width: 900px) {
+            body { overflow: auto; }
+            .auth-split { flex-direction: column; height: auto; min-height: 100vh; }
+            .auth-photo  { display: none; }
+            .auth-form-panel {
+                flex: 1;
+                background: linear-gradient(160deg, #041008 0%, #071c0b 30%, #0a2810 100%);
+                padding: 2.5rem 1.5rem;
+            }
+            .auth-form-panel::before { display: none; }
+            .auth-mobile-brand { display: flex; }
+            .auth-card { box-shadow: 0 8px 32px rgba(0,0,0,.35); }
         }
 
         @@media (max-width: 480px) {
@@ -229,31 +291,62 @@
     </style>
 </head>
 <body>
+<div class="auth-split">
 
-<!-- CSS-ONLY BACKGROUND -->
-<div class="auth-bg"></div>
-<div class="auth-blob auth-blob-1"></div>
-<div class="auth-blob auth-blob-2"></div>
-<div class="auth-blob auth-blob-3"></div>
+    <!-- ══════════════════════════════════════
+         LEFT — Photo Panel
+    ══════════════════════════════════════ -->
+    <div class="auth-photo">
+        <img class="auth-photo-img"
+             src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1080&q=80"
+             alt="Farm fields at sunset" />
+        <div class="auth-photo-grad-top"></div>
+        <div class="auth-photo-grad-bot"></div>
 
-<!-- CENTERED CONTENT -->
-<div class="auth-page">
+        <!-- Brand -->
+        <div class="auth-photo-brand">
+            <div class="auth-photo-logo"><i class="bi bi-tree-fill"></i></div>
+            <div>
+                <div class="auth-photo-logo-name">AgroManage</div>
+                <div class="auth-photo-logo-sub">Farm Management System</div>
+            </div>
+        </div>
 
-    <!-- Brand -->
-    <div class="auth-brand-top">
-        <div class="auth-brand-icon"><i class="bi bi-tree-fill"></i></div>
-        <div>
-            <div class="auth-brand-name">AgroManage</div>
-            <div class="auth-brand-sub">Farm Management System</div>
+        <!-- Bottom caption -->
+        <div class="auth-photo-caption">
+            <div class="auth-photo-tag">Smart Farming Platform</div>
+            <div class="auth-photo-title">
+                Grow smarter,<br>harvest <span>better</span>
+            </div>
+            <div class="auth-photo-pills">
+                <span class="auth-pill"><i class="bi bi-graph-up-arrow"></i> Yield Analytics</span>
+                <span class="auth-pill"><i class="bi bi-shield-check"></i> Pest Monitoring</span>
+                <span class="auth-pill"><i class="bi bi-boxes"></i> Inventory</span>
+            </div>
         </div>
     </div>
 
-    <!-- Form card -->
-    <div class="auth-form-wrap">
-        @RenderBody()
-    </div>
+    <!-- ══════════════════════════════════════
+         RIGHT — Form Panel
+    ══════════════════════════════════════ -->
+    <div class="auth-form-panel">
 
-    <div class="auth-page-footer">&copy; @DateTime.Now.Year AgroManage</div>
+        <!-- Mobile brand (shown when photo panel is hidden) -->
+        <div class="auth-mobile-brand">
+            <div style="width:40px;height:40px;background:linear-gradient(135deg,#15803d,#4ade80);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;">
+                <i class="bi bi-tree-fill"></i>
+            </div>
+            <div style="line-height:1.25;text-align:left;">
+                <div style="font-size:.95rem;font-weight:900;color:#fff;">AgroManage</div>
+                <div style="font-size:.58rem;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.1em;">Farm System</div>
+            </div>
+        </div>
+
+        <div class="auth-form-inner">
+            @RenderBody()
+        </div>
+
+    </div>
 
 </div>
 
