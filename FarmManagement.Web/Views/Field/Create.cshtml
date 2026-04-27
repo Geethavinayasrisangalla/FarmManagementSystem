@@ -31,7 +31,10 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label asp-for="FieldName" class="form-label"></label>
-                    <input asp-for="FieldName" class="form-control" placeholder="e.g. North Field" />
+                    <div class="fm-field">
+                        <i class="bi bi-map-fill fm-fi" style="color:#16a34a;"></i>
+                        <input asp-for="FieldName" class="form-control" placeholder="e.g. North Field" />
+                    </div>
                     <span asp-validation-for="FieldName" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
@@ -44,26 +47,32 @@
                 </div>
                 <div class="col-md-6">
                     <label asp-for="SoilType" class="form-label"></label>
-                    <select asp-for="SoilType" class="form-select">
-                        <option value="">-- Select Soil Type --</option>
-                        <option value="Loamy">Loamy</option>
-                        <option value="Clay">Clay</option>
-                        <option value="Sandy">Sandy</option>
-                        <option value="Sandy Loam">Sandy Loam</option>
-                        <option value="Silt">Silt</option>
-                        <option value="Peaty">Peaty</option>
-                        <option value="Chalky">Chalky</option>
-                    </select>
+                    <div class="fm-field">
+                        <i class="bi bi-layers fm-fi" style="color:#78350f;"></i>
+                        <select asp-for="SoilType" class="form-select">
+                            <option value="">-- Select Soil Type --</option>
+                            <option value="Loamy">Loamy</option>
+                            <option value="Clay">Clay</option>
+                            <option value="Sandy">Sandy</option>
+                            <option value="Sandy Loam">Sandy Loam</option>
+                            <option value="Silt">Silt</option>
+                            <option value="Peaty">Peaty</option>
+                            <option value="Chalky">Chalky</option>
+                        </select>
+                    </div>
                     <span asp-validation-for="SoilType" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="Location" class="form-label"></label>
-                    <input asp-for="Location" class="form-control" placeholder="e.g. North Block A" />
+                    <div class="fm-field">
+                        <i class="bi bi-geo-alt fm-fi" style="color:#dc2626;"></i>
+                        <input asp-for="Location" class="form-control" placeholder="e.g. North Block A" />
+                    </div>
                     <span asp-validation-for="Location" class="text-danger small"></span>
                 </div>
             </div>
 
-            <div class="mt-4 d-flex gap-2">
+            <div class="fm-actions">
                 <button type="submit" class="btn-fm btn-primary-fm">
                     <i class="bi bi-check-circle"></i> Save Field
                 </button>
