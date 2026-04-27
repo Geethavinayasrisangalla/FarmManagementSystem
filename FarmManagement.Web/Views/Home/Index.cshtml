@@ -4,25 +4,6 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<!-- ══ QUICK ACTION BUTTONS ══ -->
-<div style="display:flex;gap:.65rem;flex-wrap:wrap;margin-bottom:1.5rem;">
-    <a asp-controller="Crop" asp-action="Create" class="btn-fm btn-primary-fm btn-sm-fm">
-        <i class="bi bi-plus-circle"></i> Add Crop
-    </a>
-    <a asp-controller="Field" asp-action="Create" class="btn-fm btn-outline-fm btn-sm-fm">
-        <i class="bi bi-map"></i> Add Field
-    </a>
-    <a asp-controller="Schedule" asp-action="Create" class="btn-fm btn-outline-fm btn-sm-fm">
-        <i class="bi bi-calendar-plus"></i> Schedule
-    </a>
-    <a asp-controller="Pest" asp-action="Create" class="btn-fm btn-outline-fm btn-sm-fm">
-        <i class="bi bi-bug"></i> Report Pest
-    </a>
-    <a asp-controller="Report" asp-action="YieldAnalytics" class="btn-fm btn-outline-fm btn-sm-fm" style="margin-left:auto;">
-        <i class="bi bi-graph-up-arrow"></i> Analytics
-    </a>
-</div>
-
 <!-- ══ KPI STAT CARDS ══ -->
 <div class="row g-3 mb-4">
 

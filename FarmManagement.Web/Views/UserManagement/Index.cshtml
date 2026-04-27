@@ -69,7 +69,7 @@
 <div class="row g-4">
 
     <!-- ── Users Table ─────────────────────────────────────────── -->
-    <div class="col-xl-8">
+    <div class="col-xl-12">
         <div class="fm-card">
             <div class="fm-card-header">
                 <span class="ch-title">
@@ -136,7 +136,11 @@
                                     </td>
                                     <td>@user.CreatedAt.ToString("dd MMM yyyy")</td>
                                     <td>
-                                        @if (!isMe)
+                                        @if (user.Role == UserRole.Admin)
+                                        {
+                                            <span class="badge-pill badge-red" style="font-size:.75rem;"><i class="bi bi-shield-fill me-1"></i>Admin</span>
+                                        }
+                                        else if (!isMe)
                                         {
                                             <form asp-action="UpdateRole" method="post"
                                                   style="display:flex;gap:.4rem;align-items:center;">
@@ -161,7 +165,11 @@
                                         }
                                     </td>
                                     <td>
-                                        @if (!isMe)
+                                        @if (user.Role == UserRole.Admin)
+                                        {
+                                            <span class="badge-pill" style="font-size:.72rem;background:#f1f5f9;color:#64748b;">N/A</span>
+                                        }
+                                        else if (!isMe)
                                         {
                                             <div class="d-flex gap-1 flex-wrap">
                                                 <form asp-action="ToggleBlock" method="post" class="d-inline">
@@ -203,70 +211,7 @@
         </div>
     </div>
 
-    <!-- ── Activity Feed ───────────────────────────────────────── -->
-    <div class="col-xl-4">
-        <div class="fm-card" style="height:100%;">
-            <div class="fm-card-header">
-                <span class="ch-title">
-                    <i class="bi bi-activity" style="color:#16a34a;"></i>
-                    Recent Activity
-                </span>
-                <span style="font-size:.75rem;color:var(--fm-muted);">Last 60 actions</span>
-            </div>
-            @if (!activities.Any())
-            {
-                <div class="empty-state" style="padding:2.5rem 1rem;">
-                    <i class="bi bi-clock-history" style="font-size:2rem;opacity:.3;display:block;margin-bottom:.5rem;"></i>
-                    <p>No activity recorded yet.</p>
-                </div>
-            }
-            else
-            {
-                <div style="max-height:520px;overflow-y:auto;">
-                    @foreach (var log in activities)
-                    {
-                        var (icon, iconColor) = log.EntityType switch {
-                            "Crop"     => ("bi-flower1",       "#2563eb"),
-                            "Field"    => ("bi-grid-3x3-gap",  "#16a34a"),
-                            "Schedule" => ("bi-calendar3",     "#ca8a04"),
-                            "Harvest"  => ("bi-basket",        "#16a34a"),
-                            "Pest"     => ("bi-bug",           "#dc2626"),
-                            "Resource" => ("bi-box-seam",      "#ea580c"),
-                            "User"     => ("bi-person-fill",   "#dc2626"),
-                            _          => ("bi-circle-fill",   "#94a3b8")
-                        };
-                        var roleCss = log.UserRole.ToLower() switch {
-                            "admin"           => "role-admin",
-                            "farmer"          => "role-manager",
-                            "fieldsupervisor" => "role-supervisor",
-                            "storekeeper"     => "role-worker",
-                            _                 => "role-viewer"
-                        };
-                        <div style="display:flex;gap:.75rem;padding:.75rem 1.1rem;border-bottom:1px solid #f1f5f9;">
-                            <div style="width:32px;height:32px;border-radius:8px;background:#f8fafc;
-                                        display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">
-                                <i class="bi @icon" style="color:@iconColor;font-size:.95rem;"></i>
-                            </div>
-                            <div style="min-width:0;flex:1;">
-                                <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;">
-                                    <span style="font-weight:600;font-size:.82rem;color:var(--fm-text);">@log.UserName</span>
-                                    <span class="urole @roleCss" style="font-size:.6rem;padding:.07rem .38rem;">@(log.UserRole == "FieldSupervisor" ? "Field Supervisor" : log.UserRole)</span>
-                                </div>
-                                <div style="font-size:.8rem;color:var(--fm-muted);margin-top:.1rem;
-                                            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
-                                     title="@log.Description">
-                                    @log.Description
-                                </div>
-                                <div style="font-size:.7rem;color:#94a3b8;margin-top:.15rem;">
-                                    @log.Timestamp.ToString("dd MMM yyyy, hh:mm tt")
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-        </div>
-    </div>
+
 
 </div>
 

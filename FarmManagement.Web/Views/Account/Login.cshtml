@@ -21,12 +21,23 @@
         <form asp-action="Login" method="post">
             <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
 
-            @if (ViewData.ModelState.ErrorCount > 0)
+            @{
+                var modelErrors = ViewData.ModelState[string.Empty]?.Errors;
+            }
+            @if (modelErrors != null && modelErrors.Count > 0)
             {
-                <div class="alert alert-danger py-2 px-3 rounded-3 mb-3 d-flex align-items-center gap-2" style="font-size:.82rem;border:1px solid #fecaca;background:#fef2f2;color:#991b1b;">
-                    <i class="bi bi-exclamation-circle-fill"></i>
-                    <span asp-validation-summary="ModelOnly"></span>
-                </div>
+                foreach (var error in modelErrors)
+                {
+                    var isSuspended = error.ErrorMessage.Contains("suspended", StringComparison.OrdinalIgnoreCase);
+                    var bgColor = isSuspended ? "#fff7ed" : "#fef2f2";
+                    var borderColor = isSuspended ? "#fed7aa" : "#fecaca";
+                    var textColor = isSuspended ? "#9a3412" : "#991b1b";
+                    var icon = isSuspended ? "bi-person-lock" : "bi-exclamation-circle-fill";
+                    <div class="alert py-2 px-3 rounded-3 mb-3 d-flex align-items-center gap-2" style="font-size:.82rem;border:1px solid @borderColor;background:@bgColor;color:@textColor;">
+                        <i class="bi @icon"></i>
+                        <span>@error.ErrorMessage</span>
+                    </div>
+                }
             }
 
             <!-- Email -->

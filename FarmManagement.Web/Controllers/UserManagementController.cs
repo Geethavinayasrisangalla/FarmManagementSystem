@@ -78,6 +78,12 @@ public class UserManagementController : Controller
         var user = await _userService.GetByIdAsync(userId);
         if (user == null) return NotFound();
 
+        if (user.Role == UserRole.Admin)
+        {
+            TempData["Error"] = "Cannot change the role of an administrator.";
+            return RedirectToAction(nameof(Index));
+        }
+
         var oldRole = user.Role;
         await _userService.UpdateRoleAsync(userId, role);
 
@@ -102,6 +108,12 @@ public class UserManagementController : Controller
         var user = await _userService.GetByIdAsync(userId);
         if (user == null) return NotFound();
 
+        if (user.Role == UserRole.Admin)
+        {
+            TempData["Error"] = "Cannot remove an administrator account.";
+            return RedirectToAction(nameof(Index));
+        }
+
         await _userService.DeleteUserAsync(userId);
 
         await _activityService.LogAsync(CurrentUserId, CurrentUserName, CurrentUserRole,
@@ -124,6 +136,12 @@ public class UserManagementController : Controller
 
         var user = await _userService.GetByIdAsync(userId);
         if (user == null) return NotFound();
+
+        if (user.Role == UserRole.Admin)
+        {
+            TempData["Error"] = "Cannot suspend an administrator account.";
+            return RedirectToAction(nameof(Index));
+        }
 
         await _userService.ToggleBlockAsync(userId);
 
