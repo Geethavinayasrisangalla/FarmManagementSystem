@@ -2,107 +2,163 @@
 
 @{
     ViewData["Title"] = "Dashboard";
+    var hour = DateTime.Now.Hour;
+    var greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+    var greetIcon = hour < 12 ? "bi-sunrise" : hour < 17 ? "bi-sun" : "bi-moon-stars";
+    var userName = User.Identity?.Name ?? "Farmer";
 }
 
-<div class="page-header">
-    <div class="page-header-left">
-        <h1>
-            <span class="ph-icon" style="background:#dcfce7;color:#16a34a;">
-                <i class="bi bi-speedometer2"></i>
-            </span>
-            Farm Dashboard
-        </h1>
-        <p>Overview of your farm operations — @DateTime.Now.ToString("dddd, dd MMMM yyyy")</p>
+<!-- Welcome Banner -->
+<div class="welcome-banner mb-4">
+    <div class="welcome-banner-content">
+        <div class="welcome-greeting">
+            <i class="bi @greetIcon"></i> @greeting
+        </div>
+        <div class="welcome-name">@userName</div>
+        <div class="welcome-sub">
+            <i class="bi bi-calendar3 me-1"></i>
+            @DateTime.Now.ToString("dddd, dd MMMM yyyy") &nbsp;·&nbsp;
+            Farm Operations Overview
+        </div>
+        <div class="welcome-stats">
+            <div class="welcome-stat">
+                <div class="welcome-stat-val">@Model.TotalFields</div>
+                <div class="welcome-stat-lbl">Fields</div>
+            </div>
+            <div class="welcome-stat">
+                <div class="welcome-stat-val">@Model.TotalCrops</div>
+                <div class="welcome-stat-lbl">Crops</div>
+            </div>
+            <div class="welcome-stat">
+                <div class="welcome-stat-val">@Model.TotalYieldThisSeason.ToString("N0") kg</div>
+                <div class="welcome-stat-lbl">Yield This Year</div>
+            </div>
+        </div>
+    </div>
+    <div class="welcome-icon-wrap">
+        <i class="bi bi-tree-fill"></i>
     </div>
 </div>
 
+<!-- KPI Stat Cards -->
 <div class="row g-3 mb-4">
+
     <div class="col-sm-6 col-xl-4">
-        <a asp-controller="Field" asp-action="Index" class="stat-card">
-            <div class="stat-icon" style="background:#dcfce7;color:#16a34a;">
-                <i class="bi bi-grid-3x3-gap"></i>
+        <a asp-controller="Field" asp-action="Index" class="stat-card" style="--accent:var(--grad-green);">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0);">
+                <i class="bi bi-grid-3x3-gap" style="color:#15803d;"></i>
             </div>
-            <div>
-                <div class="stat-value" style="color:#16a34a;">@Model.TotalFields</div>
+            <div class="stat-body">
+                <div class="stat-value text-grad-green">@Model.TotalFields</div>
                 <div class="stat-label">Total Fields</div>
+                <div class="stat-trend up"><i class="bi bi-arrow-up-right"></i> Active</div>
             </div>
         </a>
     </div>
+
     <div class="col-sm-6 col-xl-4">
         <a asp-controller="Crop" asp-action="Index" class="stat-card">
-            <div class="stat-icon" style="background:#dbeafe;color:#2563eb;">
-                <i class="bi bi-flower1"></i>
+            <div class="stat-icon" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);">
+                <i class="bi bi-flower1" style="color:#1d4ed8;"></i>
             </div>
-            <div>
-                <div class="stat-value" style="color:#2563eb;">@Model.TotalCrops</div>
+            <div class="stat-body">
+                <div class="stat-value" style="color:var(--blue);">@Model.TotalCrops</div>
                 <div class="stat-label">Total Crops</div>
+                <div class="stat-trend up"><i class="bi bi-arrow-up-right"></i> Growing</div>
             </div>
         </a>
     </div>
+
     <div class="col-sm-6 col-xl-4">
         <a asp-controller="Pest" asp-action="Index" class="stat-card">
-            <div class="stat-icon" style="background:#fee2e2;color:#dc2626;">
-                <i class="bi bi-bug"></i>
+            <div class="stat-icon" style="background:linear-gradient(135deg,#fee2e2,#fecaca);">
+                <i class="bi bi-bug" style="color:#b91c1c;"></i>
             </div>
-            <div>
-                <div class="stat-value" style="color:#dc2626;">@Model.ActivePestIncidents</div>
+            <div class="stat-body">
+                <div class="stat-value" style="color:var(--red);">@Model.ActivePestIncidents</div>
                 <div class="stat-label">Active Pest Incidents</div>
+                @if (Model.ActivePestIncidents > 0)
+                {
+                    <div class="stat-trend down"><i class="bi bi-exclamation-circle"></i> Needs attention</div>
+                }
+                else
+                {
+                    <div class="stat-trend up"><i class="bi bi-check-circle"></i> All clear</div>
+                }
             </div>
         </a>
     </div>
+
     <div class="col-sm-6 col-xl-4">
         <a asp-controller="Resource" asp-action="Index" class="stat-card">
-            <div class="stat-icon" style="background:#fef9c3;color:#ca8a04;">
-                <i class="bi bi-exclamation-triangle"></i>
+            <div class="stat-icon" style="background:linear-gradient(135deg,#fef9c3,#fef08a);">
+                <i class="bi bi-exclamation-triangle" style="color:#a16207;"></i>
             </div>
-            <div>
-                <div class="stat-value" style="color:#ca8a04;">@Model.LowStockResources</div>
+            <div class="stat-body">
+                <div class="stat-value" style="color:var(--yellow);">@Model.LowStockResources</div>
                 <div class="stat-label">Low Stock Resources</div>
+                @if (Model.LowStockResources > 0)
+                {
+                    <div class="stat-trend down"><i class="bi bi-box-seam"></i> Restock needed</div>
+                }
+                else
+                {
+                    <div class="stat-trend up"><i class="bi bi-box-seam"></i> Stock OK</div>
+                }
             </div>
         </a>
     </div>
+
     <div class="col-sm-6 col-xl-4">
         <a asp-controller="Schedule" asp-action="HarvestList" class="stat-card">
-            <div class="stat-icon" style="background:#e0f2fe;color:#0284c7;">
-                <i class="bi bi-calendar-check"></i>
+            <div class="stat-icon" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd);">
+                <i class="bi bi-calendar-check" style="color:#0369a1;"></i>
             </div>
-            <div>
+            <div class="stat-body">
                 <div class="stat-value" style="color:#0284c7;">@Model.UpcomingHarvests</div>
-                <div class="stat-label">Upcoming Harvests (30 days)</div>
+                <div class="stat-label">Upcoming Harvests</div>
+                <div class="stat-trend up"><i class="bi bi-clock"></i> Next 30 days</div>
             </div>
         </a>
     </div>
+
     <div class="col-sm-6 col-xl-4">
         <a asp-controller="Report" asp-action="YieldAnalytics" class="stat-card">
-            <div class="stat-icon" style="background:#dcfce7;color:#16a34a;">
-                <i class="bi bi-graph-up-arrow"></i>
+            <div class="stat-icon" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0);">
+                <i class="bi bi-graph-up-arrow" style="color:#15803d;"></i>
             </div>
-            <div>
-                <div class="stat-value" style="color:#16a34a;font-size:1.25rem;">
+            <div class="stat-body">
+                <div class="stat-value text-grad-green" style="font-size:1.3rem;">
                     @Model.TotalYieldThisSeason.ToString("N0") kg
                 </div>
                 <div class="stat-label">Total Yield This Year</div>
+                <div class="stat-trend up"><i class="bi bi-bar-chart-line"></i> View analytics</div>
             </div>
         </a>
     </div>
+
 </div>
 
+<!-- Activity Section -->
 <div class="row g-4">
-    <div class="col-md-6">
+
+    <!-- Upcoming Schedules -->
+    <div class="col-lg-6">
         <div class="fm-card h-100">
             <div class="fm-card-header">
                 <span class="ch-title">
-                    <i class="bi bi-calendar3" style="color:#2563eb;"></i>
+                    <i class="bi bi-calendar3" style="color:var(--blue);"></i>
                     Upcoming Schedules
                 </span>
-                <a asp-controller="Schedule" asp-action="Index"
-                   class="btn-fm btn-outline-fm btn-sm-fm">View All</a>
+                <a asp-controller="Schedule" asp-action="Index" class="btn-fm btn-outline-fm btn-sm-fm">
+                    <i class="bi bi-arrow-right"></i> View All
+                </a>
             </div>
             @if (Model.RecentSchedules == null || !Model.RecentSchedules.Any())
             {
                 <div class="empty-state">
                     <i class="bi bi-calendar-x"></i>
-                    <p>No upcoming schedules.</p>
+                    <p>No upcoming schedules found.</p>
                 </div>
             }
             else
@@ -110,8 +166,8 @@
                 <table class="fm-table">
                     <thead>
                         <tr>
-                            <th>Crop</th>
-                            <th>Date</th>
+                            <th><i class="bi bi-flower1 me-1"></i>Crop</th>
+                            <th><i class="bi bi-calendar2 me-1"></i>Date</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -119,8 +175,13 @@
                         @foreach (var s in Model.RecentSchedules)
                         {
                             <tr>
-                                <td style="font-weight:600;">@(s.Crop?.CropName ?? "Unknown")</td>
-                                <td>@s.ScheduledDate.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    <span class="d-flex align-items-center gap-2">
+                                        <span class="status-dot status-dot-green"></span>
+                                        <span style="font-weight:700;">@(s.Crop?.CropName ?? "Unknown")</span>
+                                    </span>
+                                </td>
+                                <td style="color:var(--muted);">@s.ScheduledDate.ToString("dd MMM yyyy")</td>
                                 <td><span class="badge-pill badge-blue">Scheduled</span></td>
                             </tr>
                         }
@@ -130,21 +191,23 @@
         </div>
     </div>
 
-    <div class="col-md-6">
+    <!-- Active Pest Alerts -->
+    <div class="col-lg-6">
         <div class="fm-card h-100">
             <div class="fm-card-header">
                 <span class="ch-title">
-                    <i class="bi bi-bug" style="color:#dc2626;"></i>
+                    <i class="bi bi-shield-exclamation" style="color:var(--red);"></i>
                     Active Pest Alerts
                 </span>
-                <a asp-controller="Pest" asp-action="Index"
-                   class="btn-fm btn-outline-fm btn-sm-fm">View All</a>
+                <a asp-controller="Pest" asp-action="Index" class="btn-fm btn-outline-fm btn-sm-fm">
+                    <i class="bi bi-arrow-right"></i> View All
+                </a>
             </div>
             @if (Model.RecentPestAlerts == null || !Model.RecentPestAlerts.Any())
             {
                 <div class="empty-state">
-                    <i class="bi bi-check-circle"></i>
-                    <p>No active pest alerts.</p>
+                    <i class="bi bi-shield-check" style="color:var(--green);opacity:1;"></i>
+                    <p>No active pest alerts. Farm is healthy!</p>
                 </div>
             }
             else
@@ -152,20 +215,23 @@
                 <table class="fm-table">
                     <thead>
                         <tr>
-                            <th>Pest</th>
-                            <th>Crop</th>
-                            <th>Reported</th>
+                            <th><i class="bi bi-bug me-1"></i>Pest</th>
+                            <th><i class="bi bi-flower1 me-1"></i>Crop</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var p in Model.RecentPestAlerts)
                         {
                             <tr>
-                                <td style="font-weight:600;">@p.PestName</td>
-                                <td>@(p.Crop?.CropName ?? "Unknown")</td>
                                 <td>
-                                    <span class="badge-pill badge-red">Active</span>
+                                    <span class="d-flex align-items-center gap-2">
+                                        <span class="status-dot status-dot-red"></span>
+                                        <span style="font-weight:700;">@p.PestName</span>
+                                    </span>
                                 </td>
+                                <td style="color:var(--muted);">@(p.Crop?.CropName ?? "Unknown")</td>
+                                <td><span class="badge-pill badge-red">Active</span></td>
                             </tr>
                         }
                     </tbody>
@@ -173,4 +239,5 @@
             }
         </div>
     </div>
+
 </div>
