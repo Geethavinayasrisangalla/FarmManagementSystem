@@ -108,7 +108,7 @@
         .auth-float-stat:nth-child(2) { animation-delay: .8s; }
         .auth-float-stat:nth-child(3) { animation-delay: 1.6s; }
 
-        @keyframes floatUp {
+        @@keyframes floatUp {
             from { transform: translateY(0px); }
             to   { transform: translateY(-8px); }
         }
@@ -306,7 +306,7 @@
         .pw-toggle:hover { color: #64748b; }
 
         /* ── Responsive ── */
-        @media (max-width: 900px) {
+        @@media (max-width: 900px) {
             .auth-panel-left { display: none; }
             .auth-mobile-brand { display: block; }
             .auth-panel-right { background: linear-gradient(160deg, #041008 0%, #071c0b 30%, #0a2810 100%); }
@@ -314,7 +314,7 @@
             .auth-form-wrap { max-width: 440px; }
         }
 
-        @media (max-width: 480px) {
+        @@media (max-width: 480px) {
             .auth-panel-right { padding: 1.5rem 1rem; }
             .auth-card-body   { padding: 1.5rem 1.4rem 1.2rem; }
             .auth-card-footer { padding: .9rem 1.4rem; }
