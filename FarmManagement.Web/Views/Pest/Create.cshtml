@@ -31,36 +31,45 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label asp-for="PestName" class="form-label">Pest / Disease Name</label>
-                    <input asp-for="PestName" class="form-control" placeholder="e.g. Aphids, Blight" />
+                    <div class="fm-field">
+                        <i class="bi bi-bug fm-fi" style="color:#dc2626;"></i>
+                        <input asp-for="PestName" class="form-control" placeholder="e.g. Aphids, Blight" />
+                    </div>
                     <span asp-validation-for="PestName" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="CropId" class="form-label">Affected Crop</label>
-                    <select asp-for="CropId" class="form-select">
-                        <option value="">-- Select Crop --</option>
-                        @if (crops != null)
-                        {
-                            @foreach (var crop in crops)
+                    <div class="fm-field">
+                        <i class="bi bi-flower1 fm-fi" style="color:#16a34a;"></i>
+                        <select asp-for="CropId" class="form-select">
+                            <option value="">-- Select Crop --</option>
+                            @if (crops != null)
                             {
-                                <option value="@crop.CropId">@crop.CropName (@crop.CropType)</option>
+                                @foreach (var crop in crops)
+                                {
+                                    <option value="@crop.CropId">@crop.CropName (@crop.CropType)</option>
+                                }
                             }
-                        }
-                    </select>
+                        </select>
+                    </div>
                     <span asp-validation-for="CropId" class="text-danger small"></span>
                 </div>
                 <div class="col-12">
                     <label asp-for="Description" class="form-label">Description</label>
-                    <textarea asp-for="Description" class="form-control" rows="3"
-                              placeholder="Describe the symptoms, severity, and affected area..."></textarea>
+                    <div class="fm-field fm-field-ta">
+                        <i class="bi bi-chat-left-text fm-fi"></i>
+                        <textarea asp-for="Description" class="form-control" rows="3"
+                                  placeholder="Describe the symptoms, severity, and affected area..."></textarea>
+                    </div>
                     <span asp-validation-for="Description" class="text-danger small"></span>
                 </div>
             </div>
 
-            <div class="mt-4 d-flex gap-2">
+            <div class="fm-actions">
                 <button type="submit" class="btn-fm btn-danger-fm">
                     <i class="bi bi-exclamation-triangle"></i> Report Incident
                 </button>
-                <a asp-action="Index" class="btn-fm btn-outline-fm">Cancel</a>
+                <a asp-action="Index" class="btn-fm btn-ghost-fm">Cancel</a>
             </div>
         </form>
     </div>
