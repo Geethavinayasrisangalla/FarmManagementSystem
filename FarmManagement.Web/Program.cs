@@ -105,12 +105,12 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var db = scope.ServiceProvider.GetRequiredService<FarmDbContext>();
-        await DbInitializer.SeedAsync(db);
+        await db.Database.MigrateAsync();
     }
     catch (Exception ex)
     {
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+        logger.LogError(ex, "An error occurred while applying database migrations.");
     }
 }
 
