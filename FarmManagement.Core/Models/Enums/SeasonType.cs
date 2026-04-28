@@ -2,7 +2,9 @@ namespace FarmManagement.Web.Models.Enums;
 
 public enum SeasonType
 {
-    Kharif = 0,
-    Rabi = 1,
-    Zaid = 2
+    Summer  = 0,
+    Winter  = 1,
+    Monsoon = 2,
+    Spring  = 3,
+    Rainy   = 4
 }

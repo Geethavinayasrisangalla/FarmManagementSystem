@@ -34,7 +34,7 @@ public class CropFieldTests
             CropId = 1,
             CropName = "Rice",
             CropType = "Cereal",
-            Season = SeasonType.Kharif,
+            Season = SeasonType.Monsoon,
             PlantingDate = new DateTime(2025, 6, 1),
             ExpectedHarvestDate = new DateTime(2025, 10, 15),
             Status = "Growing",
@@ -89,8 +89,8 @@ public class CropFieldTests
     [Test]
     public void Crop_Season_ShouldBeValidEnum()
     {
-        // Assert — Season is Kharif (defined in SeasonType enum)
-        Assert.That(_crop.Season, Is.EqualTo(SeasonType.Kharif));
+        // Assert — Season is Monsoon (defined in SeasonType enum)
+        Assert.That(_crop.Season, Is.EqualTo(SeasonType.Monsoon));
         Assert.That(Enum.IsDefined(typeof(SeasonType), _crop.Season), Is.True);
     }
 }

@@ -69,7 +69,7 @@ public class YieldAnalyticsTests
             CropId = 1,
             TotalYieldKg = 1450m,
             AverageYieldPerAcre = 263.6m,
-            Season = SeasonType.Kharif,
+            Season = SeasonType.Monsoon,
             Year = 2025,
             Remarks = "Auto-generated from 3 harvest records"
         };

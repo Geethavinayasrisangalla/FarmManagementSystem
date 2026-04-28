@@ -46,9 +46,9 @@ public static class DbInitializer
             {
                 var crops = new List<Crop>
                 {
-                    new Crop { CropName = "Wheat",  CropType = "Grain",     Season = SeasonType.Rabi,   PlantingDate = new DateTime(2025, 11, 1), ExpectedHarvestDate = new DateTime(2026, 4, 15), FieldId = fields[0].FieldId, Status = "Growing" },
-                    new Crop { CropName = "Rice",   CropType = "Grain",     Season = SeasonType.Kharif, PlantingDate = new DateTime(2025, 6, 1),  ExpectedHarvestDate = new DateTime(2025, 10, 1), FieldId = fields[1].FieldId, Status = "Growing" },
-                    new Crop { CropName = "Tomato", CropType = "Vegetable", Season = SeasonType.Zaid,   PlantingDate = new DateTime(2026, 3, 1),  ExpectedHarvestDate = new DateTime(2026, 7, 1),  FieldId = fields[2].FieldId, Status = "Harvested" }
+                    new Crop { CropName = "Wheat",  CropType = "Grain",     Season = SeasonType.Winter,  PlantingDate = new DateTime(2025, 11, 1), ExpectedHarvestDate = new DateTime(2026, 4, 15), FieldId = fields[0].FieldId, Status = "Growing" },
+                    new Crop { CropName = "Rice",   CropType = "Grain",     Season = SeasonType.Monsoon, PlantingDate = new DateTime(2025, 6, 1),  ExpectedHarvestDate = new DateTime(2025, 10, 1), FieldId = fields[1].FieldId, Status = "Growing" },
+                    new Crop { CropName = "Tomato", CropType = "Vegetable", Season = SeasonType.Summer,  PlantingDate = new DateTime(2026, 3, 1),  ExpectedHarvestDate = new DateTime(2026, 7, 1),  FieldId = fields[2].FieldId, Status = "Harvested" }
                 };
 
                 await context.Crops.AddRangeAsync(crops);
@@ -65,9 +65,9 @@ public static class DbInitializer
             {
                 var schedules = new List<PlantingSchedule>
                 {
-                    new PlantingSchedule { CropId = crops[0].CropId, FieldId = fields[0].FieldId, ScheduledDate = new DateTime(2026, 4, 15), ExpectedYieldKg = 4500.00m, Status = "Scheduled",  Notes = "First wheat harvest of the Rabi season" },
-                    new PlantingSchedule { CropId = crops[1].CropId, FieldId = fields[1].FieldId, ScheduledDate = new DateTime(2025, 10, 1), ExpectedYieldKg = 3800.00m, Status = "Scheduled",  Notes = "Main Kharif rice harvest" },
-                    new PlantingSchedule { CropId = crops[2].CropId, FieldId = fields[2].FieldId, ScheduledDate = new DateTime(2026, 7, 1),  ExpectedYieldKg = 3000.00m, Status = "Completed", Notes = "Zaid tomato harvest completed" }
+                    new PlantingSchedule { CropId = crops[0].CropId, FieldId = fields[0].FieldId, ScheduledDate = new DateTime(2026, 4, 15), ExpectedYieldKg = 4500.00m, Status = "Scheduled",  Notes = "First wheat harvest of the Winter season" },
+                    new PlantingSchedule { CropId = crops[1].CropId, FieldId = fields[1].FieldId, ScheduledDate = new DateTime(2025, 10, 1), ExpectedYieldKg = 3800.00m, Status = "Scheduled",  Notes = "Main Monsoon rice harvest" },
+                    new PlantingSchedule { CropId = crops[2].CropId, FieldId = fields[2].FieldId, ScheduledDate = new DateTime(2026, 7, 1),  ExpectedYieldKg = 3000.00m, Status = "Completed", Notes = "Summer tomato harvest completed" }
                 };
 
                 await context.PlantingSchedules.AddRangeAsync(schedules);
@@ -150,9 +150,9 @@ public static class DbInitializer
             {
                 var yieldReports = new List<YieldReport>
                 {
-                    new YieldReport { CropId = crops[0].CropId, TotalYieldKg = 4500.00m, Season = SeasonType.Rabi,   Year = 2026, GeneratedAt = DateTime.Now },
-                    new YieldReport { CropId = crops[1].CropId, TotalYieldKg = 3800.00m, Season = SeasonType.Kharif, Year = 2025, GeneratedAt = DateTime.Now },
-                    new YieldReport { CropId = crops[2].CropId, TotalYieldKg = 3200.00m, Season = SeasonType.Zaid,   Year = 2026, GeneratedAt = DateTime.Now }
+                    new YieldReport { CropId = crops[0].CropId, TotalYieldKg = 4500.00m, Season = SeasonType.Winter,  Year = 2026, GeneratedAt = DateTime.Now },
+                    new YieldReport { CropId = crops[1].CropId, TotalYieldKg = 3800.00m, Season = SeasonType.Monsoon, Year = 2025, GeneratedAt = DateTime.Now },
+                    new YieldReport { CropId = crops[2].CropId, TotalYieldKg = 3200.00m, Season = SeasonType.Summer,  Year = 2026, GeneratedAt = DateTime.Now }
                 };
 
                 await context.YieldReports.AddRangeAsync(yieldReports);
