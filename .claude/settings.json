@@ -6,7 +6,10 @@
       "Bash(netstat -ano)",
       "Bash(findstr \":49291 \")",
       "Bash(findstr \":49293 \")",
-      "Bash(cmd /c \"taskkill /PID 23532 /F\")"
+      "Bash(cmd /c \"taskkill /PID 23532 /F\")",
+      "Bash(cmd /c \"del \\\\\"/c/Users/2483402/source/repos/FarmManagementSystem/FramManagementSystem NUNIT/FramManagementSystem NUNIT.csproj\\\\\"\")",
+      "Bash(powershell -Command \"Remove-Item 'C:\\\\Users\\\\2483402\\\\source\\\\repos\\\\FarmManagementSystem\\\\FramManagementSystem NUNIT\\\\obj' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item 'C:\\\\Users\\\\2483402\\\\source\\\\repos\\\\FarmManagementSystem\\\\FramManagementSystem NUNIT\\\\bin' -Recurse -Force -ErrorAction SilentlyContinue; Write-Host 'cleaned'\")",
+      "Bash(dotnet test:*)"
     ]
   }
 }

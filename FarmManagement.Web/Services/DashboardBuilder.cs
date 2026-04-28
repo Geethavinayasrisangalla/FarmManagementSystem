@@ -1,12 +1,12 @@
-using FarmManagement.Web.Data;
+﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Enums;
 using FarmManagement.Web.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace FarmManagement.Web.Services;
 
-// Builder Pattern — constructs a DashboardViewModel step by step.
-// Each With___() method populates one section; Build() returns the finished object.
+
+
 public class DashboardBuilder
 {
     private readonly FarmDbContext      _db;
@@ -79,6 +79,6 @@ public class DashboardBuilder
         return this;
     }
 
-    // Build — returns the fully assembled DashboardViewModel
+
     public DashboardViewModel Build() => _vm;
 }

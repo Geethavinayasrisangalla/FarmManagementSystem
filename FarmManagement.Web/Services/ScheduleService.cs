@@ -1,4 +1,4 @@
-using FarmManagement.Web.Data;
+﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
@@ -80,7 +80,7 @@ public class ScheduleService : IScheduleService
         ps.ExpectedYieldKg = vm.ExpectedYieldKg;
         ps.Notes = vm.Notes;
 
-        // Remove old resource usages and restore quantities
+
         var oldUsages = await _db.ResourceUsages
             .Where(ru => ru.ScheduleId == vm.ScheduleId)
             .ToListAsync();
@@ -96,7 +96,7 @@ public class ScheduleService : IScheduleService
         }
         _db.ResourceUsages.RemoveRange(oldUsages);
 
-        // Add new resource usages and deduct quantities
+
         if (vm.ResourceUsages != null && vm.ResourceUsages.Count > 0)
         {
             foreach (var ru in vm.ResourceUsages)

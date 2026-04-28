@@ -1,4 +1,4 @@
-using FarmManagement.Web.Events;
+﻿using FarmManagement.Web.Events;
 using FarmManagement.Web.Factories;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
@@ -8,10 +8,10 @@ using System.Security.Claims;
 
 namespace FarmManagement.Web.Controllers;
 
-// Patterns used:
-//   Factory  — IFieldFactory maps entity ↔ ViewModel (no manual mapping in controller)
-//   Observer — IEventDispatcher replaces direct IActivityService calls
-//   Facade   — IFarmFacade handles Delete (service + event in one call)
+
+
+
+
 [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper,Agronomist")]
 public class FieldController : Controller
 {
@@ -58,7 +58,7 @@ public class FieldController : Controller
 
         await _fieldService.CreateAsync(vm);
 
-        // Observer Pattern — dispatch event; ActivityLogHandler writes the log
+
         await _dispatcher.DispatchAsync(new FieldCreatedEvent(
             CurrentUserId, CurrentUserName, CurrentUserRole,
             vm.FieldName, vm.AreaHectares, vm.SoilType));
@@ -73,7 +73,7 @@ public class FieldController : Controller
         var field = await _fieldService.GetByIdAsync(id);
         if (field == null) return NotFound();
 
-        // Factory Pattern — one line instead of 5-line manual mapping
+
         var vm = _fieldFactory.ToViewModel(field);
         return View(vm);
     }
@@ -88,7 +88,7 @@ public class FieldController : Controller
 
         await _fieldService.UpdateAsync(vm);
 
-        // Observer Pattern
+
         await _dispatcher.DispatchAsync(new FieldUpdatedEvent(
             CurrentUserId, CurrentUserName, CurrentUserRole,
             vm.FieldName, vm.AreaHectares, vm.SoilType));
@@ -107,7 +107,7 @@ public class FieldController : Controller
 
         try
         {
-            // Facade Pattern — single call coordinates FieldService + event dispatch
+
             await _facade.DeleteFieldAsync(
                 id, field.FieldName,
                 CurrentUserId, CurrentUserName, CurrentUserRole);

@@ -1,4 +1,4 @@
-using FarmManagement.Web.Data;
+﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,7 @@ public class AuthController : ControllerBase
         _config = config;
     }
 
-    /// <summary>Obtain a JWT token. Use admin@farmmanagement.com / Admin@123</summary>
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest req)
     {

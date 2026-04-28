@@ -1,9 +1,9 @@
-using FarmManagement.Web.Models.Entities;
+﻿using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.ViewModels;
 
 namespace FarmManagement.Web.Factories;
 
-// Factory Pattern — centralises all Resource <-> ViewModel mapping in one place
+
 public class ResourceFactory : IResourceFactory
 {
     public InventoryViewModel ToViewModel(Resource resource) => new InventoryViewModel

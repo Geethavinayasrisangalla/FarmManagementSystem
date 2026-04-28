@@ -1,4 +1,4 @@
-using FarmManagement.Web.Models.Enums;
+﻿using FarmManagement.Web.Models.Enums;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -35,7 +35,7 @@ public class UserManagementController : Controller
         return View(users);
     }
 
-    // ── Register new user (Admin only) ──────────────────────────────
+
     public IActionResult RegisterUser() => View(new RegisterViewModel());
 
     [HttpPost]
@@ -64,7 +64,7 @@ public class UserManagementController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // ── Update role ─────────────────────────────────────────────────
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateRole(int userId, UserRole role)
@@ -94,7 +94,7 @@ public class UserManagementController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // ── Delete user ─────────────────────────────────────────────────
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int userId)
@@ -123,7 +123,7 @@ public class UserManagementController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // ── Suspend / Activate user ─────────────────────────────────────
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ToggleBlock(int userId)

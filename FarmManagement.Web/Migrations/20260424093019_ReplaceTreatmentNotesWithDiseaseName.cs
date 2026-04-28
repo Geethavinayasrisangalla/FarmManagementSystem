@@ -4,10 +4,10 @@
 
 namespace FarmManagement.Web.Migrations
 {
-    /// <inheritdoc />
+
     public partial class ReplaceTreatmentNotesWithDiseaseName : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -22,7 +22,7 @@ namespace FarmManagement.Web.Migrations
                 nullable: true);
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(

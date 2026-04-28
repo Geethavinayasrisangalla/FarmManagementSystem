@@ -11,7 +11,7 @@ public class PestIncidentDto
     public IncidentStatus Status { get; set; }
     public string? DiseaseName { get; set; }
 
-    // Related crop info (flattened — no navigation property)
+
     public int CropId { get; set; }
     public string? CropName { get; set; }
 }

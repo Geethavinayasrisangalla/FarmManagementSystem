@@ -25,7 +25,7 @@ public class InventoryViewModel
     [Display(Name = "Unit (kg / L / units)")]
     public string Unit { get; set; } = string.Empty;
 
-    // ── Pest Incident fields (used only when Type == Pesticide) ──
+
 
     [Display(Name = "Pest Name")]
     public string? PestName { get; set; }

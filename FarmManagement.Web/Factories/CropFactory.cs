@@ -1,9 +1,9 @@
-using FarmManagement.Web.Models.Entities;
+﻿using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.ViewModels;
 
 namespace FarmManagement.Web.Factories;
 
-// Factory Pattern — centralises all Crop <-> ViewModel mapping in one place
+
 public class CropFactory : ICropFactory
 {
     public CropViewModel ToViewModel(Crop crop) => new CropViewModel

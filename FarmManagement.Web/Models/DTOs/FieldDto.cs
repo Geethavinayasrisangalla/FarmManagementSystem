@@ -8,7 +8,7 @@ public class FieldDto
     public string? SoilType { get; set; }
     public string? Location { get; set; }
 
-    // Summary counts (useful for display)
+
     public int TotalCrops { get; set; }
     public int TotalSchedules { get; set; }
 }

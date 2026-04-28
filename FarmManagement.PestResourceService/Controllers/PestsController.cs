@@ -1,4 +1,4 @@
-using FarmManagement.Web.Data;
+﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Enums;
 using FarmManagement.Web.States;
@@ -16,7 +16,7 @@ public class PestsController : ControllerBase
     private readonly FarmDbContext _db;
     public PestsController(FarmDbContext db) => _db = db;
 
-    /// <summary>Get all pest incidents.</summary>
+
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] string? status)
     {
@@ -26,7 +26,7 @@ public class PestsController : ControllerBase
         return Ok(await query.OrderByDescending(p => p.ReportedDate).ToListAsync());
     }
 
-    /// <summary>Get a pest incident by ID.</summary>
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -35,7 +35,7 @@ public class PestsController : ControllerBase
         return pest is null ? NotFound(new { message = $"Incident {id} not found." }) : Ok(pest);
     }
 
-    /// <summary>Report a new pest incident.</summary>
+
     [HttpPost]
     [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Agronomist")]
     public async Task<IActionResult> Create([FromBody] PestRequest req)
@@ -54,7 +54,7 @@ public class PestsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = pest.PestIncidentId }, pest);
     }
 
-    /// <summary>Update a pest incident's status using the State Machine (Active → Monitoring → Resolved).</summary>
+
     [HttpPatch("{id:int}/status")]
     [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Agronomist")]
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] StatusRequest req)
@@ -74,7 +74,7 @@ public class PestsController : ControllerBase
         }
     }
 
-    /// <summary>Delete a pest incident.</summary>
+
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin,Farmer")]
     public async Task<IActionResult> Delete(int id)

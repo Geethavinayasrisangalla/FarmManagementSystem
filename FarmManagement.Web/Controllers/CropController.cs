@@ -1,4 +1,4 @@
-using FarmManagement.Web.Events;
+﻿using FarmManagement.Web.Events;
 using FarmManagement.Web.Factories;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
@@ -8,10 +8,10 @@ using System.Security.Claims;
 
 namespace FarmManagement.Web.Controllers;
 
-// Patterns used:
-//   Factory  — ICropFactory maps entity ↔ ViewModel (no manual mapping in controller)
-//   Observer — IEventDispatcher replaces direct IActivityService calls
-//   Facade   — IFarmFacade handles Delete (service + event in one call)
+
+
+
+
 [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper,Agronomist")]
 public class CropController : Controller
 {
@@ -73,7 +73,7 @@ public class CropController : Controller
 
         await _cropService.CreateAsync(vm);
 
-        // Observer Pattern — dispatch event; CropCreatedHandler writes the activity log
+
         await _dispatcher.DispatchAsync(new CropCreatedEvent(
             CurrentUserId, CurrentUserName, CurrentUserRole,
             vm.CropName, vm.CropType, vm.Season.ToString()));
@@ -88,7 +88,7 @@ public class CropController : Controller
         var crop = await _cropService.GetByIdAsync(id);
         if (crop == null) return NotFound();
 
-        // Factory Pattern — single line replaces 8-line manual ViewModel construction
+
         var vm = _cropFactory.ToViewModel(crop);
 
         var prepared = await _cropService.PrepareViewModelAsync(vm);
@@ -110,7 +110,7 @@ public class CropController : Controller
 
         await _cropService.UpdateAsync(vm);
 
-        // Observer Pattern
+
         await _dispatcher.DispatchAsync(new CropUpdatedEvent(
             CurrentUserId, CurrentUserName, CurrentUserRole,
             vm.CropName, vm.Status ?? "Growing"));
@@ -127,7 +127,7 @@ public class CropController : Controller
         var crop = await _cropService.GetByIdAsync(id);
         if (crop == null) return NotFound();
 
-        // Facade Pattern — single call coordinates CropService + event dispatch
+
         await _facade.DeleteCropAsync(
             id, crop.CropName,
             CurrentUserId, CurrentUserName, CurrentUserRole);

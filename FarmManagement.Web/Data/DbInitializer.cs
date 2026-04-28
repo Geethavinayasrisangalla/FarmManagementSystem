@@ -1,4 +1,4 @@
-using FarmManagement.Web.Models.Entities;
+﻿using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Enums;
 using FarmManagement.Web.Services;
 using Microsoft.EntityFrameworkCore;

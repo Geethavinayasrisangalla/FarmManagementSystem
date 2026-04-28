@@ -1,4 +1,4 @@
-using FarmManagement.Web.Events;
+﻿using FarmManagement.Web.Events;
 using FarmManagement.Web.Factories;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Enums;
@@ -10,10 +10,10 @@ using System.Security.Claims;
 
 namespace FarmManagement.Web.Controllers;
 
-// Patterns used:
-//   Factory  — IResourceFactory maps entity ↔ ViewModel
-//   Observer — IEventDispatcher replaces direct IActivityService calls
-//   Facade   — IFarmFacade coordinates Allocate & Delete (multi-service ops)
+
+
+
+
 [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper,Agronomist")]
 public class ResourceController : Controller
 {
@@ -49,7 +49,7 @@ public class ResourceController : Controller
     public async Task<IActionResult> Index(string? search)
     {
         var resources = await _resourceService.GetAllAsync();
-        // Pesticide resources are shown in Pest Incidents, not here
+
         resources = resources.Where(r => r.Type != ResourceType.Pesticide);
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -79,7 +79,7 @@ public class ResourceController : Controller
     [Authorize(Roles = "Admin,Farmer,Storekeeper")]
     public async Task<IActionResult> Create(InventoryViewModel vm)
     {
-        // For Pesticide type, pest fields are required but Name/Quantity/Unit are not
+
         if (vm.Type == ResourceType.Pesticide)
         {
             ModelState.Remove("Name");
@@ -100,7 +100,7 @@ public class ResourceController : Controller
 
         if (vm.Type == ResourceType.Pesticide)
         {
-            // Create a PestIncident only (no resource row needed)
+
             var pest = new PestIncident
             {
                 PestName     = vm.PestName!,
@@ -112,7 +112,7 @@ public class ResourceController : Controller
             };
             await _pestService.CreateAsync(pest);
 
-            // Observer Pattern
+
             await _dispatcher.DispatchAsync(new PestReportedEvent(
                 CurrentUserId, CurrentUserName, CurrentUserRole, vm.PestName!));
 
@@ -122,7 +122,7 @@ public class ResourceController : Controller
 
         await _resourceService.CreateAsync(vm);
 
-        // Observer Pattern
+
         await _dispatcher.DispatchAsync(new ResourceCreatedEvent(
             CurrentUserId, CurrentUserName, CurrentUserRole,
             vm.Name, vm.Quantity, vm.Unit));
@@ -137,7 +137,7 @@ public class ResourceController : Controller
         var resource = await _resourceService.GetByIdAsync(id);
         if (resource == null) return NotFound();
 
-        // Factory Pattern — single line replaces 5-line manual ViewModel construction
+
         var vm = _resourceFactory.ToViewModel(resource);
         return View(vm);
     }
@@ -152,7 +152,7 @@ public class ResourceController : Controller
 
         await _resourceService.UpdateAsync(vm);
 
-        // Observer Pattern
+
         await _dispatcher.DispatchAsync(new ResourceUpdatedEvent(
             CurrentUserId, CurrentUserName, CurrentUserRole,
             vm.Name, vm.Quantity, vm.Unit));
@@ -180,7 +180,7 @@ public class ResourceController : Controller
     {
         try
         {
-            // Facade Pattern — single call coordinates ResourceService + event dispatch
+
             await _facade.AllocateResourceAsync(
                 resourceId, scheduleId, qty, notes,
                 CurrentUserId, CurrentUserName, CurrentUserRole);
@@ -205,7 +205,7 @@ public class ResourceController : Controller
 
         try
         {
-            // Facade Pattern — single call coordinates ResourceService + event dispatch
+
             await _facade.DeleteResourceAsync(
                 id, resource.Name,
                 CurrentUserId, CurrentUserName, CurrentUserRole);

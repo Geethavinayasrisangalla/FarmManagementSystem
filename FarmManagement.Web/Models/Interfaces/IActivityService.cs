@@ -1,4 +1,4 @@
-using FarmManagement.Web.Models.Entities;
+﻿using FarmManagement.Web.Models.Entities;
 
 namespace FarmManagement.Web.Models.Interfaces;
 

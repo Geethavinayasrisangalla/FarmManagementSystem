@@ -1,11 +1,11 @@
-namespace FarmManagement.Web.Services;
+﻿namespace FarmManagement.Web.Services;
 
-// Singleton Pattern — one shared in-memory cache instance for the entire application.
-// Uses Lazy<T> for thread-safe lazy initialisation without explicit locking.
-// Registered as AddSingleton in Program.cs so the DI container manages the lifetime.
+
+
+
 public class FarmCacheService
 {
-    // Classic GoF Singleton — one instance, created on first access, thread-safe via Lazy<T>
+
     private static readonly Lazy<FarmCacheService> _instance =
         new(() => new FarmCacheService(), isThreadSafe: true);
 
@@ -14,7 +14,7 @@ public class FarmCacheService
     private readonly Dictionary<string, (object Value, DateTime ExpiresAt)> _store = new();
     private readonly object _lock = new();
 
-    // Private constructor — prevents external instantiation
+
     private FarmCacheService() { }
 
     public void Set(string key, object value, TimeSpan duration)

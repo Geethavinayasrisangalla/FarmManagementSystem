@@ -1,4 +1,4 @@
-using FarmManagement.Web.Models.Enums;
+﻿using FarmManagement.Web.Models.Enums;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 

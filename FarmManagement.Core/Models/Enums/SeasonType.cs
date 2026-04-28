@@ -1,4 +1,4 @@
-namespace FarmManagement.Web.Models.Enums;
+﻿namespace FarmManagement.Web.Models.Enums;
 
 public enum SeasonType
 {

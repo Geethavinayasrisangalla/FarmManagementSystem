@@ -1,4 +1,4 @@
-using FarmManagement.Web.Data;
+﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Events;
 using FarmManagement.Web.Events.Handlers;
 using FarmManagement.Web.Factories;
@@ -13,19 +13,19 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Database ──────────────────────────────────────────────────────────────────
+
 builder.Services.AddDbContext<FarmDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllersWithViews();
 
-// ── Validation ────────────────────────────────────────────────────────────────
+
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<CropValidator>();
 
-// ── Authentication ────────────────────────────────────────────────────────────
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -34,10 +34,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan  = TimeSpan.FromHours(8);
     });
 
-// ── Caching (Decorator Pattern) ───────────────────────────────────────────────
+
 builder.Services.AddMemoryCache();
 
-// ── Application Services ──────────────────────────────────────────────────────
+
 builder.Services.AddScoped<IFieldService,          FieldService>();
 builder.Services.AddScoped<IPestService,           PestService>();
 builder.Services.AddScoped<IScheduleService,       ScheduleService>();
@@ -46,56 +46,56 @@ builder.Services.AddScoped<IAccountService,        AccountService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddScoped<IActivityService,       ActivityService>();
 
-// Decorator Pattern — register the real CropService by its concrete type,
-// then register ICropService as CachedCropService (which wraps the real one).
+
+
 builder.Services.AddScoped<CropService>();
 builder.Services.AddScoped<ICropService>(provider =>
     new CachedCropService(
         provider.GetRequiredService<CropService>(),
         provider.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>()));
 
-// Strategy Pattern — swap to ReserveAllocationStrategy here to change allocation rules
+
 builder.Services.AddScoped<IAllocationStrategy, StandardAllocationStrategy>();
 builder.Services.AddScoped<IResourceService,    ResourceService>();
 
-// ── Factory Pattern ───────────────────────────────────────────────────────────
+
 builder.Services.AddScoped<ICropFactory,      CropFactory>();
 builder.Services.AddScoped<IFieldFactory,     FieldFactory>();
 builder.Services.AddScoped<IResourceFactory,  ResourceFactory>();
 
-// ── Observer Pattern — Event Dispatcher ──────────────────────────────────────
+
 builder.Services.AddScoped<IEventDispatcher, EventDispatcher>();
 
-// Crop event handlers
+
 builder.Services.AddScoped<IEventHandler<CropCreatedEvent>,  CropCreatedHandler>();
 builder.Services.AddScoped<IEventHandler<CropUpdatedEvent>,  CropUpdatedHandler>();
 builder.Services.AddScoped<IEventHandler<CropDeletedEvent>,  CropDeletedHandler>();
 
-// Field event handlers
+
 builder.Services.AddScoped<IEventHandler<FieldCreatedEvent>, FieldCreatedHandler>();
 builder.Services.AddScoped<IEventHandler<FieldUpdatedEvent>, FieldUpdatedHandler>();
 builder.Services.AddScoped<IEventHandler<FieldDeletedEvent>, FieldDeletedHandler>();
 
-// Resource event handlers
+
 builder.Services.AddScoped<IEventHandler<ResourceCreatedEvent>,   ResourceCreatedHandler>();
 builder.Services.AddScoped<IEventHandler<ResourceUpdatedEvent>,   ResourceUpdatedHandler>();
 builder.Services.AddScoped<IEventHandler<ResourceAllocatedEvent>, ResourceAllocatedHandler>();
 builder.Services.AddScoped<IEventHandler<ResourceDeletedEvent>,   ResourceDeletedHandler>();
 
-// Pest event handlers
+
 builder.Services.AddScoped<IEventHandler<PestReportedEvent>,      PestReportedHandler>();
 builder.Services.AddScoped<IEventHandler<PestStatusUpdatedEvent>, PestStatusUpdatedHandler>();
 builder.Services.AddScoped<IEventHandler<PestDeletedEvent>,       PestDeletedHandler>();
 
-// Schedule / Harvest event handlers
+
 builder.Services.AddScoped<IEventHandler<ScheduleCreatedEvent>,  ScheduleCreatedHandler>();
 builder.Services.AddScoped<IEventHandler<HarvestRecordedEvent>,  HarvestRecordedHandler>();
 builder.Services.AddScoped<IEventHandler<ScheduleDeletedEvent>,  ScheduleDeletedHandler>();
 
-// ── Facade Pattern ────────────────────────────────────────────────────────────
+
 builder.Services.AddScoped<IFarmFacade, FarmFacade>();
 
-// ── Singleton Pattern — one shared cache instance for the entire app ──────────
+
 builder.Services.AddSingleton(FarmCacheService.Instance);
 
 var app = builder.Build();

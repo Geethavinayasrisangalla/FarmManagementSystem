@@ -4,10 +4,10 @@
 
 namespace FarmManagement.Web.Migrations
 {
-    /// <inheritdoc />
+
     public partial class AddYieldReportFields : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<decimal>(
@@ -25,7 +25,7 @@ namespace FarmManagement.Web.Migrations
                 nullable: true);
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(

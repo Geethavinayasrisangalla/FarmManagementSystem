@@ -1,4 +1,4 @@
-using FarmManagement.Web.Events;
+﻿using FarmManagement.Web.Events;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -7,9 +7,9 @@ using System.Security.Claims;
 
 namespace FarmManagement.Web.Controllers;
 
-// Patterns used:
-//   Observer — IEventDispatcher replaces direct IActivityService calls
-//   Facade   — IFarmFacade handles RecordHarvest & Delete (multi-service ops)
+
+
+
 [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper,Agronomist")]
 public class ScheduleController : Controller
 {
@@ -79,7 +79,7 @@ public class ScheduleController : Controller
 
         await _scheduleService.CreateAsync(vm);
 
-        // Observer Pattern
+
         await _dispatcher.DispatchAsync(new ScheduleCreatedEvent(
             CurrentUserId, CurrentUserName, CurrentUserRole,
             vm.ScheduledDate, vm.ExpectedYieldKg));
@@ -165,7 +165,7 @@ public class ScheduleController : Controller
             return RedirectToAction(nameof(RecordHarvest), new { id });
         }
 
-        // Facade Pattern — single call coordinates ScheduleService + event dispatch
+
         await _facade.RecordHarvestAsync(
             id, actualYield, notes,
             CurrentUserId, CurrentUserName, CurrentUserRole);
@@ -179,7 +179,7 @@ public class ScheduleController : Controller
     [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        // Facade Pattern — single call coordinates ScheduleService + event dispatch
+
         await _facade.DeleteScheduleAsync(
             id, CurrentUserId, CurrentUserName, CurrentUserRole);
 

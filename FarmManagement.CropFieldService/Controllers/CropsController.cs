@@ -1,4 +1,4 @@
-using FarmManagement.Web.Data;
+﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +14,7 @@ public class CropsController : ControllerBase
     private readonly FarmDbContext _db;
     public CropsController(FarmDbContext db) => _db = db;
 
-    /// <summary>Get all crops with their associated field.</summary>
+
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] string? search)
     {
@@ -24,7 +24,7 @@ public class CropsController : ControllerBase
         return Ok(await query.OrderByDescending(c => c.CropId).ToListAsync());
     }
 
-    /// <summary>Get a single crop by ID.</summary>
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -36,7 +36,7 @@ public class CropsController : ControllerBase
         return crop is null ? NotFound(new { message = $"Crop {id} not found." }) : Ok(crop);
     }
 
-    /// <summary>Create a new crop.</summary>
+
     [HttpPost]
     [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> Create([FromBody] CropRequest req)
@@ -59,7 +59,7 @@ public class CropsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = crop.CropId }, crop);
     }
 
-    /// <summary>Update an existing crop.</summary>
+
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Admin,Farmer,FieldSupervisor")]
     public async Task<IActionResult> Update(int id, [FromBody] CropRequest req)
@@ -77,7 +77,7 @@ public class CropsController : ControllerBase
         return Ok(crop);
     }
 
-    /// <summary>Delete a crop and all related data.</summary>
+
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin,Farmer")]
     public async Task<IActionResult> Delete(int id)

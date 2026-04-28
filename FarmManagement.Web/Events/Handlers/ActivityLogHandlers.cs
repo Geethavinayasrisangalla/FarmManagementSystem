@@ -1,11 +1,11 @@
-using FarmManagement.Web.Models.Interfaces;
+﻿using FarmManagement.Web.Models.Interfaces;
 
 namespace FarmManagement.Web.Events.Handlers;
 
-// Observer Pattern — each handler listens to one event and writes the activity log.
-// Controllers no longer call IActivityService directly; they just dispatch an event.
 
-// ── Crop Handlers ─────────────────────────────────────────────────────────────
+
+
+
 public class CropCreatedHandler : IEventHandler<CropCreatedEvent>
 {
     private readonly IActivityService _activity;
@@ -39,7 +39,7 @@ public class CropDeletedHandler : IEventHandler<CropDeletedEvent>
             $"Deleted crop '{e.CropName}'");
 }
 
-// ── Field Handlers ────────────────────────────────────────────────────────────
+
 public class FieldCreatedHandler : IEventHandler<FieldCreatedEvent>
 {
     private readonly IActivityService _activity;
@@ -73,7 +73,7 @@ public class FieldDeletedHandler : IEventHandler<FieldDeletedEvent>
             $"Deleted field '{e.FieldName}'");
 }
 
-// ── Resource Handlers ─────────────────────────────────────────────────────────
+
 public class ResourceCreatedHandler : IEventHandler<ResourceCreatedEvent>
 {
     private readonly IActivityService _activity;
@@ -118,7 +118,7 @@ public class ResourceDeletedHandler : IEventHandler<ResourceDeletedEvent>
             $"Deleted resource '{e.Name}'");
 }
 
-// ── Pest Handlers ─────────────────────────────────────────────────────────────
+
 public class PestReportedHandler : IEventHandler<PestReportedEvent>
 {
     private readonly IActivityService _activity;
@@ -152,7 +152,7 @@ public class PestDeletedHandler : IEventHandler<PestDeletedEvent>
             $"Deleted pest incident: '{e.PestName}'");
 }
 
-// ── Schedule / Harvest Handlers ───────────────────────────────────────────────
+
 public class ScheduleCreatedHandler : IEventHandler<ScheduleCreatedEvent>
 {
     private readonly IActivityService _activity;

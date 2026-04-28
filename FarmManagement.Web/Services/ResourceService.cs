@@ -1,4 +1,4 @@
-using FarmManagement.Web.Data;
+﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FarmManagement.Web.Services;
 
-// Strategy Pattern — allocation behaviour is injected via IAllocationStrategy.
-// Swap StandardAllocationStrategy for ReserveAllocationStrategy in Program.cs
-// without changing any code here.
+
+
+
 public class ResourceService : IResourceService
 {
     private readonly FarmDbContext       _db;
@@ -89,7 +89,7 @@ public class ResourceService : IResourceService
         var resource = await _db.Resources.FindAsync(resourceId)
                        ?? throw new KeyNotFoundException("Resource not found.");
 
-        // Strategy Pattern — delegates the allocation rule to the injected strategy
+
         await _allocationStrategy.AllocateAsync(resource, qty);
 
         resource.LastUpdated = DateTime.Now;

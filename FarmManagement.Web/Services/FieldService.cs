@@ -1,4 +1,4 @@
-using FarmManagement.Web.Data;
+﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
@@ -60,7 +60,7 @@ public class FieldService : IFieldService
 
         if (field == null) return;
 
-        // Remove child records bottom-up to avoid FK constraint errors
+
         foreach (var crop in field.Crops)
         {
             _db.PestIncidents.RemoveRange(crop.PestIncidents);

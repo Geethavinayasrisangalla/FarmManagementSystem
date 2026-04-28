@@ -1,8 +1,8 @@
-using FarmManagement.Web.Models.Entities;
+﻿using FarmManagement.Web.Models.Entities;
 
 namespace FarmManagement.Web.Services.Strategies;
 
-// Strategy Pattern — conservative strategy: always keeps 20% of stock in reserve
+
 public class ReserveAllocationStrategy : IAllocationStrategy
 {
     private const decimal ReservePercent = 0.20m;

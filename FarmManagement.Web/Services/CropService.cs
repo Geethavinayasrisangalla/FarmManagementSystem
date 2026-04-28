@@ -1,4 +1,4 @@
-using FarmManagement.Web.Data;
+﻿using FarmManagement.Web.Data;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Interfaces;
 using FarmManagement.Web.Models.ViewModels;
@@ -7,22 +7,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FarmManagement.Web.Services;
 
-// Template Method Pattern — extends BaseEntityService which defines the Create skeleton.
-// CropService implements BuildEntity (required) and ValidateViewModel (optional hook).
+
+
 public class CropService : BaseEntityService<Crop, CropViewModel>, ICropService
 {
     public CropService(FarmDbContext db) : base(db) { }
 
-    // ── Template Method hooks ────────────────────────────────────────────────
 
-    // Step 1 hook — custom business-rule validation before saving
+
+
     protected override void ValidateViewModel(CropViewModel vm)
     {
         if (vm.PlantingDate >= vm.ExpectedHarvestDate)
             throw new ArgumentException("Planting date must be before the expected harvest date.");
     }
 
-    // Step 2 — constructs the Crop entity from the ViewModel
+
     protected override Crop BuildEntity(CropViewModel vm) => new Crop
     {
         CropName            = vm.CropName,
@@ -34,7 +34,7 @@ public class CropService : BaseEntityService<Crop, CropViewModel>, ICropService
         Status              = "Growing"
     };
 
-    // ── ICropService implementation ──────────────────────────────────────────
+
 
     public async Task<IEnumerable<Crop>> GetAllAsync() =>
         await _db.Crops.AsNoTracking()
@@ -49,7 +49,7 @@ public class CropService : BaseEntityService<Crop, CropViewModel>, ICropService
                        .Include(c => c.PlantingSchedules)
                        .FirstOrDefaultAsync(c => c.CropId == id);
 
-    // Delegates to the base template method — Validate → BuildEntity → Save → AfterCreate
+
     public async Task CreateAsync(CropViewModel vm) => await TemplateCreateAsync(vm);
 
     public async Task UpdateAsync(CropViewModel vm)

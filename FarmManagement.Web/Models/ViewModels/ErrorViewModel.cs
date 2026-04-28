@@ -1,4 +1,4 @@
-namespace FarmManagement.Web.Models.ViewModels;
+﻿namespace FarmManagement.Web.Models.ViewModels;
 
 public class ErrorViewModel
 {

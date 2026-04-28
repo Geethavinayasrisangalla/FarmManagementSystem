@@ -1,8 +1,8 @@
-using FarmManagement.Web.Models.Entities;
+﻿using FarmManagement.Web.Models.Entities;
 
 namespace FarmManagement.Web.Services.Strategies;
 
-// Strategy Pattern — default strategy: deducts stock immediately, no reserve floor
+
 public class StandardAllocationStrategy : IAllocationStrategy
 {
     public Task AllocateAsync(Resource resource, decimal quantity)

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using FarmManagement.Web.Models.Entities;
 
 namespace FarmManagement.Web.Data;

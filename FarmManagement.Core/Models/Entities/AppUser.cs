@@ -1,4 +1,4 @@
-using FarmManagement.Web.Models.Enums;
+﻿using FarmManagement.Web.Models.Enums;
 
 namespace FarmManagement.Web.Models.Entities;
 

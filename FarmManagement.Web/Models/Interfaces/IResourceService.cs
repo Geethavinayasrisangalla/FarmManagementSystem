@@ -11,6 +11,6 @@ public interface IResourceService
     Task CreateAsync(InventoryViewModel vm, int pestIncidentId);
     Task UpdateAsync(InventoryViewModel vm);
     Task DeleteAsync(int id);
-    Task AllocateAsync(int resourceId, int scheduleId, decimal qty, string? notes); // fixed: fieldId → scheduleId
+    Task AllocateAsync(int resourceId, int scheduleId, decimal qty, string? notes);
     Task<IEnumerable<Resource>> GetLowStockAsync(decimal threshold = 10);
 }

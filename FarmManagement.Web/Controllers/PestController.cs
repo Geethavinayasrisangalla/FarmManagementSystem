@@ -1,4 +1,4 @@
-using FarmManagement.Web.Events;
+﻿using FarmManagement.Web.Events;
 using FarmManagement.Web.Models.Entities;
 using FarmManagement.Web.Models.Enums;
 using FarmManagement.Web.Models.Interfaces;
@@ -10,10 +10,10 @@ using System.Security.Claims;
 
 namespace FarmManagement.Web.Controllers;
 
-// Patterns used:
-//   State    — PestStateMachine enforces valid status transitions (Active→Monitoring→Resolved)
-//   Observer — IEventDispatcher replaces direct IActivityService calls
-//   Facade   — IFarmFacade handles Delete (service + event in one call)
+
+
+
+
 [Authorize(Roles = "Admin,Farmer,FieldSupervisor,Storekeeper,Agronomist")]
 public class PestController : Controller
 {
@@ -82,7 +82,7 @@ public class PestController : Controller
 
         await _pestService.CreateAsync(pest);
 
-        // Observer Pattern
+
         await _dispatcher.DispatchAsync(new PestReportedEvent(
             CurrentUserId, CurrentUserName, CurrentUserRole, pest.PestName));
 
@@ -134,10 +134,10 @@ public class PestController : Controller
 
         try
         {
-            // State Pattern — PestService uses PestStateMachine to validate the transition
+
             await _pestService.UpdateStatusAsync(id, status);
 
-            // Observer Pattern
+
             await _dispatcher.DispatchAsync(new PestStatusUpdatedEvent(
                 CurrentUserId, CurrentUserName, CurrentUserRole,
                 incident.PestName, status));
@@ -159,7 +159,7 @@ public class PestController : Controller
         var incident = await _pestService.GetByIdAsync(id);
         if (incident == null) return NotFound();
 
-        // Facade Pattern — single call coordinates PestService + event dispatch
+
         await _facade.DeletePestAsync(
             id, incident.PestName,
             CurrentUserId, CurrentUserName, CurrentUserRole);
@@ -168,7 +168,7 @@ public class PestController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // ── Pest Resource Management (Pesticide type only) ──
+
 
     public async Task<IActionResult> AddResource(int id)
     {

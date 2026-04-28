@@ -10,6 +10,6 @@ public class ResourceDto
     public decimal Quantity { get; set; }
     public string? Unit { get; set; }
 
-    // Computed flag for dashboard low-stock alert
+
     public bool IsLowStock => Quantity <= 10;
 }

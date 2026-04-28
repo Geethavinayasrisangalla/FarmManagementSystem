@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FarmManagement.Web.Migrations
 {
-    /// <inheritdoc />
+
     public partial class FinalDatabaseSetup : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -250,7 +250,7 @@ namespace FarmManagement.Web.Migrations
                 column: "CropId");
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

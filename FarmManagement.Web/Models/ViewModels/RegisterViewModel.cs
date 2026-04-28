@@ -1,4 +1,4 @@
-using FarmManagement.Web.Models.Enums;
+﻿using FarmManagement.Web.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace FarmManagement.Web.Models.ViewModels;

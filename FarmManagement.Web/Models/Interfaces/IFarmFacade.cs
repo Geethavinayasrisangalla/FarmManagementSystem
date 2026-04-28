@@ -1,6 +1,6 @@
-namespace FarmManagement.Web.Models.Interfaces;
+﻿namespace FarmManagement.Web.Models.Interfaces;
 
-// Facade Pattern — single entry point for complex multi-service operations
+
 public interface IFarmFacade
 {
     Task AllocateResourceAsync(int resourceId, int scheduleId, decimal qty, string? notes,

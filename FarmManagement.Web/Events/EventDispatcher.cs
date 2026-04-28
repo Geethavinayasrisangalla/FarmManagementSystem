@@ -1,6 +1,6 @@
-namespace FarmManagement.Web.Events;
+﻿namespace FarmManagement.Web.Events;
 
-// Observer Pattern — resolves all registered handlers for an event and calls each one
+
 public class EventDispatcher : IEventDispatcher
 {
     private readonly IServiceProvider _provider;

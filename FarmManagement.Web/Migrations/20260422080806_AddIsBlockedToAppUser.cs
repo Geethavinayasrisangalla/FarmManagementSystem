@@ -4,10 +4,10 @@
 
 namespace FarmManagement.Web.Migrations
 {
-    /// <inheritdoc />
+
     public partial class AddIsBlockedToAppUser : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<bool>(
@@ -18,7 +18,7 @@ namespace FarmManagement.Web.Migrations
                 defaultValue: false);
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
